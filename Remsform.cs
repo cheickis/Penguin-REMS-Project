@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace Penguin__REMS_Project
 {
-    public partial class Form1 : Form
+    public partial class Remsform : Form
     {
-        public Form1()
+        public Remsform()
         {
             InitializeComponent();
         }
