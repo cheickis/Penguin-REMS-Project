@@ -1,0 +1,1752 @@
+﻿
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Reflection;
+using System.IO;
+using System.IO.Ports;
+using System.Diagnostics;
+using System.Threading;
+
+
+namespace Penguin__REMS_Project
+{
+    delegate void ObtainPositonDelegate(double x, double y, double z);
+    delegate void ObtainOrientationDelegate(double r, double p, double y);
+    //private delegate double[] PositionOrientationInterpreterDelegate(byte[] _data);
+
+    class TalinDataProcess
+    {
+        delegate void DataProcessDelegate(byte[] _data);
+
+        public bool Write2File = false;
+        private StreamWriter sw;
+        public bool WriteRawData = false;
+        public bool AllowRewriteConfigure = false;
+
+        //for VCT information TT01x, Reading information need two layer command
+        //First layer is command of TR01Hx, Second layer is command [10, 10, 60]
+        //Then TT01x bytes will be read.
+        private static ManualResetEvent receiveGeneralCommand = new ManualResetEvent(false);
+        private string readConfiguration1;
+        private string presetConfiguration1;
+        private byte[] Configuration1PresetCommand;
+        private bool Configuration1Presence = false;
+        private static ManualResetEvent receiveConfiguration1 = new ManualResetEvent(false);
+        private string readConfiguration2;
+        private string presetConfiguration2;
+        private byte[] Configuration2PresetCommand;
+        private bool Configuration2Presence = false;
+        private static ManualResetEvent receiveConfiguration2 = new ManualResetEvent(false);
+        private string readBoreSight1;
+        private string presetBoreSight1;
+        private byte[] BoreSightPresetCommand;
+        private bool BoresightPresence = false;
+        private static ManualResetEvent receiveBoreSight1 = new ManualResetEvent(false);
+        private string readLeverArm;
+        private string presetLeverArm;
+        private byte[] LeverArmPresetCommand;
+        private bool LeverArmPresence = false;
+        private static ManualResetEvent receiveLeverArm = new ManualResetEvent(false);
+        private string readGravityReference;
+        private string presetGravityReference;
+        private byte[] GravityReferencePresetCommand;
+        private static ManualResetEvent receiveGravityReference = new ManualResetEvent(false);
+        private string CommPort = "COM7";
+
+        private byte presetInitialZone;
+        private byte[] presetInitialEasting = new byte[4];
+        private byte[] presetInitialNorthing = new byte[4];
+        private byte[] presetInitialElevation = new byte[4];
+        private static ManualResetEvent receiveInitialPosition = new ManualResetEvent(false);
+
+        private byte[] readStatus = new byte[64];
+        private static ManualResetEvent receiveStatus = new ManualResetEvent(false);
+
+        private const byte DLE = 0x10;
+        private const byte STX = 0x02;
+        private const byte ETX = 0x03;
+        private const int positionaccuracy = -7;
+        private const int angleaccuracy = -31;
+        private const int offsetaccuracy = -7;
+        private const int linearvelocityaccuracy = -20;
+        private const int angularvelocityaccuracy = -12;
+        private const int angularaccelerationaccuracy = -10;
+        private const int lieanraccelerationaccuracy = -7;
+        private const int headingerroraccuracy = -15;
+        private const int rotationpointaccuracy = -15;
+        private static readonly byte[] Prefix = new byte[] { DLE, STX };
+        private static readonly byte[] Surfix = new byte[] { DLE, ETX };
+        private bool requestCommandSend = false;
+        private UInt16 ZoneID;
+        private UInt16 PositionFormat;
+        private double initialEast, initialNorth, initialElevation;
+        private double initialRefereceGravity, initialMaterialDensity, initialDeflection1, initialDeflection2;
+
+        public double elevation_display = 0;
+        public int TalinMode = 0;
+        private TalinStatus TS = new TalinStatus();
+
+        private byte singlebyte = 0x00;
+        private bool singlebyteexist = false;
+
+        public struct TalinStatus
+        {
+            public bool NavigationMode;
+            public bool OutofTravelLock;
+            public int AlignmentTimeLeft;
+            public bool Configuration1Presence;
+            public bool BoreSightPresence;
+            public bool AbleCompleteAlign;
+            public bool InitialPositionReceived;
+
+            public TalinStatus(byte MW2, byte AW11, byte SW12, byte ATG1, byte ATG2)
+            {
+                NavigationMode = ((MW2 & 0x40) > 0);
+                OutofTravelLock = !((SW12 & 0x02) > 0);
+                byte[] AlignTimebyte = { ATG1, ATG2 };
+                if (BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(AlignTimebyte);
+                }
+                AlignmentTimeLeft = Convert.ToInt32(BitConverter.ToUInt16(AlignTimebyte, 0));
+                Configuration1Presence = !((AW11 & 0x20) > 0);
+                BoreSightPresence = !((AW11 & 0x40) > 0);
+                AbleCompleteAlign = !((AW11 & 0x08) > 0);
+                InitialPositionReceived = !((AW11 & 0x10) > 0);
+            }
+
+        }
+
+
+        #region TalinCommandRegion
+
+        private static readonly byte[] TalinShutDown = new byte[] { 0x41, 0x00, 0x3C, 0x00, 0x00, 0x00, 0x0A };
+
+        private static readonly byte[] TalinTravelLock = new byte[] { 0x41, 0x00, 0x3C, 0x00, 0x00, 0x00, 0x3D };
+
+        private static readonly byte[] TalinOutTravelLock = new byte[] { 0x41, 0x00, 0x3C, 0x00, 0x00, 0x00, 0x3C };
+
+        private static readonly byte[] OrientationRequestOnly = new byte[] { 0x02, 0x41, 0x8B };
+        private static readonly byte[] OrientationRequestAll = new byte[] { 0x02, 0x40, 0xE0 };  //in 12 Hz
+        private static readonly byte[] OrientationStopAll = new byte[] { 0x02, 0x00, 0xE0 };  //in 12 Hz Stop
+        private static readonly byte[] PositionRequestOnly = new byte[] { 0x03, 0x41, 0x4E };
+        private static readonly byte[] PositionRequestAll = new byte[] { 0x03, 0x40, 0xD5 };     //in 12 Hz
+        private static readonly byte[] PositionStopAll = new byte[] { 0x03, 0x00, 0xD5 };     //in 12 Hz
+        private static readonly byte[] PositionUpdateNorth = new byte[] { 0x00, 0x28, 0xB8, 0x00, 0x00, 0x02 };
+        private static readonly byte[] PositionUpdateSouth = new byte[] { 0x00, 0x28, 0xB8, 0x00, 0x80, 0x02 };
+        // 0x0028 = 40 Position update 
+        // 0xB800 - Data Validity (Bit: 1011 1000 0000 0000 in sequence Grid Zone Validity, Grid Square Invalidity, Horizontal Validate,
+        //                                 Altitude Validate, Datum ID invalidity, Position Uncertainty inValid, Lever Arm Invalid, then spares. 
+        // 0x00 - bit in sequency: Hemisphere - Northern; Zone - Normal; Altitude ref - MSL (mean sea level); spares (3); Ox80 is for southern.
+        // 0x02 - Coordinate ReferenceUTM format, UTM is 2 . 
+
+
+        //Gravity Mode
+        //Gravity Mode Position request
+        private static readonly byte[] GravityModePositionRequest = new byte[] { 0x00, 0x5A, 0xFF, 0xE6, 0x00, 0x00, 0x00, 0x00 };
+        //0x005A = Mode Command 90 for gravity mode
+        //0xFF = User Defined Sync code
+        //0xE6 = Data Code 230
+        //Others are data validity code and Configuration Code Number
+
+        //Update the gravity mode position - Question: it is used for build Gravity model numbers or initial position?
+        private static readonly byte[] GravityModePositionUpdate = new byte[] { 0x00, 0xE6, 0xC0, 0x00, 0x00, 0x00, 0xFF, 0xFF };
+
+        private static readonly byte[] GravityModeAllPositionUpdate = new byte[] { 0x00, 0xE6, 0xF8, 0x00, 0x00, 0x00, 0xFF, 0xFF };
+        // 0x00E6 = 230 - Data ID Code;
+        // 0xC000 - Data Validity : C000 - only update reference positions
+        //                          F800 - update the reference position/gravity reference/Material density reference/Deflection of vertical
+        // 0x0000 - Configuration Code Number: 0000 use current configuration
+        // 0xFFFF - Model number: 0000 for surface and 0xFFFF for underground; Maybe - 0x0001 for underground and 0x0000 for surface.
+
+        private static readonly byte[] VehicleConfiguration1Request = new byte[] { 0x41, 0x00, 0x50, 0x00, 0x0A };
+        // 0x41 message ID
+        // 0x50 5HZ;
+        // 0x60 reading first word to first offset word for now
+        // 0x0050 = 80 - Data ID Code;
+        // 0x00 - Sync Code to setect which information is request
+        // 0x0A = 10 - Data Code
+        // 0x00 - Current Configuration
+        private static readonly byte[] VehicleConfiguration2Request = new byte[] { 0x41, 0x00, 0x50, 0x00, 0x14 };
+        // 0x0E - Sync Code to setect which information is request
+        // 0x014 = 20 - Data Code
+        private static readonly byte[] VehicleBoreSight1Request = new byte[] { 0x41, 0x00, 0x50, 0x00, 0xA1 };
+        // 0x41 message ID
+        // 0x50 5HZ;
+        // 0x60 reading first word to first offset word for now
+        // 0x0050 = 80 - Data ID Code;
+        // 0x0F - Sync Code to setect which information is request
+        // 0x0A = 10 - Data Code
+        // 0x00 - Current Configuration
+        private static readonly byte[] TalinGeneralReading = new byte[] { 0x10, 0x02, 0x01, 0x10, 0x10, 0x60, 0x7F, 0x10, 0x03 };
+        private static readonly byte[] ReadLeverArm = new byte[] { 0x41, 0x00, 0x50, 0x00, 0x8C, 0x00, 0x00 }; //F8, 00,00,00
+
+        //private static readonly byte[] ReadRotationPoint1 = new byte[] { 0x41, 0x00, 0x50, 0x00, 0x97, 0x00, 0x00 };
+        //private static readonly byte[] ReadRotationPoint2 = new byte[] { 0x41, 0x00, 0x50, 0x00, 0x98, 0x00, 0x00 };
+
+        private static readonly byte[] ReadGravityModeReference = new byte[] { 0x41, 0x00, 0x50, 0x00, 0xE6, 0x00, 0x00 };
+
+        private static readonly byte[] GravityModePositionCommand = new byte[] { 0x41, 0x00, 0x50, 0x00, 0x3C };
+        private static readonly byte[] ReadGravityModePosition = new byte[] { 0x01, 0x40, 0x60 };
+        private static readonly byte[] ReadStatus = new byte[] { 0x04, 0x10, 0x10, 0x60 };
+        private static readonly byte[] ReadStatus1Hz = new byte[] { 0x04, 0x20, 0x60 };
+        private static readonly byte[] ReadStatusStop = new byte[] { 0x04, 0x00, 0x60 };
+        #endregion
+
+        #region dataconvertingregion
+        /// <summary>
+        /// Convert a string to a double with assigned accuracy for Talin
+        /// </summary>
+        /// <param name="tempstr"> the string contain a decimal</param>
+        /// <returns></returns>
+        private byte[] Decimal_TalinDoubleWordsFloat(string tempstr, int accuracyvalue)
+        {
+            byte[] tempbyte = new byte[4];
+            try
+            {
+                double tempdbl = Convert.ToDouble(tempstr) * Math.Pow(2, -accuracyvalue);
+                Int32 tempint = Convert.ToInt32(tempdbl);
+                tempbyte = BitConverter.GetBytes(tempint);
+                if (BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(tempbyte);
+                }
+                return tempbyte;
+            }
+            catch (Exception er)
+            {
+                byte[] temp = new byte[4] { 0xFF, 0xFF, 0xFF, 0xFF };
+                return temp;
+            }
+
+        }
+
+        /// <summary>
+        /// Convert a string with 4 bytes to a double with assigned accuracy for Talin
+        /// </summary>
+        /// <param name="temp"> the double number</param>
+        /// <returns></returns>
+        private byte[] Decimal_TalinDoubleWordsFloat(double temp, int accuracyvalue)
+        {
+            double tempdbl = temp * Math.Pow(2, -accuracyvalue);
+            Int32 tempint = Convert.ToInt32(tempdbl);
+            byte[] tempbyte = BitConverter.GetBytes(tempint);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(tempbyte);
+            }
+            return tempbyte;
+        }
+        /// <summary>
+        /// Convert a double to double number with assigned accuracy for Talin.
+        /// </summary>
+        /// <param name="data"> 4 bytes contains a number</param>
+        /// <returns></returns>
+        private double TalinDoubleWordsFloat_Double(byte[] data, int accuracyvalue)
+        {
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(data);
+            }
+            double tempdbl = BitConverter.ToInt32(data, 0) * Math.Pow(2, accuracyvalue);
+            return tempdbl;
+        }
+
+        /// <summary>
+        /// Convert a string with 2 bytes to accuracy double for Talin
+        /// </summary>
+        /// <param name="tempstr"> the string contain a decimal</param>
+        /// <returns></returns>
+        private byte[] Decimal_TalinSingleWordFloat(string tempstr, int accuracyvalue)
+        {
+            byte[] tempbyte = new byte[4];
+            try
+            {
+                double tempdbl = Convert.ToDouble(tempstr) * Math.Pow(2, -accuracyvalue);
+                Int32 tempint = Convert.ToInt32(tempdbl);
+                tempbyte = BitConverter.GetBytes(tempint);
+                if (BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(tempbyte);
+                }
+                return tempbyte;
+            }
+            catch (Exception err)
+            {
+                byte[] temp = new byte[4] { 0xFF, 0xFF, 0xFF, 0xFF };
+                return temp;
+            }
+        }
+        /// <summary>
+        /// Convert a double number to 2 bytes floating number for Talin with assigned accuracy
+        /// </summary>
+        /// <param name="temp"> the double number </param>
+        /// <returns></returns>
+        private byte[] Decimal_TalinSingleWordFloat(double temp, int accuracyvalue)
+        {
+            double tempdbl = temp * Math.Pow(2, -accuracyvalue);
+            Int32 tempint = Convert.ToInt32(tempdbl);
+            byte[] tempbyte = BitConverter.GetBytes(tempint);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(tempbyte);
+            }
+            //byte[] results = new byte[2] { tempbyte[3], tempbyte[4] };
+            return tempbyte;
+        }
+        /// <summary>
+        /// Convert a double number to 2 bytes floating number for Talin with assigned accuracy.
+        /// </summary>
+        /// <param name="data"> 4 bytes contains a number</param>
+        /// <returns></returns>
+        private double TalinSingleWordsFloat_Double(byte[] data, int accuracyvalue)
+        {
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(data);
+            }
+            double tempdbl = BitConverter.ToInt16(data, 0) * Math.Pow(2, accuracyvalue);
+            return tempdbl;
+        }
+
+        private byte[] Hexstring2byte(string buffer)
+        {
+            string str = buffer;
+            string[] fields = str.Split('-');
+            byte[] _command = new byte[fields.Length];
+            for (int i = 0; i < fields.Length; i++)
+            {
+                _command[i] = Convert.ToByte(fields[i], 16);
+            }
+            return _command;
+        }
+
+        private byte[] ReceiveDataRemoveHex10(byte[] Command, int bytestart)
+        {
+            byte[] temp = new byte[Command.Length];
+            int j = 0;
+            for (int i = 0; i < Command.Length; i++)
+            {
+                temp[j] = Command[i];
+                j++;
+                if (((i > bytestart) && (i < Command.Length - 3)) && ((Command[i] == 0x10) && (Command[i + 1] == 0x10)))
+                {
+                    i++;
+                }
+            }
+
+            byte[] results = new byte[j];
+            System.Buffer.BlockCopy(temp, 0, results, 0, j);
+            return results;
+        }
+
+        #endregion
+
+        public void StartWriteFile(string FileName)
+        {
+            sw = new StreamWriter(FileName);
+            //Write2File = true;
+        }
+
+        public void EndWriteFile()
+        {
+            sw.Close();
+            Write2File = false;
+        }
+
+        #region Talin_InitialProcess
+        private bool readPresetData()
+        {
+            try
+            {
+                StreamReader sr = new StreamReader("TalinConfig.cfg");
+                int j = 0;
+                string line;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    string[] fields = line.Split('=', ',');
+                    string valuetoremove2 = " ";
+                    fields = fields.Where(val => val != valuetoremove2).ToArray();
+                    if (j == 0)
+                    {
+                        CommPort = fields[1].Trim();
+                    }
+                    if (j == 1)
+                    {
+                        presetConfiguration1 = fields[1].Trim();
+                    }
+                    if (j == 2)
+                    {
+                        Configuration1PresetCommand = Hexstring2byte(fields[1].Trim());
+                    }
+
+                    if (j == 3)
+                    {
+                        presetBoreSight1 = fields[1].Trim();
+                    }
+                    if (j == 4)
+                    {
+                        BoreSightPresetCommand = Hexstring2byte(fields[1].Trim());
+                    }
+                    if (j == 5)
+                    {
+                        presetLeverArm = fields[1].Trim();
+                    }
+                    if (j == 6)
+                    {
+                        LeverArmPresetCommand = Hexstring2byte(fields[1].Trim());
+                    }
+                    /*if (j==6)
+                    {
+                        presetInitialZone = Convert.ToByte(fields[1].Trim(), 16);
+                        presetInitialEasting = string2byte(fields[2].Trim());
+                        presetInitialNorthing = string2byte(fields[3].Trim());
+                        presetInitialElevation = string2byte(fields[4].Trim());
+                        double IntialEasting = TalinDoubleWordsFloat_Double(presetInitialEasting,positionaccuracy);
+                        double IntialNorthing = TalinDoubleWordsFloat_Double(presetInitialNorthing,positionaccuracy);
+                        double IntialElevation = TalinDoubleWordsFloat_Double(presetInitialElevation,positionaccuracy);
+                    }
+                    if (j==7)
+                    {
+                        presetGravityReference = fields[1].Trim();
+                    }
+                    if (j==8)
+                    {
+                        GravityReferencePresetCommand = string2byte(fields[1].Trim());
+                    }*/
+                    j++;
+                }
+                if (j < 6)
+                {
+                    //Console.SetCursorPosition(1, 43);
+                    //Console.WriteLine("Software Configuration File Missing Lines!");
+                    return false;
+                }
+                sr.Close();
+                return true;
+            }
+            catch
+            {
+                //Console.SetCursorPosition(1, 43);
+                //Console.WriteLine("Software Configuration File Error!");
+                return false;
+            }
+
+
+        }
+        private byte[] ReadConfig4WriteCommand(byte[] readConfig)
+        {
+            byte[] results;
+            byte[] temp = new byte[90];
+            byte dataID = readConfig[7];
+            int L = readConfig.Length;
+
+            temp[2] = 0x41;
+            temp[3] = 0x00;
+            temp[4] = dataID;
+            int ValidDataStart = 12;  //10-02-01-10-10-60-00-DataID-Reserve-Reserve
+
+            switch (dataID)
+            {
+                case 0x0A: //Configuration 1
+                    temp[5] = 0xFF;  //Data Valid bytes
+                    temp[6] = 0xC0;
+                    break;
+                case 0x14: //Configuration 2
+                    temp[5] = 0x2C;
+                    temp[6] = 0xF8;
+                    break;
+                case 0xA0: //BoreSight
+                    ValidDataStart = 14;  //Four reserves
+                    temp[5] = 0xF0;
+                    temp[6] = 0x00;
+                    break;
+                case 0x8C: //Lever Arm
+                    temp[5] = 0x60;   //If GPS is include change to 0x70
+                    temp[6] = 0x00;
+                    break;
+                default:
+                    results = new byte[2];
+                    return results;
+            }
+            int ValidDataLenght = L - 3 - ValidDataStart;  // ...-checksum-10-03
+            int bytepointer = 7;
+            System.Buffer.BlockCopy(readConfig, ValidDataStart, temp, bytepointer, ValidDataLenght);
+            bytepointer += ValidDataLenght;
+            //Get CheckSum
+            temp[bytepointer++] = CalculateChecksum(temp);
+
+            temp[0] = DLE;
+            temp[1] = STX;
+            temp[bytepointer++] = DLE;
+            temp[bytepointer++] = ETX;
+            results = new byte[bytepointer];
+            System.Buffer.BlockCopy(temp, 0, results, 0, bytepointer);
+            return results;
+        }
+        private bool writePresetFile()
+        {
+            try
+            {
+                StreamWriter sr = new StreamWriter("TalinConfig.cfg");
+                sr.WriteLine("Comm Port = " + CommPort);
+                sr.WriteLine("Vehicle Configuration 1 Setup = " + presetConfiguration1);
+                sr.WriteLine("Vehicle Configuration 1 Command = " + BitConverter.ToString(Configuration1PresetCommand));
+                sr.WriteLine("Bore Sight 1 Setup = " + presetBoreSight1);
+                sr.WriteLine("Bore Sight 1 Command = " + BitConverter.ToString(BoreSightPresetCommand));
+                sr.WriteLine("Lever Arm Setup = " + presetConfiguration1);
+                sr.WriteLine("Lever Arm Command = " + LeverArmPresetCommand);
+                //sr.WriteLine("Initial Position = " + BitConverter.ToString(presetInitialEasting) + ", " + BitConverter.ToString(presetInitialNorthing) + ", " + BitConverter.ToString(presetInitialElevation));
+                //sr.WriteLine("Gravity Reference Setup = " + presetGravityReference );
+                // sr.WriteLine("Gravity Reference Command = " + BitConverter.ToString(GravityReferencePresetCommand));
+                sr.Close();
+                return true;
+            }
+            catch (Exception er)
+            {
+                //Console.SetCursorPosition(1, 43);
+                //Console.WriteLine("Write Configuration File Error!" + er.ToString());
+                return false;
+            }
+        }
+
+
+        /*
+                /// <summary>
+                /// Send commands to check the Configurations 
+                /// </summary>
+                /// <returns> Shut down of not</returns>
+                private int CheckVCT()
+                {
+                    int shutdownRequest = 0;
+                    int RewriteConfigurationFile = 0x00;
+                    try
+                    {
+                        string X;
+                        Configuration1Presence = false;
+                        //Configuration2Presence = false;
+                        BoresightPresence = false;
+                        //LeverArmPresence = false;
+                        byte[] _command;
+                        //Check Status -vehicle configuration - boresight angle presence 
+                        //_command = ReadStatus;
+                        byte[] OrginazedCommand = SerialSendCommand(ReadStatus);
+                        SerialSend(OrginazedCommand);
+                        if (receiveStatus.WaitOne(new TimeSpan(0, 0, 15)) == false)
+                        {
+                            //Console.SetCursorPosition(1, 43);
+                            //Console.WriteLine("Talin Communication Time out !");
+                            throw new TimeoutException();
+                        }
+
+                        //check Configuration 1
+                        //_command = VehicleBoreSight1Request;
+                        bool UpdateRequest = false;
+                        if (TS.Configuration1Presence == true)
+                        {
+                            OrginazedCommand = SerialSendCommand(VehicleConfiguration1Request);
+                            SerialSend(OrginazedCommand);
+                            receiveGeneralCommand.WaitOne(new TimeSpan(0, 0, 15));
+
+                            do
+                            {
+                                SerialSend(TalinGeneralReading);
+                            }
+                            while (receiveConfiguration1.WaitOne(new TimeSpan(0, 0, 15)) == false);
+
+                            if (readConfiguration1 == presetConfiguration1)
+                            {
+                                //Console.SetCursorPosition(1, 21);
+                                //Console.WriteLine("Vehicle Configuration 1 Checked!");
+                            }
+                            else
+                            {
+                                UpdateRequest = true;
+                            }
+                        }
+                        else
+                        {
+                            UpdateRequest = true;
+                        }
+
+                        if (UpdateRequest == true)
+                        {
+                            //Console.SetCursorPosition(1, 25);
+                            //Console.WriteLine("Vehicle Configuration 1 NOT match the saved data or not present.  Update from the saved configuration?");
+                            //Console.WriteLine("Y - Update from the saved configuration; Other key -Cancel.");
+                            if (AllowRewriteConfigure)
+                                //Console.WriteLine("W - Write the new configuration to Configuration File!");
+                            X = //Console.ReadLine();
+                            if ((X[0] == 'y') || (X[0] == 'Y'))
+                            {
+                                SerialSend(Configuration1PresetCommand);
+                                //Console.SetCursorPosition(1, 28);
+                                do
+                                {
+                                    //Console.Write(".");
+                                }
+                                while (receiveGeneralCommand.WaitOne(new TimeSpan(0, 0, 15)) == false);
+
+                                shutdownRequest = 0x01;
+                                //Console.SetCursorPosition(1, 28);
+                                //Console.WriteLine("Recycle the Talin Power is required.               ");
+
+                            }
+                            else
+                            {   //Following code is excluded from the software because it is very hard to generate a input command from received output reading.
+                                //This will cause whenever we have a new Talin, a configure file must be included. if the file is lost or damaged, We have to fix it rather than client.
+                                if (((X[0] == 'w') || (X[0] == 'W')) && (AllowRewriteConfigure))   //Key W or w
+                                {
+                                    presetConfiguration1 = readConfiguration1;
+                                    Configuration1PresetCommand = ReadConfig4WriteCommand(Hexstring2byte(presetConfiguration1));
+                                    RewriteConfigurationFile = 0x01;
+                                    shutdownRequest = 0x00;
+                                }
+                                else
+                                    return 0x10;
+                            }
+                        }
+                        //Check Configuration 2
+
+                        //Check Boresight
+                        UpdateRequest = false;
+                        if (TS.BoreSightPresence == true)
+                        {
+                            OrginazedCommand = SerialSendCommand(VehicleBoreSight1Request);
+                            SerialSend(OrginazedCommand);
+                            receiveGeneralCommand.WaitOne(new TimeSpan(0, 0, 15), false);
+                            do
+                            {
+                                SerialSend(TalinGeneralReading);
+
+                            } while (receiveBoreSight1.WaitOne(new TimeSpan(0, 0, 15), false) == false);
+                            // {        
+                            //     //Console.SetCursorPosition(1,56);
+                            //     //Console.WriteLine("Talin Communication Time out !");
+                            //     throw new TimeoutException();
+                            // }
+                            if (readBoreSight1 == presetBoreSight1)
+                            {
+                                //Console.SetCursorPosition(1, 31);
+                                //Console.WriteLine("Vehicle BoreSight 1 Checked!");
+                            }
+                            else
+                            {
+                                UpdateRequest = true;
+                            }
+                        }
+                        else
+                        {
+                            UpdateRequest = true;
+                        }
+
+                        if (UpdateRequest == true)
+                        {
+                            //Console.SetCursorPosition(1, 35);
+                            //Console.WriteLine("Vehicle BoreSight 1 NOT match the saved data or not present.  Update from the saved configuration? (Y or N)");
+                            //Console.WriteLine("Y - Update from the saved configuration; Other key -Cancel.");
+                            if (AllowRewriteConfigure)
+                                //Console.WriteLine("W - Write the new configuration to Configuration File!");
+                            X = //Console.ReadLine();
+                            if ((X[0] == 'y') || (X[0] == 'Y'))
+                            {
+                                SerialSend(BoreSightPresetCommand);
+                                //Console.SetCursorPosition(1, 38);
+                                do
+                                {
+                                    //Console.Write(".");
+                                }
+                                while (receiveGeneralCommand.WaitOne(new TimeSpan(0, 0, 15)) == false);
+                                shutdownRequest = shutdownRequest | 0x01;
+                                //Console.SetCursorPosition(1, 38);
+                                //Console.WriteLine("Recycle the Talin Power is required.");
+                            }
+                            else
+                            {
+                                if (((X[0] == 'w') || (X[0] == 'W')) && (AllowRewriteConfigure))
+                                {
+                                    presetBoreSight1 = readBoreSight1;
+                                    BoreSightPresetCommand = ReadConfig4WriteCommand(Hexstring2byte(presetBoreSight1));
+                                    RewriteConfigurationFile = RewriteConfigurationFile | 0x02;
+                                    shutdownRequest = (shutdownRequest | 0x00);
+                                }
+                                else
+                                    return 0x10;
+                            }
+                        }
+                        //Check Lever Arm
+                        UpdateRequest = false;
+                        OrginazedCommand = SerialSendCommand(ReadLeverArm);
+                        SerialSend(OrginazedCommand);
+                        receiveGeneralCommand.WaitOne(new TimeSpan(0, 0, 15));
+                        do
+                        {
+                            SerialSend(TalinGeneralReading);
+                        }
+                        while (receiveLeverArm.WaitOne(new TimeSpan(0, 0, 15)) == false);
+
+                        if (readLeverArm == presetLeverArm)
+                        {
+                            //Console.SetCursorPosition(1, 41);
+                            //Console.WriteLine("Vehicle Lever Arm Checked!");
+                        }
+                        else
+                        {
+                            UpdateRequest = true;
+                        }
+
+                        if (UpdateRequest == true)
+                        {
+                            //Console.SetCursorPosition(1, 31);
+                            //Console.WriteLine("Vehicle Lever Arm NOT match the saved data or not present!");
+                            //Console.WriteLine("Y - Update from the saved configuration; Other key -Cancel.");
+                            if (AllowRewriteConfigure)
+                                //Console.WriteLine("W - Write the new configuration to Configuration File!");
+                            X = //Console.ReadLine();
+                            if ((X[0] == 'y') || (X[0] == 'Y'))  //Key Y or y
+                            {
+                                SerialSend(LeverArmPresetCommand);
+                                //Console.SetCursorPosition(1, 43);
+                                do
+                                {
+                                    //Console.Write(".");
+                                }
+                                while (receiveGeneralCommand.WaitOne(new TimeSpan(0, 0, 15)) == false);
+
+                                shutdownRequest = shutdownRequest | 0x01;
+                                //Console.SetCursorPosition(1, 43);
+                                //Console.WriteLine("Recycle the Talin Power is required.");
+                            }
+                            else
+                            {
+                                if (((X[0] == 'w') || (X[0] == 'W')) && (AllowRewriteConfigure))
+                                {
+                                    presetLeverArm = readLeverArm;
+                                    LeverArmPresetCommand = ReadConfig4WriteCommand(Hexstring2byte(presetLeverArm));
+                                    RewriteConfigurationFile = RewriteConfigurationFile | 0x04;
+                                    shutdownRequest = (shutdownRequest | 0x00);  //Shut down not required for this configuration
+                                }
+                                else
+                                {
+                                    return 0x10;
+                                }
+                            }
+                        }
+                        if (RewriteConfigurationFile > 0)
+                        {
+                            if (writePresetFile())
+                            {
+                                //Console.SetCursorPosition(1, 34);
+                                //Console.WriteLine("Successfully write the new Configuration file.");
+                            }
+                            else
+                                return 0x20;
+                        }
+                        return shutdownRequest;
+                    }
+                    catch (Exception er)
+                    {
+                        return -1;
+                    }
+
+                }
+        */
+        public bool Talin_Initial()
+        {
+            try
+            {
+                // if (readPresetData() != true)
+                // { return false; }
+
+                if (Connect_Talin(CommPort) != true)
+                { return false; }
+
+                /*stopNavigation();
+                startReadStatus(false);
+                int _checkVCT = CheckVCT();
+                if (_checkVCT == 0x01)
+                {
+                    //Console.SetCursorPosition(1, 4);
+                    //Console.WriteLine("Talin is required to cycle the power!");
+                    //Console.WriteLine("Y - Cycle Power, Other keys - Cancel");
+                    int X = //Console.Read();
+                    if ((X == 89) || (X == 121))
+                    {
+                        ShutdownTalin();
+                        
+                    }
+                    else   //Key N or n
+                    {
+                        //Console.SetCursorPosition(1, 8);
+                        //Console.WriteLine("Talin self checkup need cycle power but user cancelled the operation!");
+                        return false;
+                    }
+
+                }
+                if (_checkVCT == 0x10)
+                {
+                    //Console.SetCursorPosition(1, 4);
+                    //Console.WriteLine("Current Talin Configuration is not match preset values and update Talin is canceled!");
+                    return false;
+                }
+
+                if (_checkVCT == 0x20)
+                {
+                    //Console.SetCursorPosition(1, 4);
+                    //Console.WriteLine("Current Talin Configuration is not match preset values and update preset value is failed!");
+                    return false;
+                }
+                //Console.SetCursorPosition(1, 8);
+                //Console.WriteLine("Talin self checkup successed!");
+                //Console.Clear();
+                 */
+                return true;
+            }
+            catch (Exception er)
+            {
+                //Console.SetCursorPosition(1, 8);
+                //Console.WriteLine("Talin self checkup failed!");
+                return false;
+            }
+
+
+        }
+        #endregion
+
+        #region InitialPosition
+        public byte[] PositionUpdateCommand;
+        public void Talin_InitialPosition()
+        {
+            try
+            {
+
+                int results = 0x00;
+                if (PositionUpdateCommand == null)
+                {
+                    //Console.WriteLine("Data input format error! Position intial Failed!");
+                    return; //0xFF;
+                }
+                if (PositionUpdateCommand[0] == 0x00)
+                {
+                    //Console.WriteLine("Command Generated Error!");
+                    return;// 0xFF;
+                }
+                //Send Out of Travel Control Command:
+
+                byte[] OrginazedCommand;
+
+                OrginazedCommand = SerialSendCommand(PositionUpdateCommand);
+                SerialSend(OrginazedCommand);
+                receiveGeneralCommand.WaitOne(new TimeSpan(0, 0, 15), true);
+
+
+                OrginazedCommand = SerialSendCommand(TalinOutTravelLock);
+                SerialSend(OrginazedCommand);
+                receiveGeneralCommand.WaitOne(new TimeSpan(0, 0, 15), true);
+
+                startReadStatus(true);
+                return;// results;
+            }
+            catch (Exception e)
+            {
+                return;// 0xFF;
+            }
+        }
+        /*
+        private byte[] ObtainTalinPositionCommand()
+        {
+            try
+            {
+                string FileName = "TalinPositionList.txt";
+                //int DataLength = File.ReadLines(FileName).Count();
+                StreamReader sr;
+                if (File.Exists(FileName))
+                {
+                    sr = new StreamReader(FileName);
+                }
+                else
+                {
+                    StreamWriter sw = new StreamWriter(FileName);
+                    sw.WriteLine("Date, Time, Name, Format, ZoneID, Easting, Northing, Elevation, Datum, Gravity, Density, Deflection1, Deflection2");
+                    sw.Close();
+                    sr = new StreamReader(FileName);
+                }
+
+                
+                string line;
+
+                //Console.WriteLine("Num, Date, Name, Mode Format, Zone, East, North, Elevation, Datum, Gravity, Density, Deflect1, Deflect2\n");
+                int j = 0;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    if (j > 0)
+                        //Console.WriteLine(j.ToString() + " = " + line);
+                    
+                    j++;
+                }
+                sr.Close();
+                //Console.WriteLine();
+                //Console.WriteLine();
+                if (j >= 1)
+                {
+                    //Console.WriteLine("Key in the selected number and enter to use the saved position. ");
+                    //Console.WriteLine("0 key for create new position; other key for cancel!");
+                }
+                else
+                {
+                    //Console.WriteLine("No previous initial positions. 0 key for create new position!");
+                }
+                bool contiuousAsking = true;
+                while (contiuousAsking)
+                {
+                    string keyinstring = //Console.ReadLine();
+                    if ((keyinstring[0] == 'N') || (keyinstring[0] == 'n'))
+                    {
+                        contiuousAsking = false;
+                    }
+                    else
+                    {
+
+                        if ((keyinstring[0] == '0') || (keyinstring[0] == ')'))
+                        {
+                            contiuousAsking = false;
+                            string Positionstring = "";
+                            //Console.WriteLine("Please input a name for this position!");
+                            string PName = //Console.ReadLine();
+                            //Console.WriteLine("Please Select Mode type: 0 - Surface!, 1 for Underground, other key cancel");
+                            string pMode = //Console.ReadLine();
+                            string PMode;
+                            if (pMode[0] == '0')
+                                PMode = ", Surface";
+                            else
+                            {
+                                if (pMode[0] == '1')
+                                    PMode = ", Underground";
+                                else
+                                    return null;
+                            }
+
+                            //Console.WriteLine("Please select Semisphere 0 - north; 1- south; 9 - cancel!");
+                            string temp = //Console.ReadLine();
+                            int pFormat = int.Parse(temp);
+
+                            string PFormat = ", 2";
+                            bool done = false;
+                            if (pFormat == 0)
+                            {
+                                PFormat = ", 2";   //UTM
+
+                            }
+                            else
+                            {
+                                if (pFormat == 1)
+                                {
+                                    PFormat = ", 32770";   //UTM
+                                }
+                                else
+                                {
+                                    return null;
+                                }
+                            }
+
+                            //Console.WriteLine("Please Input Zone Number: 0 - Cancel input!");
+                            temp = //Console.ReadLine();
+                            int pZone = int.Parse(temp);
+                            if (pZone == 0)
+                                return null;
+                            string PZone = ", " + pZone.ToString();
+
+                            //Console.WriteLine("Please Input Easting: 0 - Cancel input!");
+                            temp = //Console.ReadLine();
+                            double pEast = double.Parse(temp);
+                            if (pEast == 0)
+                                return null;
+                            string PEasting = ", " + pEast.ToString();
+
+                            //Console.WriteLine("Please Input Northing: 0 - Cancel input!");
+                            temp = //Console.ReadLine();
+                            double pNorthing = double.Parse(temp);
+                            if (pNorthing == 0)
+                                return null;
+                            string PNorthing = ", " + pNorthing.ToString();
+
+                            //Console.WriteLine("Please Input Elevation: 0 - Cancel input!");
+                            temp = //Console.ReadLine();
+                            double pElevation = double.Parse(temp);
+                            if (pElevation == 0)
+                                return null;
+                            string PElevation = ", " + pElevation.ToString();
+
+                            //Console.WriteLine("Please Input DatumID: 0 - Cancel input!");
+                            string PDatumID = //Console.ReadLine();
+                            if (PDatumID[0] == '0')
+                                return null;
+
+                            DateTime DT = DateTime.Now;
+                            string PDate = DT.ToString("yyyy-MM-dd HH:mm:ss") + ", ";
+                            string readline = PDate + PName + PMode + PFormat + PZone + PEasting + PNorthing + PElevation + ", " + PDatumID;
+                            byte[] results = generatePositionUpdateCommand(readline);
+                            File.AppendAllText(FileName, readline);
+                            return results;
+                        }
+                        else
+                        {
+                            int k;
+                            if ((int.TryParse(keyinstring, out k)) && (k <= j))
+                            {
+                                string readline = File.ReadLines(FileName).Skip(k).Take(1).First();
+                                byte[] results = generatePositionUpdateCommand(readline);
+                                contiuousAsking = false;
+                                return results;
+                            }
+                            else
+                            {
+                                //Console.WriteLine("Please input an integer!");
+                            }
+                        }
+                    }
+                }
+                return null;
+            }
+            catch (Exception e)
+            {
+                byte[] results = new byte[2] { 0, 0 };
+                return results;
+            }
+
+
+        }
+*/
+
+        private byte[] generatePositionUpdateCommand(string PositionArray)
+        {
+            try
+            {
+
+                byte[] temp = new byte[65];
+                string[] fields = PositionArray.Split(',');
+                string valuetoremove2 = "";
+                fields = fields.Where(val => val != valuetoremove2).ToArray();
+                ZoneID = UInt16.Parse(fields[4].Trim());
+                PositionFormat = UInt16.Parse(fields[3].Trim());
+                byte[] Initial_FormatBytes = BitConverter.GetBytes(PositionFormat);
+                byte[] Initial_ZoneIDBytes = BitConverter.GetBytes(ZoneID);
+                if (BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(Initial_FormatBytes);
+                    Array.Reverse(Initial_ZoneIDBytes);
+                }
+
+                byte[] Initial_EastingBytes = Decimal_TalinDoubleWordsFloat(fields[5].Trim(), positionaccuracy);
+                byte[] Initial_NorthingBytes = Decimal_TalinDoubleWordsFloat(fields[6].Trim(), positionaccuracy);
+                byte[] Initial_ElevationBytes = Decimal_TalinDoubleWordsFloat(fields[7].Trim(), positionaccuracy);
+                byte[] Initial_DatumIDBytes = new byte[6] { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
+                byte[] temp1 = Encoding.ASCII.GetBytes(fields[8].Trim());
+                int L = temp1.Length;
+                if (L > 6)
+                    L = 6;
+                System.Buffer.BlockCopy(temp1, 0, Initial_DatumIDBytes, 0, L);
+                byte[] positionarray = new byte[24];
+
+                System.Buffer.BlockCopy(Initial_FormatBytes, 0, positionarray, 0, 2);
+                System.Buffer.BlockCopy(Initial_ZoneIDBytes, 0, positionarray, 2, 2);
+                System.Buffer.BlockCopy(Initial_EastingBytes, 0, positionarray, 6, 4);
+                System.Buffer.BlockCopy(Initial_NorthingBytes, 0, positionarray, 10, 4);
+                System.Buffer.BlockCopy(Initial_ElevationBytes, 0, positionarray, 14, 4);
+                System.Buffer.BlockCopy(Initial_DatumIDBytes, 0, positionarray, 18, 6);
+                temp[0] = 0x41;   //
+
+                int i = 0;
+                string ModeType = fields[2].Trim();
+                if (ModeType[0] == 'S')
+                {
+                    temp[1] = 0x00;
+                    temp[2] = 0x28;
+                    temp[3] = 0xB8;
+                    temp[4] = 0x00;
+                    System.Buffer.BlockCopy(positionarray, 0, temp, 5, 24);
+                    i = 29;
+                }
+                else
+                {
+                    byte[] Initial_GravityBytes = Decimal_TalinDoubleWordsFloat(fields[9], -8);
+                    initialMaterialDensity = double.Parse(fields[10]);
+                    byte[] Initial_DensityBytes = BitConverter.GetBytes(Convert.ToUInt16(initialMaterialDensity * 10));
+                    initialDeflection1 = double.Parse(fields[11]);
+                    byte[] Initial_Deflection1Bytes = BitConverter.GetBytes(Convert.ToInt32(initialDeflection1 * 1000));
+                    initialDeflection2 = double.Parse(fields[12]);
+                    byte[] Initial_Deflection2Bytes = BitConverter.GetBytes(Convert.ToInt32(initialDeflection2 * 1000));
+                    if (BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(Initial_DensityBytes);
+                        Array.Reverse(Initial_Deflection1Bytes);
+                        Array.Reverse(Initial_Deflection2Bytes);
+                    }
+                    temp[1] = 0xF8;
+                    temp[2] = 0x00;
+                    temp[3] = 0x00;  // Configuration Code
+                    temp[4] = 0x00;
+                    temp[5] = 0x00;  //Gravity -Underground Mode
+                    temp[6] = 0x01;
+                    System.Buffer.BlockCopy(positionarray, 0, temp, 7, 24);
+                    System.Buffer.BlockCopy(Initial_GravityBytes, 0, temp, 31, 4);
+                    System.Buffer.BlockCopy(Initial_DensityBytes, 0, temp, 35, 2);
+                    System.Buffer.BlockCopy(Initial_Deflection1Bytes, 0, temp, 37, 4);
+                    System.Buffer.BlockCopy(Initial_Deflection2Bytes, 0, temp, 41, 4);
+                    i = 45;
+                }
+                byte[] Command = new byte[i];
+                System.Buffer.BlockCopy(temp, 0, Command, 0, i);
+                // Change 0x10 to 0x10 0x10.
+                byte[] results = CommandAddHex10(Command);
+                // return command body
+                return results;
+            }
+            catch (Exception er)
+            {
+                return null;
+            }
+
+        }
+        #endregion
+
+        public bool startReadStatus(bool start)
+        {
+            //Read Status in 1Hz;
+            try
+            {
+                //Send Out of Travel Control Command:
+                byte[] OrginazedCommand;
+                byte[] Command = ReadStatus1Hz;
+                if (!start)
+                {
+                    Command[1] = 0x00;
+                    OrginazedCommand = SerialSendCommand(Command);
+                    SerialSend(OrginazedCommand);
+                    return true;
+                }
+                OrginazedCommand = SerialSendCommand(Command);
+                SerialSend(OrginazedCommand);
+                //do
+                //{
+                //}
+                //while (receiveStatus.WaitOne(new TimeSpan(0, 0, 15)) == false);
+                receiveStatus.WaitOne(new TimeSpan(0, 0, 15));
+                return true;
+            }
+            catch (Exception er)
+            {
+                return false;
+            }
+        }
+        public static int AlignmentTime = 600;
+        private int StatusDisplay(TalinStatus TS)
+        {
+            int results = 0x00;
+            if (!TS.AbleCompleteAlign)
+            {
+                //Console.SetCursorPosition(1, 3);
+                //Console.WriteLine("Unable to finish alignment! Shut down Talin may required.");
+                results = 0xFF;
+            }
+            else
+            {
+                results = results | 0x02;
+                //Console.SetCursorPosition(1, 3);
+                //Console.WriteLine("Waiting for alignment!                           ");
+
+                //Console.SetCursorPosition(1, 5);
+                if (TS.AlignmentTimeLeft != 0)
+                {
+                    //Console.WriteLine("Align Time Left {0}", TS.AlignmentTimeLeft.ToString());
+                }
+                else
+                {
+                    //Console.WriteLine("Talin is Aligned!                      ");
+                }
+                AlignmentTime = TS.AlignmentTimeLeft;
+                //Console.SetCursorPosition(1, 7);
+                if (TS.OutofTravelLock)
+                {
+                    //Console.WriteLine("Talin is out of travel lock!");
+                    results = results | 0x04;
+                }
+                else
+                {
+                    //Console.WriteLine("Talin in travel lock!");
+                    results = results & 0xFB;
+                }
+                //Console.SetCursorPosition(1, 9);
+                if (TS.NavigationMode)
+                {
+                    //Console.WriteLine("Talin is in Navigation Mode!");
+                    results = results | 0x08;
+                }
+                else
+                {
+                    //Console.WriteLine("Talin is not in Navigation Mode!");
+                    results = results & 0xF7;
+                }
+                //Console.SetCursorPosition(1, 11);
+
+                if (TS.InitialPositionReceived)
+                {
+                    //Console.WriteLine("Talin Initial Position received!");
+                    results = results | 0x10;
+                }
+                else
+                {
+                    //Console.WriteLine("Talin Initial Position is not received or lost!");
+                    results = results & 0xEF;
+                }
+            }
+            return results;
+        }
+
+        public void startNavigation()
+        {
+            Write2File = true;
+
+            startPositioning(TalinMode);
+            startOrientation();
+            ////Console.WriteLine
+        }
+        public void stopNavigation()
+        {
+            Write2File = false;
+
+            byte[] OrginazedCommand;
+
+            OrginazedCommand = SerialSendCommand(PositionStopAll);
+            ////Console.WriteLine(BitConverter.ToString(OrginazedCommand));
+            SerialSend(OrginazedCommand);
+
+            OrginazedCommand = SerialSendCommand(OrientationStopAll);
+            ////Console.WriteLine(BitConverter.ToString(OrginazedCommand));
+            SerialSend(OrginazedCommand);
+
+            OrginazedCommand = SerialSendCommand(ReadStatusStop);
+            SerialSend(OrginazedCommand);
+
+        }
+        private bool startPositioning(int Mode)
+        {
+            try
+            {
+                if (Mode == 0) //Surface
+                {
+                    byte[] OrginazedCommand;
+
+                    OrginazedCommand = SerialSendCommand(PositionRequestAll);
+                    // //Console.WriteLine(BitConverter.ToString(OrginazedCommand));
+                    SerialSend(OrginazedCommand);
+                    return true;
+                }
+                return true;
+            }
+            catch (Exception er)
+            {
+                return false;
+            }
+        }
+        private bool startOrientation()
+        {
+            try
+            {
+                byte[] OrginazedCommand;
+
+                OrginazedCommand = SerialSendCommand(OrientationRequestAll);
+                ////Console.WriteLine(BitConverter.ToString(OrginazedCommand));
+                SerialSend(OrginazedCommand);
+                return true;
+            }
+            catch (Exception er)
+            {
+                return false;
+            }
+        }
+
+        #region SerialPort
+
+        private byte[] CommandAddHex10(byte[] Command)
+        {
+            byte[] temp = new byte[Command.Length * 2];
+            int bytepointer = 0;
+            for (int i = 0; i < Command.Length; i++)
+            {
+                temp[bytepointer] = Command[i];
+                bytepointer++;
+                if (Command[i] == 0x10)
+                {
+                    temp[bytepointer] = 0x10;
+                    bytepointer++;
+                }
+            }
+            byte[] results = new byte[bytepointer];
+            System.Buffer.BlockCopy(temp, 0, results, 0, bytepointer);
+            return results;
+        }
+        /// <summary>
+        /// Orginaze comands to Talin through Serial port
+        /// </summary>
+        /// <param name="Command">Orginazed commands exclude the prefix, sumcheck and surfix</param>
+        /// <returns></returns>
+        private byte[] SerialSendCommand(byte[] Command)
+        {
+            byte[] _command;
+            _command = Command;
+            byte[] results = new byte[_command.Length + 5];
+
+            System.Buffer.BlockCopy(Prefix, 0, results, 0, Prefix.Length);   //Add the 0x10 0x02
+            System.Buffer.BlockCopy(_command, 0, results, Prefix.Length, _command.Length);  //Add Command Body
+
+            results[Prefix.Length + _command.Length] = CalculateChecksum(_command);  //Add Check Sum
+
+            System.Buffer.BlockCopy(Surfix, 0, results, Prefix.Length + _command.Length + 1, Surfix.Length); //Add 0x10 0x03 for end 
+
+            return results;
+        }
+
+        private static byte CalculateChecksum(byte[] data)
+        {
+            byte checksum = 0;
+            int result = 0;
+            foreach (byte value in data)
+            {
+                result += value;
+            }
+            checksum = (byte)(-1 * (result));
+            return checksum;
+        }
+
+        static int bufferSize = 400;
+        static byte[] _buffer = new byte[bufferSize];
+        static int offset = 0;
+        SerialPort sp;
+        int baudrate = 19200;
+        string ComNo = "";
+
+        public bool Connect_Talin(string ComNum)
+        {
+            ComNo = ComNum;
+            if (sp != null)
+                sp.Close();
+
+            sp = new SerialPort(ComNo, baudrate, Parity.None, 8, StopBits.One);
+            try
+            {
+                sp.Open();
+            }
+            catch (Exception err)
+            {
+                //Console.SetCursorPosition(1, 2);
+                //Console.WriteLine("Talin Connection is failed.");
+                ////Console.WriteLine(err.ToString());
+                return false;
+            }
+            sp.ReceivedBytesThreshold = 1;
+            sp.DataReceived += sp_DataReceived;
+            sp.ErrorReceived += sp_ErrorReceived;
+            sp.ReadTimeout = 200;
+            sp.WriteTimeout = 200;
+            //Console.SetCursorPosition(1, 2);
+            //Console.WriteLine("Talin is connected at " + ComNo + " baudrate: " + sp.BaudRate.ToString() + " .");
+            return true;
+        }
+
+        public void Disconnect_Talin()
+        {
+            if (sp != null)
+                sp.Close();
+            //Console.WriteLine("Talin is disconnected.");
+        }
+
+        public void ShutdownTalin()
+        {
+            byte[] OrginazedCommand = SerialSendCommand(TalinShutDown);
+            SerialSend(OrginazedCommand);
+            receiveGeneralCommand.WaitOne(new TimeSpan(0, 0, 15), true);
+            //Console.Clear();
+            //Console.SetCursorPosition(1, 6);
+            //Console.WriteLine("Talin is Shut down! Please cycle power");
+        }
+        /// <summary>
+        /// Send comand to Talin through Serial port
+        /// </summary>
+        /// <param name="Command">Orginazed commands exclude the prefix, sumcheck and surfix</param>
+        /// <returns></returns>
+        private bool SerialSend(byte[] Command)
+        {
+            try
+            {
+                sp.Write(Command, offset, Command.Length);
+                return true;
+            }
+            catch (TimeoutException err)
+            {
+                //Console.WriteLine("Sending Command to Talin is time out.");
+                return false;
+            }
+            catch (NullReferenceException er)
+            {
+                //Console.WriteLine("Talin isn't connected.");
+                return false;
+            }
+            catch (Exception e)
+            {
+                //Console.WriteLine("Talin isn't connected or terminated.");
+                return false;
+            }
+        }
+
+        void sp_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
+        {
+            SerialPort _sp = (SerialPort)sender;
+            _sp.DiscardInBuffer();
+        }
+
+        static int ReadingArraySize = bufferSize * 2;
+        byte[] ReadingArrayBuilder = new byte[ReadingArraySize];
+
+        int ReadArrayBuilderOffset = 0;
+        bool ReadArrayBuilderEnd = false;
+        void sp_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            SerialPort sp = (SerialPort)sender;
+            try
+            {
+                int sByteRead = sp.BytesToRead;
+                if (sByteRead == 0)   //nothing to read return;
+                    return;
+                offset = 0;
+                if (sByteRead > bufferSize)
+                    sByteRead = bufferSize;
+
+                sp.Read(_buffer, offset, sByteRead); //Read to buffer
+
+                //Sometimes, port only read one port, it shall be added into the first byte of the next reading
+                if ((sByteRead == 1) && (singlebyteexist == false))
+                {
+                    singlebyte = _buffer[0];
+                    singlebyteexist = true;
+                    return;
+                }
+
+                byte[] results;
+                if (singlebyteexist == false)
+                {
+
+                    results = new byte[sByteRead];
+                    Array.Copy(_buffer, results, sByteRead);
+                    //Reinitial the buffer
+                }
+                else
+                {
+                    results = new byte[sByteRead + 1];
+                    Array.Copy(_buffer, 0, results, 1, sByteRead);
+                    results[0] = singlebyte;
+                    singlebyte = 0x00;
+                    singlebyteexist = false;
+                }
+                _buffer = new byte[bufferSize];  //Reset buffer
+                //ReadArrayBuilderEnd = false;
+                //Make sure we obtain 0x10, 0x03 as the end.
+
+                if ((results[0] == 0x10) && (results[1] == 0x02) && (results[results.Length - 2] == 0x10) && (results[results.Length - 1] == 0x03))
+                {
+                    ReadArrayBuilderEnd = true;
+                    System.Buffer.BlockCopy(results, 0, ReadingArrayBuilder, ReadArrayBuilderOffset, results.Length);
+                    //load command to process
+                    ReadArrayBuilderOffset += results.Length;
+                }
+                else if ((results[0] == 0x10) && (results[1] == 0x02))
+                {  //Array starts
+                    ReadingArrayBuilder = new byte[ReadingArraySize];
+                    ReadArrayBuilderOffset = 0;
+                    ReadArrayBuilderEnd = false;
+                    System.Buffer.BlockCopy(results, 0, ReadingArrayBuilder, ReadArrayBuilderOffset, results.Length);
+                    ReadArrayBuilderOffset = results.Length;
+                    return;
+                }
+                else if ((results[results.Length - 2] == 0x10) && (results[results.Length - 1] == 0x03))
+                { // Array end started
+                    ReadArrayBuilderEnd = true;
+                    System.Buffer.BlockCopy(results, 0, ReadingArrayBuilder, ReadArrayBuilderOffset, results.Length);
+                    ReadArrayBuilderOffset += results.Length;
+                    //load command to process
+                }
+                else if ((ReadArrayBuilderOffset > 120) | (results.Length > 120))
+                {
+                    bool NotFindEnd = true;
+                    System.Buffer.BlockCopy(results, 0, ReadingArrayBuilder, ReadArrayBuilderOffset, results.Length);
+                    ReadArrayBuilderOffset += results.Length;
+                    bool getRidRemainData = false;
+                    if (results.Length == bufferSize)
+                        getRidRemainData = true;  //in this case, since data lost we cannot properly restart build another data array
+                    int i = ReadArrayBuilderOffset;
+                    while ((i > 1) && (NotFindEnd))
+                    {
+                        if ((ReadingArrayBuilder[i - 2] == 0x10) && (ReadingArrayBuilder[i - 1] == 0x03) && (ReadingArrayBuilder[i] == 0x10) && (ReadingArrayBuilder[i + 1] == 0x02))
+                        {
+                            NotFindEnd = false; // Find the end;
+                            byte[] finalResults1 = new byte[i];
+                            System.Buffer.BlockCopy(ReadingArrayBuilder, 0, finalResults1, 0, i);
+                            int remainLength = ReadArrayBuilderOffset - i;
+                            byte[] remainResults = new byte[remainLength];
+                            System.Buffer.BlockCopy(ReadingArrayBuilder, i, remainResults, 0, remainLength);
+                            DataProcessDelegate _dataProcessDelegate1 = new DataProcessDelegate(dataprocess4save);
+                            _dataProcessDelegate1(finalResults1);
+                            //Start new Data Array
+                            ReadArrayBuilderEnd = true;
+                            if (!getRidRemainData)  //if get rid of data.
+                            {
+                                ReadingArrayBuilder = new byte[ReadingArraySize];
+                                ReadArrayBuilderOffset = 0;
+                                ReadArrayBuilderEnd = false;
+                                System.Buffer.BlockCopy(remainResults, 0, ReadingArrayBuilder, 0, remainLength);
+                                ReadArrayBuilderOffset = remainLength;
+                                System.Buffer.BlockCopy(results, 0, ReadingArrayBuilder, ReadArrayBuilderOffset, results.Length);
+                                ReadArrayBuilderOffset = results.Length;
+                            }
+
+                            return;
+                        }
+                        i--;
+                    }
+                }
+                else if (ReadArrayBuilderEnd == false)
+                {
+                    System.Buffer.BlockCopy(results, 0, ReadingArrayBuilder, ReadArrayBuilderOffset, results.Length);
+                    ReadArrayBuilderOffset += results.Length;
+                    return;
+                }
+                else
+                {
+                    return;
+                    //throw new Exception("No reading Valid Data");
+                }
+
+                byte[] finalResults = new byte[ReadArrayBuilderOffset];
+                System.Buffer.BlockCopy(ReadingArrayBuilder, 0, finalResults, 0, ReadArrayBuilderOffset);
+
+
+                DataProcessDelegate _dataProcessDelegate = new DataProcessDelegate(dataprocess4save);
+                _dataProcessDelegate(finalResults);
+            }
+            catch (Exception err)
+            {
+                sp.DiscardInBuffer();
+                return;
+            }
+
+        }
+
+        /// <summary>
+        /// Handling the read data
+        /// </summary>
+        /// <param name="_data"></param>
+        /// <returns></returns>
+        private void DataProcess4Display(byte[] _data)
+        {
+            //int results;
+            int Length = _data.Length;
+            //StringBuilder sb = new StringBuilder();
+            int dataStartlocation = 0;
+            int dataEndlocation = 64;  //32 word for all received message
+            int dataOffset = 0;
+            int dataGroup = _data[2];
+            //
+            if ((_data[0] != 0x10) || (_data[1] != 0x02) || (_data[Length - 2] != 0x10) || (_data[Length - 1] != 0x03)) //(DataReading Error)
+            {
+                return;
+            }
+            if ((_data[3] != 0x00) || (_data[4] != 0x00))  //Protocol Error
+            {
+                return;
+            }
+            else
+            {
+                if ((dataGroup == 0x41) && (Length < 10)) //The update command is proper Received
+                {
+                    receiveGeneralCommand.Set();
+                    return;
+                }
+            }
+            if (Length < 12)  //No Data Include
+            {
+                return;
+            }
+            if ((_data[5] == 0x10) && (_data[6] == 0x10))
+            {
+                dataEndlocation = (_data[7] & 0x3F);
+                dataStartlocation = ((_data[6] & 0x0F) << 2) + (_data[7] >> 6);
+                dataOffset = 8;
+            }
+            else
+            {
+                dataEndlocation = (_data[6] & 0x3F);
+                dataStartlocation = ((_data[5] & 0x0F) << 2) + (_data[6] >> 6);
+                dataOffset = 7;
+            }
+            //Length = (dataEndlocation - dataStartlocation + 1) * 2 + dataOffset+3;
+            byte[] Temp = new byte[Length - 5];
+            if ((_data[Length - 3] == 0x10) && (_data[Length - 4] == 0x10))
+                System.Buffer.BlockCopy(_data, 2, Temp, 0, Length - 6);
+            else
+                System.Buffer.BlockCopy(_data, 2, Temp, 0, Length - 5);
+
+            byte CheckSumValue = CalculateChecksum(Temp);
+            //if (!((Length >= 75) && (_data[2] == 0x04)))
+            //{
+            if ((CheckSumValue != _data[Length - 3])) // && (CheckSumValue != _data[(dataEndlocation - dataStartlocation + 1) * 2 + dataOffset-1]))  //status reading crazy
+            {
+                if ((dataGroup != 0x04) && (dataGroup != 1))
+                {
+                    return;    //Since there are repeat data obtained from Talin for all readings. This cause the checksum error So ignored this error for status and Vehicle Configuration Setup now.
+                }
+            }
+            //}
+            byte[] RegulatedData;
+            RegulatedData = ReceiveDataRemoveHex10(_data, dataOffset);   //Change the "0x10, 0x10" to 0x10
+            Length = RegulatedData.Length;
+
+            byte[] FullReadFrame = new byte[64];   //Only save the databody for position, status and orientation
+            if (((dataEndlocation - dataStartlocation + 1) * 2) <= (Length - dataOffset - 3))
+                System.Buffer.BlockCopy(RegulatedData, dataOffset, FullReadFrame, (dataStartlocation - 1) * 2, (dataEndlocation - dataStartlocation + 1) * 2);
+            else  //Data Length is different from requested (something wrong);
+            {
+                return;
+            }
+
+
+            DateTime _now = DateTime.Now;
+            string NowString = _now.ToString("yyyyMMddHHmmssffff");
+
+            switch (dataGroup)
+            {
+                case 3:
+
+                    byte[] altitudebyte = { FullReadFrame[24], FullReadFrame[25], FullReadFrame[26], FullReadFrame[27] };
+                    double altitude = TalinDoubleWordsFloat_Double(altitudebyte, positionaccuracy);
+                    //Console.SetCursorPosition(1, 10);
+                    //Console.WriteLine("Current Elevation = {0}.                     ", altitude.ToString("F3"));
+                    if (Write2File == true)
+                        sw.WriteLine(NowString + "-" + BitConverter.ToString(Temp));
+
+                    break;
+                case 2:
+                    if (Write2File == true)
+                        sw.WriteLine(NowString + "-" + BitConverter.ToString(Temp));
+
+                    break;
+                case 4:
+                    if (Write2File == true)
+                        sw.WriteLine(NowString + "-" + BitConverter.ToString(Temp));
+                    else
+                    {
+                        byte mode1 = FullReadFrame[0];
+                        byte mode2 = FullReadFrame[1];
+                        byte status11 = FullReadFrame[10];
+                        byte status12 = FullReadFrame[11];
+                        byte status21 = FullReadFrame[12];
+                        byte status22 = FullReadFrame[13];
+                        byte Alert11 = FullReadFrame[18];
+                        byte Alert12 = FullReadFrame[19];
+                        byte Alert21 = FullReadFrame[20];
+                        byte Alert22 = FullReadFrame[21];
+                        byte Alert32 = FullReadFrame[23];
+                        TS = new TalinStatus(mode2, Alert11, status12, FullReadFrame[26], FullReadFrame[27]);
+                        StatusDisplay(TS);
+
+                        receiveStatus.Set();
+                    }
+                    break;
+                case 1:
+                    if (FullReadFrame[1] == 10)  //Vehicle Configuration 1
+                    {
+                        readConfiguration1 = BitConverter.ToString(_data);
+                        ////Console.SetCursorPosition(1, 22);
+                        ////Console.WriteLine(readConfiguration1);
+                        receiveConfiguration1.Set();
+                    }
+                    if (FullReadFrame[1] == 20)  //Vehicle Configuration 2
+                    {
+                        readConfiguration2 = BitConverter.ToString(_data);
+                        receiveConfiguration2.Set();
+                    }
+                    if (FullReadFrame[1] == 161)  //Bore Sight
+                    {
+                        readBoreSight1 = BitConverter.ToString(_data);
+                        ////Console.SetCursorPosition(1, 32);
+                        ////Console.WriteLine(readBoreSight1);
+                        receiveBoreSight1.Set();
+                    }
+                    if (FullReadFrame[1] == 140)  //Lever Arm
+                    {
+                        readLeverArm = BitConverter.ToString(_data);
+                        ////Console.SetCursorPosition(1, 42);
+                        ////Console.WriteLine(readLeverArm);
+                        receiveLeverArm.Set();
+                    }
+                    if (FullReadFrame[1] == 151)  //Rotation Point
+                    {
+
+                    }
+                    if (FullReadFrame[1] == 230)  //Gravity Reference
+                    {
+                        readGravityReference = BitConverter.ToString(_data);
+                        receiveGravityReference.Set();
+                    }
+                    if (FullReadFrame[1] == 60)  //Gravity Modeposition
+                    {
+
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void dataprocess4save(byte[] _data)
+        {
+            int[] ReadingGroup_Index = new int[50];
+            int j = 1;
+            ReadingGroup_Index[0] = 0;
+            for (int i = 0; i < _data.Length - 4; i++)
+            {
+                if ((_data[i] == 0x10) && (_data[i + 1] == 0x03) && (_data[i + 2] == 0x10) && (_data[i + 3] == 0x02))
+                {
+                    ReadingGroup_Index[j] = i + 2;
+                    j++;
+                }
+            }
+
+            ReadingGroup_Index[j] = _data.Length;
+            // One reading may content different data, the following code is seperating the data
+            for (int k = 0; k < j; k++)
+            {
+                int SingleLineDataLength = ReadingGroup_Index[k + 1] - ReadingGroup_Index[k];
+                byte[] data = new byte[SingleLineDataLength];
+
+                System.Buffer.BlockCopy(_data, ReadingGroup_Index[k], data, 0, SingleLineDataLength);
+                DataProcess4Display(data);
+            }
+
+        }
+
+        #endregion
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
