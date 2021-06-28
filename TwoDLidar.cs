@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net;
+using System.Net.Sockets;
+using System.IO;
 
 namespace Penguin__REMS_Project
 {
@@ -14,8 +17,9 @@ namespace Penguin__REMS_Project
         private TcpClient Tcp;
         private NetworkStream stream;
         private StreamWriter writer, fileWriter;
-        public TwoDLidar(string strIp, int vport, String name ) : base(strIp, vport, name)
+        public TwoDLidar(string strIp, int vport, String name ) : base( name, strIp, vport)
         {
+
         }
            /// <summary>
             /// Creates a new TCP-socket
@@ -116,32 +120,6 @@ namespace Penguin__REMS_Project
 
             fileWriter.Close();
         }
-        /// <summary>
-        /// Read results of one measurement from the MRS6124R
-        /// </summary>
-        /// <returns>MeasurementResult struct containing the info</returns>
-        public MeasurementResult ReadScan()
-        {
-            MeasurementResult res = new MeasurementResult();
-            res.distanceAndAngle = new Dictionary<double, double>();
-                
-               // Console.WriteLine("Time out TCP {0}", Tcp.ReceiveTimeout);
-            // Request results from SICK LMS511 
-            writer.Write(READREQSUITE);
-            writer.Flush();
-            // Wait for an answer
-            System.Threading.Thread.Sleep(200);
-            String _m = readTCP();
-            if (_m.Contains("sRA") == true)
-            {
-                updateDataFile(DateTime.Now.ToString("hh:mm:ss.ff ") + _m);
-                
-            }
-          //  Console.WriteLine(_m);
-           // Console.Clear();
-             return res;
-        }
-     
         
 
         public Boolean IsContainTheOpposite()

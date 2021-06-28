@@ -5,12 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Net;
-
+using System.IO;
 namespace Penguin__REMS_Project
 {
     class Lidar
     {
-        #rgion Variable
+        #region Variable
         private string strIpAdress; // the string ip address to be parse
         private IPAddress ipAdr; // lidar ip address
         private IPEndPoint lidarEndPoint; // lidar endpoint
