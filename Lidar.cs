@@ -5,12 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Net;
+using System.IO;
 
 namespace Penguin__REMS_Project
 {
     class Lidar
     {
-        #rgion Variable
+        #region Variable
         private string strIpAdress; // the string ip address to be parse
         private IPAddress ipAdr; // lidar ip address
         private IPEndPoint lidarEndPoint; // lidar endpoint
@@ -95,7 +96,7 @@ namespace Penguin__REMS_Project
             {
                 WriteFile = true;
                 continuousReading = true;
-                listener_Lidar.BeginReceive(new AsyncCallback(ReceiveScanData), s);
+                //listener_Lidar.BeginReceive(new AsyncCallback(ReceiveScanData), s);
             }
             catch (Exception e)
             {
@@ -116,7 +117,7 @@ namespace Penguin__REMS_Project
             if (stopscan == false)
             {
                 UdpState s = new UdpState();
-                s.e = LidarEndPoint;
+                s.e = lidarEndPoint;
                 s.u = listener_Lidar;
                 listener_Lidar.BeginReceive(new AsyncCallback(ReceiveScanData), s);
             }

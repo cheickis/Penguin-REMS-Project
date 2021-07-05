@@ -8,7 +8,7 @@ namespace Penguin__REMS_Project
 {
     class ThreeDLidar : Lidar
     {
-        public ThreeDLidar(string strIp, int vport) : base(strIp, vport)
+        public ThreeDLidar(string name,string strIp, int vport) : base(name, strIp, vport)
         {
 
         }

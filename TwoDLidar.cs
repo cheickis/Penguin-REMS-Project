@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net.Sockets;
+using System.IO;
 
 namespace Penguin__REMS_Project
 {
@@ -14,7 +16,7 @@ namespace Penguin__REMS_Project
         private TcpClient Tcp;
         private NetworkStream stream;
         private StreamWriter writer, fileWriter;
-        public TwoDLidar(string strIp, int vport, String name ) : base(strIp, vport, name)
+        public TwoDLidar(String name, string strIp, int vport) : base(name,strIp, vport)
         {
         }
            /// <summary>
@@ -120,7 +122,7 @@ namespace Penguin__REMS_Project
         /// Read results of one measurement from the MRS6124R
         /// </summary>
         /// <returns>MeasurementResult struct containing the info</returns>
-        public MeasurementResult ReadScan()
+      /*  public MeasurementResult ReadScan()
         {
             MeasurementResult res = new MeasurementResult();
             res.distanceAndAngle = new Dictionary<double, double>();
@@ -141,7 +143,7 @@ namespace Penguin__REMS_Project
            // Console.Clear();
              return res;
         }
-     
+       */
         
 
         public Boolean IsContainTheOpposite()
