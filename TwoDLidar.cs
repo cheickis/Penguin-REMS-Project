@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using System.Net.Sockets;
 using System.IO;
 
@@ -10,34 +11,40 @@ namespace Penguin__REMS_Project
 {
     class TwoDLidar : Lidar
     {
+        #region  VARIABLES
         private String req = "";
         private const string READREQ = "\x02sEN LMDscandata 1\x03"; // request for one telegram 
         private const string READREQSUITE = "\x02sRN LMDscandata \x03"; // request polling data
         private TcpClient Tcp;
         private NetworkStream stream;
-        private StreamWriter writer, fileWriter;
-        public TwoDLidar(String name, string strIp, int vport) : base(name,strIp, vport)
+        private StreamWriter fileWriter, writer;
+       
+        #endregion
+        public TwoDLidar(String name ,string strIp, int vport) : base( name, strIp, vport)
         {
+
         }
-           /// <summary>
-            /// Creates a new TCP-socket
-            /// </summary>
-            /// <param name="ip">IP adress of the MRS6124R
-            /// </param>
-            /// <param name="port">Port to the MRS6124R, default:211</param>
-            public void ConnectToSICKLMS5XX(string ip, int port = 2111)
+   
+        /// <summary>
+        /// Creates a new TCP-socket
+        /// </summary>
+        /// <param name="ip">IP adress of the MRS6124R
+        /// </param>
+        /// <param name="port">Port to the MRS6124R, default:211</param>
+        public override void ConnectToTheLidar()
         {
             try
             {
                 Console.WriteLine("\tInit connection to SICK LMS 511");
                 Tcp = new TcpClient();
-                Tcp.Connect(System.Net.IPAddress.Parse(ip), port);
+                Tcp.Connect(ipAdr, port);
                 stream = Tcp.GetStream();
-                fileWriter = new StreamWriter(new FileStream("../../data.txt", FileMode.Create), Encoding.ASCII);
+                // fileWriter = new StreamWriter(new FileStream("../../data.txt", FileMode.Create), Encoding.ASCII);
+                fileWriter = new StreamWriter(new FileStream(lidarFile, FileMode.Create), Encoding.ASCII);
                 stream.ReadTimeout = 1000;
                 writer = new StreamWriter(Tcp.GetStream(), Encoding.ASCII);
                 Console.WriteLine("\tConnection to SICK LMS 511 ok");
-                
+
             }
             catch (Exception Ex)
             {
@@ -96,7 +103,6 @@ namespace Penguin__REMS_Project
             }
             return null;
         }
-
         private void updateDataFile(String data)
         {
             // Change decimal separator from , to .
@@ -118,37 +124,15 @@ namespace Penguin__REMS_Project
 
             fileWriter.Close();
         }
-        /// <summary>
-        /// Read results of one measurement from the MRS6124R
-        /// </summary>
-        /// <returns>MeasurementResult struct containing the info</returns>
-      /*  public MeasurementResult ReadScan()
-        {
-            MeasurementResult res = new MeasurementResult();
-            res.distanceAndAngle = new Dictionary<double, double>();
-                
-               // Console.WriteLine("Time out TCP {0}", Tcp.ReceiveTimeout);
-            // Request results from SICK LMS511 
-            writer.Write(READREQSUITE);
-            writer.Flush();
-            // Wait for an answer
-            System.Threading.Thread.Sleep(200);
-            String _m = readTCP();
-            if (_m.Contains("sRA") == true)
-            {
-                updateDataFile(DateTime.Now.ToString("hh:mm:ss.ff ") + _m);
-                
-            }
-          //  Console.WriteLine(_m);
-           // Console.Clear();
-             return res;
-        }
-       */
-        
-
         public Boolean IsContainTheOpposite()
         {
             return false;
         }
+        public override void DisconnectTheLidar()
+        {
+            throw new NotImplementedException();
+        }
+
+       
     }
 }

@@ -7,8 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MetroFramework;
-using System.Windows.Forms;
 using MetroFramework.Forms;
+using System.Windows.Forms;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using MetroFramework.Controls;
@@ -117,6 +117,135 @@ namespace Penguin__REMS_Project
         {
 
         }
+
+        private void metroTabPage1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        #region 3D Lidar Tab Function
+        private void ThreeDLidarResetBtn_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void threeDLidarAddBtn_Click(object sender, EventArgs e)
+        {
+            String name = threeDLidarNameTxt.Text;
+            int port = Int32.Parse(threeDLidarPort.Text);
+            String ipAdd = threeDLidarIPTxt.Text;
+
+            if (!name.Equals("") && !ipAdd.Equals(""))
+            {
+                ThreeDLidar newSick = new ThreeDLidar(name, ipAdd, port);
+                ResertAddNewThreeDLidarForm();
+                treeDLidarCollection.Add(newSick);
+                //AddNewSickTile(name);
+            }
+            else {
+
+              // handle the error  herer
+
+            }
+
+           
+        }
+
+        private void ResertAddNewThreeDLidarForm()
+        {
+            threeDLidarNameTxt.Text = "";
+            threeDLidarPort.Text = "";
+            threeDLidarIPTxt.Text = "";
+
+        }
+
+
+        #endregion
+
+        #region Scan Button handler
+        private void StartBtn_Click(object sender, EventArgs e)
+        {
+            DateTime _now = DateTime.Now;
+            string NowString = _now.ToString("yyyyMMddHHmmss");   //Timestamp.
+
+            #region ParallelTasks
+            // Perform three tasks in parallel :  2D lidar , 3D lidar, realsens, GPR ...
+            Parallel.Invoke(() =>
+            { 
+                TwoLidarHandlers(NowString);
+            },  
+            () =>
+            {
+                   ThreeDLidarHandler(NowString);
+             }, 
+             () =>
+             {
+                     TalonHandler();
+                    },
+              () =>
+              {
+                     GPRHandler();
+               },
+                 () =>
+               {
+                     RealsensHandler();
+               }
+
+             ); 
+
+           
+            #endregion
+        }
+
+        #endregion
+
+
+        #region Two Lidar
+        private void TwoLidarHandlers(String timeStamp) {
+
+
+            if (sickCollections.Count != 0)
+            {
+                foreach (var item in sickCollections)
+                {
+                    
+
+
+                }
+            }
+        }
+        #endregion
+        #region Three D Lidar
+        private void ThreeDLidarHandler(String timeStamp) {
+            if (treeDLidarCollection.Count != 0)
+            {
+                foreach (var item in treeDLidarCollection)
+                {
+
+
+
+                }
+            }
+        }
+        #endregion
+        #region Realsens
+        private void RealsensHandler()
+        {
+
+        }
+        #endregion
+        #region  Talon handler
+        private void TalonHandler()
+        {
+
+        }
+        #endregion
+        #region  GPR (Ground prenetration radar handler
+        private void GPRHandler()
+        {
+
+        }
+        #endregion
     }
-  
+
 }
