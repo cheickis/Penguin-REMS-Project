@@ -14,6 +14,7 @@ namespace Penguin__REMS_Project
 {
     class ThreeDLidar : Lidar
     {
+
         #region VARIABLE
         private UdpClient listener_Lidar; // the lidar Listener
         private UdpState udpState;  // the udp state

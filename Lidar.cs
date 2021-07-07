@@ -10,10 +10,12 @@ using System.Net.NetworkInformation;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
+
 namespace Penguin__REMS_Project
 {
     abstract class Lidar
     {
+
        #region Variable
         protected string strIpAdress; // the string ip address to be parse
         protected IPAddress ipAdr; // lidar ip address
