@@ -14,7 +14,7 @@ namespace Penguin__REMS_Project
 {
     delegate void ObtainPositonDelegate(double x, double y, double z);
     delegate void ObtainOrientationDelegate(double r, double p, double y);
-    //private delegate double[] PositionOrientationInterpreterDelegate(byte[] _data);
+
 
     class TalinDataProcess
     {
@@ -347,7 +347,7 @@ namespace Penguin__REMS_Project
         public void StartWriteFile(string FileName)
         {
             sw = new StreamWriter(FileName);
-            //Write2File = true;
+           
         }
 
         public void EndWriteFile()
@@ -398,30 +398,12 @@ namespace Penguin__REMS_Project
                     {
                         LeverArmPresetCommand = Hexstring2byte(fields[1].Trim());
                     }
-                    /*if (j==6)
-                    {
-                        presetInitialZone = Convert.ToByte(fields[1].Trim(), 16);
-                        presetInitialEasting = string2byte(fields[2].Trim());
-                        presetInitialNorthing = string2byte(fields[3].Trim());
-                        presetInitialElevation = string2byte(fields[4].Trim());
-                        double IntialEasting = TalinDoubleWordsFloat_Double(presetInitialEasting,positionaccuracy);
-                        double IntialNorthing = TalinDoubleWordsFloat_Double(presetInitialNorthing,positionaccuracy);
-                        double IntialElevation = TalinDoubleWordsFloat_Double(presetInitialElevation,positionaccuracy);
-                    }
-                    if (j==7)
-                    {
-                        presetGravityReference = fields[1].Trim();
-                    }
-                    if (j==8)
-                    {
-                        GravityReferencePresetCommand = string2byte(fields[1].Trim());
-                    }*/
+         
                     j++;
                 }
                 if (j < 6)
                 {
-                    //Console.SetCursorPosition(1, 43);
-                    //Console.WriteLine("Software Configuration File Missing Lines!");
+                   
                     return false;
                 }
                 sr.Close();
@@ -429,8 +411,7 @@ namespace Penguin__REMS_Project
             }
             catch
             {
-                //Console.SetCursorPosition(1, 43);
-                //Console.WriteLine("Software Configuration File Error!");
+               
                 return false;
             }
 
@@ -498,316 +479,32 @@ namespace Penguin__REMS_Project
                 sr.WriteLine("Bore Sight 1 Command = " + BitConverter.ToString(BoreSightPresetCommand));
                 sr.WriteLine("Lever Arm Setup = " + presetConfiguration1);
                 sr.WriteLine("Lever Arm Command = " + LeverArmPresetCommand);
-                //sr.WriteLine("Initial Position = " + BitConverter.ToString(presetInitialEasting) + ", " + BitConverter.ToString(presetInitialNorthing) + ", " + BitConverter.ToString(presetInitialElevation));
-                //sr.WriteLine("Gravity Reference Setup = " + presetGravityReference );
-                // sr.WriteLine("Gravity Reference Command = " + BitConverter.ToString(GravityReferencePresetCommand));
-                sr.Close();
+                  sr.Close();
                 return true;
             }
             catch (Exception er)
             {
-                //Console.SetCursorPosition(1, 43);
-                //Console.WriteLine("Write Configuration File Error!" + er.ToString());
+               
                 return false;
             }
         }
 
 
-        /*
-                /// <summary>
-                /// Send commands to check the Configurations 
-                /// </summary>
-                /// <returns> Shut down of not</returns>
-                private int CheckVCT()
-                {
-                    int shutdownRequest = 0;
-                    int RewriteConfigurationFile = 0x00;
-                    try
-                    {
-                        string X;
-                        Configuration1Presence = false;
-                        //Configuration2Presence = false;
-                        BoresightPresence = false;
-                        //LeverArmPresence = false;
-                        byte[] _command;
-                        //Check Status -vehicle configuration - boresight angle presence 
-                        //_command = ReadStatus;
-                        byte[] OrginazedCommand = SerialSendCommand(ReadStatus);
-                        SerialSend(OrginazedCommand);
-                        if (receiveStatus.WaitOne(new TimeSpan(0, 0, 15)) == false)
-                        {
-                            //Console.SetCursorPosition(1, 43);
-                            //Console.WriteLine("Talin Communication Time out !");
-                            throw new TimeoutException();
-                        }
-
-                        //check Configuration 1
-                        //_command = VehicleBoreSight1Request;
-                        bool UpdateRequest = false;
-                        if (TS.Configuration1Presence == true)
-                        {
-                            OrginazedCommand = SerialSendCommand(VehicleConfiguration1Request);
-                            SerialSend(OrginazedCommand);
-                            receiveGeneralCommand.WaitOne(new TimeSpan(0, 0, 15));
-
-                            do
-                            {
-                                SerialSend(TalinGeneralReading);
-                            }
-                            while (receiveConfiguration1.WaitOne(new TimeSpan(0, 0, 15)) == false);
-
-                            if (readConfiguration1 == presetConfiguration1)
-                            {
-                                //Console.SetCursorPosition(1, 21);
-                                //Console.WriteLine("Vehicle Configuration 1 Checked!");
-                            }
-                            else
-                            {
-                                UpdateRequest = true;
-                            }
-                        }
-                        else
-                        {
-                            UpdateRequest = true;
-                        }
-
-                        if (UpdateRequest == true)
-                        {
-                            //Console.SetCursorPosition(1, 25);
-                            //Console.WriteLine("Vehicle Configuration 1 NOT match the saved data or not present.  Update from the saved configuration?");
-                            //Console.WriteLine("Y - Update from the saved configuration; Other key -Cancel.");
-                            if (AllowRewriteConfigure)
-                                //Console.WriteLine("W - Write the new configuration to Configuration File!");
-                            X = //Console.ReadLine();
-                            if ((X[0] == 'y') || (X[0] == 'Y'))
-                            {
-                                SerialSend(Configuration1PresetCommand);
-                                //Console.SetCursorPosition(1, 28);
-                                do
-                                {
-                                    //Console.Write(".");
-                                }
-                                while (receiveGeneralCommand.WaitOne(new TimeSpan(0, 0, 15)) == false);
-
-                                shutdownRequest = 0x01;
-                                //Console.SetCursorPosition(1, 28);
-                                //Console.WriteLine("Recycle the Talin Power is required.               ");
-
-                            }
-                            else
-                            {   //Following code is excluded from the software because it is very hard to generate a input command from received output reading.
-                                //This will cause whenever we have a new Talin, a configure file must be included. if the file is lost or damaged, We have to fix it rather than client.
-                                if (((X[0] == 'w') || (X[0] == 'W')) && (AllowRewriteConfigure))   //Key W or w
-                                {
-                                    presetConfiguration1 = readConfiguration1;
-                                    Configuration1PresetCommand = ReadConfig4WriteCommand(Hexstring2byte(presetConfiguration1));
-                                    RewriteConfigurationFile = 0x01;
-                                    shutdownRequest = 0x00;
-                                }
-                                else
-                                    return 0x10;
-                            }
-                        }
-                        //Check Configuration 2
-
-                        //Check Boresight
-                        UpdateRequest = false;
-                        if (TS.BoreSightPresence == true)
-                        {
-                            OrginazedCommand = SerialSendCommand(VehicleBoreSight1Request);
-                            SerialSend(OrginazedCommand);
-                            receiveGeneralCommand.WaitOne(new TimeSpan(0, 0, 15), false);
-                            do
-                            {
-                                SerialSend(TalinGeneralReading);
-
-                            } while (receiveBoreSight1.WaitOne(new TimeSpan(0, 0, 15), false) == false);
-                            // {        
-                            //     //Console.SetCursorPosition(1,56);
-                            //     //Console.WriteLine("Talin Communication Time out !");
-                            //     throw new TimeoutException();
-                            // }
-                            if (readBoreSight1 == presetBoreSight1)
-                            {
-                                //Console.SetCursorPosition(1, 31);
-                                //Console.WriteLine("Vehicle BoreSight 1 Checked!");
-                            }
-                            else
-                            {
-                                UpdateRequest = true;
-                            }
-                        }
-                        else
-                        {
-                            UpdateRequest = true;
-                        }
-
-                        if (UpdateRequest == true)
-                        {
-                            //Console.SetCursorPosition(1, 35);
-                            //Console.WriteLine("Vehicle BoreSight 1 NOT match the saved data or not present.  Update from the saved configuration? (Y or N)");
-                            //Console.WriteLine("Y - Update from the saved configuration; Other key -Cancel.");
-                            if (AllowRewriteConfigure)
-                                //Console.WriteLine("W - Write the new configuration to Configuration File!");
-                            X = //Console.ReadLine();
-                            if ((X[0] == 'y') || (X[0] == 'Y'))
-                            {
-                                SerialSend(BoreSightPresetCommand);
-                                //Console.SetCursorPosition(1, 38);
-                                do
-                                {
-                                    //Console.Write(".");
-                                }
-                                while (receiveGeneralCommand.WaitOne(new TimeSpan(0, 0, 15)) == false);
-                                shutdownRequest = shutdownRequest | 0x01;
-                                //Console.SetCursorPosition(1, 38);
-                                //Console.WriteLine("Recycle the Talin Power is required.");
-                            }
-                            else
-                            {
-                                if (((X[0] == 'w') || (X[0] == 'W')) && (AllowRewriteConfigure))
-                                {
-                                    presetBoreSight1 = readBoreSight1;
-                                    BoreSightPresetCommand = ReadConfig4WriteCommand(Hexstring2byte(presetBoreSight1));
-                                    RewriteConfigurationFile = RewriteConfigurationFile | 0x02;
-                                    shutdownRequest = (shutdownRequest | 0x00);
-                                }
-                                else
-                                    return 0x10;
-                            }
-                        }
-                        //Check Lever Arm
-                        UpdateRequest = false;
-                        OrginazedCommand = SerialSendCommand(ReadLeverArm);
-                        SerialSend(OrginazedCommand);
-                        receiveGeneralCommand.WaitOne(new TimeSpan(0, 0, 15));
-                        do
-                        {
-                            SerialSend(TalinGeneralReading);
-                        }
-                        while (receiveLeverArm.WaitOne(new TimeSpan(0, 0, 15)) == false);
-
-                        if (readLeverArm == presetLeverArm)
-                        {
-                            //Console.SetCursorPosition(1, 41);
-                            //Console.WriteLine("Vehicle Lever Arm Checked!");
-                        }
-                        else
-                        {
-                            UpdateRequest = true;
-                        }
-
-                        if (UpdateRequest == true)
-                        {
-                            //Console.SetCursorPosition(1, 31);
-                            //Console.WriteLine("Vehicle Lever Arm NOT match the saved data or not present!");
-                            //Console.WriteLine("Y - Update from the saved configuration; Other key -Cancel.");
-                            if (AllowRewriteConfigure)
-                                //Console.WriteLine("W - Write the new configuration to Configuration File!");
-                            X = //Console.ReadLine();
-                            if ((X[0] == 'y') || (X[0] == 'Y'))  //Key Y or y
-                            {
-                                SerialSend(LeverArmPresetCommand);
-                                //Console.SetCursorPosition(1, 43);
-                                do
-                                {
-                                    //Console.Write(".");
-                                }
-                                while (receiveGeneralCommand.WaitOne(new TimeSpan(0, 0, 15)) == false);
-
-                                shutdownRequest = shutdownRequest | 0x01;
-                                //Console.SetCursorPosition(1, 43);
-                                //Console.WriteLine("Recycle the Talin Power is required.");
-                            }
-                            else
-                            {
-                                if (((X[0] == 'w') || (X[0] == 'W')) && (AllowRewriteConfigure))
-                                {
-                                    presetLeverArm = readLeverArm;
-                                    LeverArmPresetCommand = ReadConfig4WriteCommand(Hexstring2byte(presetLeverArm));
-                                    RewriteConfigurationFile = RewriteConfigurationFile | 0x04;
-                                    shutdownRequest = (shutdownRequest | 0x00);  //Shut down not required for this configuration
-                                }
-                                else
-                                {
-                                    return 0x10;
-                                }
-                            }
-                        }
-                        if (RewriteConfigurationFile > 0)
-                        {
-                            if (writePresetFile())
-                            {
-                                //Console.SetCursorPosition(1, 34);
-                                //Console.WriteLine("Successfully write the new Configuration file.");
-                            }
-                            else
-                                return 0x20;
-                        }
-                        return shutdownRequest;
-                    }
-                    catch (Exception er)
-                    {
-                        return -1;
-                    }
-
-                }
-        */
+        
         public bool Talin_Initial()
         {
             try
             {
-                // if (readPresetData() != true)
-                // { return false; }
+               
 
                 if (Connect_Talin(CommPort) != true)
                 { return false; }
 
-                /*stopNavigation();
-                startReadStatus(false);
-                int _checkVCT = CheckVCT();
-                if (_checkVCT == 0x01)
-                {
-                    //Console.SetCursorPosition(1, 4);
-                    //Console.WriteLine("Talin is required to cycle the power!");
-                    //Console.WriteLine("Y - Cycle Power, Other keys - Cancel");
-                    int X = //Console.Read();
-                    if ((X == 89) || (X == 121))
-                    {
-                        ShutdownTalin();
-                        
-                    }
-                    else   //Key N or n
-                    {
-                        //Console.SetCursorPosition(1, 8);
-                        //Console.WriteLine("Talin self checkup need cycle power but user cancelled the operation!");
-                        return false;
-                    }
-
-                }
-                if (_checkVCT == 0x10)
-                {
-                    //Console.SetCursorPosition(1, 4);
-                    //Console.WriteLine("Current Talin Configuration is not match preset values and update Talin is canceled!");
-                    return false;
-                }
-
-                if (_checkVCT == 0x20)
-                {
-                    //Console.SetCursorPosition(1, 4);
-                    //Console.WriteLine("Current Talin Configuration is not match preset values and update preset value is failed!");
-                    return false;
-                }
-                //Console.SetCursorPosition(1, 8);
-                //Console.WriteLine("Talin self checkup successed!");
-                //Console.Clear();
-                 */
                 return true;
             }
             catch (Exception er)
             {
-                //Console.SetCursorPosition(1, 8);
-                //Console.WriteLine("Talin self checkup failed!");
+                
                 return false;
             }
 
@@ -825,12 +522,11 @@ namespace Penguin__REMS_Project
                 int results = 0x00;
                 if (PositionUpdateCommand == null)
                 {
-                    //Console.WriteLine("Data input format error! Position intial Failed!");
                     return; //0xFF;
                 }
                 if (PositionUpdateCommand[0] == 0x00)
                 {
-                    //Console.WriteLine("Command Generated Error!");
+                   
                     return;// 0xFF;
                 }
                 //Send Out of Travel Control Command:
@@ -854,171 +550,7 @@ namespace Penguin__REMS_Project
                 return;// 0xFF;
             }
         }
-        /*
-        private byte[] ObtainTalinPositionCommand()
-        {
-            try
-            {
-                string FileName = "TalinPositionList.txt";
-                //int DataLength = File.ReadLines(FileName).Count();
-                StreamReader sr;
-                if (File.Exists(FileName))
-                {
-                    sr = new StreamReader(FileName);
-                }
-                else
-                {
-                    StreamWriter sw = new StreamWriter(FileName);
-                    sw.WriteLine("Date, Time, Name, Format, ZoneID, Easting, Northing, Elevation, Datum, Gravity, Density, Deflection1, Deflection2");
-                    sw.Close();
-                    sr = new StreamReader(FileName);
-                }
-
-                
-                string line;
-
-                //Console.WriteLine("Num, Date, Name, Mode Format, Zone, East, North, Elevation, Datum, Gravity, Density, Deflect1, Deflect2\n");
-                int j = 0;
-                while ((line = sr.ReadLine()) != null)
-                {
-                    if (j > 0)
-                        //Console.WriteLine(j.ToString() + " = " + line);
-                    
-                    j++;
-                }
-                sr.Close();
-                //Console.WriteLine();
-                //Console.WriteLine();
-                if (j >= 1)
-                {
-                    //Console.WriteLine("Key in the selected number and enter to use the saved position. ");
-                    //Console.WriteLine("0 key for create new position; other key for cancel!");
-                }
-                else
-                {
-                    //Console.WriteLine("No previous initial positions. 0 key for create new position!");
-                }
-                bool contiuousAsking = true;
-                while (contiuousAsking)
-                {
-                    string keyinstring = //Console.ReadLine();
-                    if ((keyinstring[0] == 'N') || (keyinstring[0] == 'n'))
-                    {
-                        contiuousAsking = false;
-                    }
-                    else
-                    {
-
-                        if ((keyinstring[0] == '0') || (keyinstring[0] == ')'))
-                        {
-                            contiuousAsking = false;
-                            string Positionstring = "";
-                            //Console.WriteLine("Please input a name for this position!");
-                            string PName = //Console.ReadLine();
-                            //Console.WriteLine("Please Select Mode type: 0 - Surface!, 1 for Underground, other key cancel");
-                            string pMode = //Console.ReadLine();
-                            string PMode;
-                            if (pMode[0] == '0')
-                                PMode = ", Surface";
-                            else
-                            {
-                                if (pMode[0] == '1')
-                                    PMode = ", Underground";
-                                else
-                                    return null;
-                            }
-
-                            //Console.WriteLine("Please select Semisphere 0 - north; 1- south; 9 - cancel!");
-                            string temp = //Console.ReadLine();
-                            int pFormat = int.Parse(temp);
-
-                            string PFormat = ", 2";
-                            bool done = false;
-                            if (pFormat == 0)
-                            {
-                                PFormat = ", 2";   //UTM
-
-                            }
-                            else
-                            {
-                                if (pFormat == 1)
-                                {
-                                    PFormat = ", 32770";   //UTM
-                                }
-                                else
-                                {
-                                    return null;
-                                }
-                            }
-
-                            //Console.WriteLine("Please Input Zone Number: 0 - Cancel input!");
-                            temp = //Console.ReadLine();
-                            int pZone = int.Parse(temp);
-                            if (pZone == 0)
-                                return null;
-                            string PZone = ", " + pZone.ToString();
-
-                            //Console.WriteLine("Please Input Easting: 0 - Cancel input!");
-                            temp = //Console.ReadLine();
-                            double pEast = double.Parse(temp);
-                            if (pEast == 0)
-                                return null;
-                            string PEasting = ", " + pEast.ToString();
-
-                            //Console.WriteLine("Please Input Northing: 0 - Cancel input!");
-                            temp = //Console.ReadLine();
-                            double pNorthing = double.Parse(temp);
-                            if (pNorthing == 0)
-                                return null;
-                            string PNorthing = ", " + pNorthing.ToString();
-
-                            //Console.WriteLine("Please Input Elevation: 0 - Cancel input!");
-                            temp = //Console.ReadLine();
-                            double pElevation = double.Parse(temp);
-                            if (pElevation == 0)
-                                return null;
-                            string PElevation = ", " + pElevation.ToString();
-
-                            //Console.WriteLine("Please Input DatumID: 0 - Cancel input!");
-                            string PDatumID = //Console.ReadLine();
-                            if (PDatumID[0] == '0')
-                                return null;
-
-                            DateTime DT = DateTime.Now;
-                            string PDate = DT.ToString("yyyy-MM-dd HH:mm:ss") + ", ";
-                            string readline = PDate + PName + PMode + PFormat + PZone + PEasting + PNorthing + PElevation + ", " + PDatumID;
-                            byte[] results = generatePositionUpdateCommand(readline);
-                            File.AppendAllText(FileName, readline);
-                            return results;
-                        }
-                        else
-                        {
-                            int k;
-                            if ((int.TryParse(keyinstring, out k)) && (k <= j))
-                            {
-                                string readline = File.ReadLines(FileName).Skip(k).Take(1).First();
-                                byte[] results = generatePositionUpdateCommand(readline);
-                                contiuousAsking = false;
-                                return results;
-                            }
-                            else
-                            {
-                                //Console.WriteLine("Please input an integer!");
-                            }
-                        }
-                    }
-                }
-                return null;
-            }
-            catch (Exception e)
-            {
-                byte[] results = new byte[2] { 0, 0 };
-                return results;
-            }
-
-
-        }
-*/
+       
 
         private byte[] generatePositionUpdateCommand(string PositionArray)
         {
@@ -1129,10 +661,7 @@ namespace Penguin__REMS_Project
                 }
                 OrginazedCommand = SerialSendCommand(Command);
                 SerialSend(OrginazedCommand);
-                //do
-                //{
-                //}
-                //while (receiveStatus.WaitOne(new TimeSpan(0, 0, 15)) == false);
+            
                 receiveStatus.WaitOne(new TimeSpan(0, 0, 15));
                 return true;
             }
@@ -1147,17 +676,13 @@ namespace Penguin__REMS_Project
             int results = 0x00;
             if (!TS.AbleCompleteAlign)
             {
-                //Console.SetCursorPosition(1, 3);
-                //Console.WriteLine("Unable to finish alignment! Shut down Talin may required.");
+                
                 results = 0xFF;
             }
             else
             {
                 results = results | 0x02;
-                //Console.SetCursorPosition(1, 3);
-                //Console.WriteLine("Waiting for alignment!                           ");
-
-                //Console.SetCursorPosition(1, 5);
+              
                 if (TS.AlignmentTimeLeft != 0)
                 {
                     //Console.WriteLine("Align Time Left {0}", TS.AlignmentTimeLeft.ToString());
@@ -1368,9 +893,7 @@ namespace Penguin__REMS_Project
             byte[] OrginazedCommand = SerialSendCommand(TalinShutDown);
             SerialSend(OrginazedCommand);
             receiveGeneralCommand.WaitOne(new TimeSpan(0, 0, 15), true);
-            //Console.Clear();
-            //Console.SetCursorPosition(1, 6);
-            //Console.WriteLine("Talin is Shut down! Please cycle power");
+          
         }
         /// <summary>
         /// Send comand to Talin through Serial port
@@ -1598,8 +1121,7 @@ namespace Penguin__REMS_Project
                 System.Buffer.BlockCopy(_data, 2, Temp, 0, Length - 5);
 
             byte CheckSumValue = CalculateChecksum(Temp);
-            //if (!((Length >= 75) && (_data[2] == 0x04)))
-            //{
+            
             if ((CheckSumValue != _data[Length - 3])) // && (CheckSumValue != _data[(dataEndlocation - dataStartlocation + 1) * 2 + dataOffset-1]))  //status reading crazy
             {
                 if ((dataGroup != 0x04) && (dataGroup != 1))
@@ -1607,7 +1129,7 @@ namespace Penguin__REMS_Project
                     return;    //Since there are repeat data obtained from Talin for all readings. This cause the checksum error So ignored this error for status and Vehicle Configuration Setup now.
                 }
             }
-            //}
+           
             byte[] RegulatedData;
             RegulatedData = ReceiveDataRemoveHex10(_data, dataOffset);   //Change the "0x10, 0x10" to 0x10
             Length = RegulatedData.Length;

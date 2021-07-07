@@ -7,39 +7,48 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 
+using System.Net.Sockets;
+using System.IO;
+using System.Collections.Specialized;
+
 namespace Penguin__REMS_Project
 {
     class TwoDLidar : Lidar
     {
+        #region  VARIABLES
         private String req = "";
         private const string READREQ = "\x02sEN LMDscandata 1\x03"; // request for one telegram 
         private const string READREQSUITE = "\x02sRN LMDscandata \x03"; // request polling data
         private TcpClient Tcp;
         private NetworkStream stream;
-        private StreamWriter writer, fileWriter;
-        public TwoDLidar(string strIp, int vport, String name ) : base( name, strIp, vport)
+        private StreamWriter fileWriter, writer;
+        #endregion
+        public TwoDLidar(String name, String strIp, int vport, String type) : base( name, strIp, vport, type)
+
         {
 
         }
-           /// <summary>
-            /// Creates a new TCP-socket
-            /// </summary>
-            /// <param name="ip">IP adress of the MRS6124R
-            /// </param>
-            /// <param name="port">Port to the MRS6124R, default:211</param>
-            public void ConnectToSICKLMS5XX(string ip, int port = 2111)
+   
+        /// <summary>
+        /// Creates a new TCP-socket
+        /// </summary>
+        /// <param name="ip">IP adress of the MRS6124R
+        /// </param>
+        /// <param name="port">Port to the MRS6124R, default:211</param>
+        public override void ConnectToTheLidar()
         {
             try
             {
                 Console.WriteLine("\tInit connection to SICK LMS 511");
                 Tcp = new TcpClient();
-                Tcp.Connect(System.Net.IPAddress.Parse(ip), port);
+                Tcp.Connect(ipAdr, port);
                 stream = Tcp.GetStream();
-                fileWriter = new StreamWriter(new FileStream("../../data.txt", FileMode.Create), Encoding.ASCII);
+                // fileWriter = new StreamWriter(new FileStream("../../data.txt", FileMode.Create), Encoding.ASCII);
+                fileWriter = new StreamWriter(new FileStream(lidarFile, FileMode.Create), Encoding.ASCII);
                 stream.ReadTimeout = 1000;
                 writer = new StreamWriter(Tcp.GetStream(), Encoding.ASCII);
                 Console.WriteLine("\tConnection to SICK LMS 511 ok");
-                
+
             }
             catch (Exception Ex)
             {
@@ -51,7 +60,7 @@ namespace Penguin__REMS_Project
         /// Reads incoming data from the TCP-socket
         /// </summary>
         /// <returns>ASCII string containing the read data</returns>
-        private string readTCP()
+        private string ReadTCP()
         {
             String data = null;
             Byte[] bytes = new Byte[15000]; //big Array to be sure that we don't loose some datas
@@ -84,7 +93,7 @@ namespace Penguin__REMS_Project
         /// Reads incoming data from the TCP-socket
         /// </summary>
         /// <returns>Byte array containing read data</returns>
-        private Byte[] readTCPbyte()
+        private Byte[] ReadTCPbyte()
         {
             if (!stream.DataAvailable)
             {
@@ -98,8 +107,7 @@ namespace Penguin__REMS_Project
             }
             return null;
         }
-
-        private void updateDataFile(String data)
+        private void UpdateDataFile(String data)
         {
             // Change decimal separator from , to .
             System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
@@ -120,11 +128,26 @@ namespace Penguin__REMS_Project
 
             fileWriter.Close();
         }
-        
 
         public Boolean IsContainTheOpposite()
         {
             return false;
+        }
+        public override void DisconnectTheLidar()
+        {
+            throw new NotImplementedException();
+        }
+
+
+      
+        public override string PullAFrame()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void UpdateRawData(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
     }
 }
