@@ -12,11 +12,16 @@ using System.Windows.Forms;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using MetroFramework.Controls;
+using System.Threading;
 
 namespace Penguin__REMS_Project
 {
     public partial class Remsform : MetroForm
     {
+
+        #region Variable
+        static Lidar lidar;
+        #endregion
 
         #region 3D LIDAR
 
@@ -31,10 +36,17 @@ namespace Penguin__REMS_Project
         #endregion
 
         #region Observable COLLECTION
-        private ObservableCollection<TwoDLidar> sickCollections;
+        private ObservableCollection<TwoDLidar> twoDLidarCollections;
         private ObservableCollection<ThreeDLidar> treeDLidarCollection;
         private ObservableCollection<Realsens> realsensCollection;
         #endregion
+
+        #region Queue
+
+        Queue<Lidar> lidarQ;
+        #endregion
+
+
 
         public Remsform()
         {
@@ -46,12 +58,12 @@ namespace Penguin__REMS_Project
 
         private void InitCollection()
         {
-            sickCollections = new ObservableCollection<TwoDLidar>();
+            twoDLidarCollections = new ObservableCollection<TwoDLidar>();
             treeDLidarCollection = new ObservableCollection<ThreeDLidar>();
             realsensCollection = new ObservableCollection<Realsens>();
 
-            sickCollections.CollectionChanged += upadteSickListForm;
-
+            twoDLidarCollections.CollectionChanged += upadteSickListForm;
+            lidarQ = new Queue<Lidar>();
 
         }
 
@@ -61,106 +73,7 @@ namespace Penguin__REMS_Project
         }
         #endregion
 
-        private void fileToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void metroLabel1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-
-        #region ADD New SICK FUNCTION
-
-        private void ResetSickAddFormBtn_Click(object sender, EventArgs e)
-        {
-            ResertAddNewSickForm();
-        }
-
-        private void AddSickBtn_Click(object sender, EventArgs e)
-        {
-            string name = txtSickName.Text;
-            int port = Int32.Parse(sickPortTxt.Text);
-            String ipAdd = sickIpTxt.Text;
-            TwoDLidar newSick = new TwoDLidar(name, ipAdd, port);
-            ResertAddNewSickForm();
-
-            sickCollections.Add(newSick);
-            AddNewSickTile(name);
-        }
-
-        private void ResertAddNewSickForm()
-        {
-            sickPortTxt.Text = "";
-            sickPortTxt.Text = "";
-            txtSickName.Text = "";
-
-        }
-
-        private void AddNewSickTile(String name) {
-
-             MetroTile newMetroSick   = new MetroTile();
-             newMetroSick.Name = name;
-             newMetroSick.Text = name;
-             newMetroSick.Size = new System.Drawing.Size(110, 157);
-             newMetroSick.TileImage = global::Penguin__REMS_Project.Properties.Resources.isckLMS1;
-             newMetroSick.UseTileImage = true;
-             sickFLPanel.Controls.Add(newMetroSick);
-             sickFLPanel.Update();
-        }
-        #endregion
-
-
-        private void metroTile1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void metroTabPage1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        #region 3D Lidar Tab Function
-        private void ThreeDLidarResetBtn_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void threeDLidarAddBtn_Click(object sender, EventArgs e)
-        {
-            String name = threeDLidarNameTxt.Text;
-            int port = Int32.Parse(threeDLidarPort.Text);
-            String ipAdd = threeDLidarIPTxt.Text;
-
-            if (!name.Equals("") && !ipAdd.Equals(""))
-            {
-                ThreeDLidar newSick = new ThreeDLidar(name, ipAdd, port);
-                ResertAddNewThreeDLidarForm();
-                treeDLidarCollection.Add(newSick);
-                //AddNewSickTile(name);
-            }
-            else {
-
-              // handle the error  herer
-
-            }
-
-           
-        }
-
-        private void ResertAddNewThreeDLidarForm()
-        {
-            threeDLidarNameTxt.Text = "";
-            threeDLidarPort.Text = "";
-            threeDLidarIPTxt.Text = "";
-
-        }
-
-
-        #endregion
+     
 
         #region Scan Button handler
         private void StartBtn_Click(object sender, EventArgs e)
@@ -204,9 +117,9 @@ namespace Penguin__REMS_Project
         private void TwoLidarHandlers(String timeStamp) {
 
 
-            if (sickCollections.Count != 0)
+            if (twoDLidarCollections.Count != 0)
             {
-                foreach (var item in sickCollections)
+                foreach (var item in twoDLidarCollections)
                 {
                     
 
@@ -221,7 +134,7 @@ namespace Penguin__REMS_Project
             {
                 foreach (var item in treeDLidarCollection)
                 {
-
+                   
 
 
                 }
@@ -245,6 +158,165 @@ namespace Penguin__REMS_Project
         {
 
         }
+        #endregion
+
+
+        #region Lidar Config Tab Function
+        private void ResetLidarBtn_Click(object sender, EventArgs e)
+        {
+            ResetAddLidarForm(); 
+        }
+
+        private void AddLidarBtn_Click(object sender, EventArgs e)
+        {
+            String type = lidarTypeCbx.Text;
+            String lidarName = lidarNameCbx.Text;
+            if (!lidarIPTxt.Equals("") && !lidarPortTxt.Equals("") && !lidarName.Equals("") && !type.Equals(""))
+            {
+        
+                String ip = lidarIPTxt.Text;
+                int port = Int32.Parse(lidarPortTxt.Text);
+                AddLidar( lidarName,ip, port, type);
+                pingNewLidarBtn.Visible = true;
+                pullFrameBtn.Visible = true;
+            }
+            else
+            {
+
+                // handle the error  herer
+
+            }
+
+
+        }
+
+
+        #endregion
+
+
+        #region Helper
+        private void ResetAddLidarForm()
+        {
+            lidarIPTxt.Text = "";
+            lidarPortTxt.Text = "";
+           
+        }
+
+
+        private void AddLidar(String name, String ip, int port, String type) {
+            if (type.Equals("2D"))
+            {
+                AddTwoDLidar( name, ip, port, type);
+
+            }
+            else {
+                AddThreeDLidar(name, ip, port, type);
+            }
+        }
+        private void AddThreeDLidar(String name, String ip, int port, string type)
+        {
+            ThreeDLidar newThreeDLidar = new ThreeDLidar(name, ip, port , type);
+            treeDLidarCollection.Add(newThreeDLidar);
+            AddLidarTile(name, type);
+            ResetAddLidarForm();
+            lidarQ.Enqueue(newThreeDLidar);
+            lidar = newThreeDLidar;
+        }
+        private void  AddTwoDLidar(String name, String ip, int port, string type)
+        {
+
+            TwoDLidar newtwoDLidar = new TwoDLidar(name, ip, port, type);
+            ResetAddLidarForm();
+            twoDLidarCollections.Add(newtwoDLidar);
+            AddLidarTile(name, type);
+            lidarQ.Enqueue(newtwoDLidar);
+            lidar = newtwoDLidar;
+
+        }
+        private void AddLidarTile(String name, String type) {
+
+            MetroTile lidarTile = new MetroTile();
+            lidarTile.Name = name;
+            lidarTile.Text = name;
+            lidarTile.Size = new System.Drawing.Size(110, 157);
+
+
+            if (type.Equals("2D") && name.Contains("LMS"))
+            {
+                lidarTile.TileImage = global::Penguin__REMS_Project.Properties.Resources.isckLMS1;
+                lidarTile.UseTileImage = true;
+                sickFLPanel.Controls.Add(lidarTile);
+                sickFLPanel.Update();
+
+            }
+            else if (type.Equals("3D") && name.Equals("Leinshen C16"))
+            {
+
+                lidarTile.TileImage = global::Penguin__REMS_Project.Properties.Resources.leishen2;
+                lidarTile.UseTileImage = true;
+                threeDLidarFLPanel.Controls.Add(lidarTile);
+                threeDLidarFLPanel.Update();
+
+            }
+            else if (type.Equals("3D") && name.Equals("Velodyne VLP 16"))
+            {
+                lidarTile.TileImage = global::Penguin__REMS_Project.Properties.Resources.leishen2;
+                lidarTile.UseTileImage = true;
+                threeDLidarFLPanel.Controls.Add(lidarTile);
+                threeDLidarFLPanel.Update();
+            }
+            else {
+                lidarTile.TileImage = global::Penguin__REMS_Project.Properties.Resources.leishen2;//SICK MRS633
+                lidarTile.UseTileImage = true;
+                threeDLidarFLPanel.Controls.Add(lidarTile);
+                threeDLidarFLPanel.Update();
+            }
+            lidarPicInfoTl.TileImage = lidarTile.TileImage;
+            lidarPicInfoTl.Text = lidarTile.Text;
+            lidarPicInfoTl.Update();
+            lidarPicInfoTl.Refresh();
+
+        }
+
+        #endregion
+
+        #region  Ping and  Pull
+        private void PingNewLidarBtn_Click(object sender, EventArgs e)
+        {
+             lidar = lidarQ.Peek();
+            if (lidar != null) {
+                lidar.ConnectToTheLidar();
+                lidarConfigLogview.Text = lidar.PingLidarResponse();
+            }
+        }
+
+        private void PullFrameBtn_Click(object sender, EventArgs e)
+        {
+
+            ThreeDLidar temp = new ThreeDLidar("Leinshen", "192.168.1.200", 2368, "3D");
+
+            temp.ConnectToTheLidar();
+
+            while (true) {
+                temp.InitialScanner();
+
+                Thread.Sleep(1000);
+
+                lidarConfigLogview.Text = temp.PullAFrame();
+            }
+
+           /* if(lidar== null)
+                lidar = lidarQ.Peek();
+            lidarConfigLogview.Clear();
+
+            lidar.ConnectToTheLidar();
+
+           
+            lidarConfigLogview.Text = lidar.PullAFrame();
+            */
+
+        }
+
         #endregion
     }
 

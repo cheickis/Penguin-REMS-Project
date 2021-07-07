@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Penguin__REMS_Project
@@ -20,9 +23,11 @@ namespace Penguin__REMS_Project
         public byte[] ScanDataBuffer = new byte[1500];
         private UInt64 ScanTimes = 0;
         public bool stopscan = false;
+
+        
         #endregion
         #region Constructor
-        public ThreeDLidar(string name, string strIp, int vport) : base(name, strIp, vport) { }
+        public ThreeDLidar(string name, string strIp, int vport , String type) : base(name, strIp, vport , type) { }
         #endregion
         #region Functions
         public override void ConnectToTheLidar()
@@ -34,6 +39,7 @@ namespace Penguin__REMS_Project
                 udpState = new UdpState();
                 udpState.e = lidarEndPoint;
                 udpState.u = listener_Lidar;
+               
             }
             catch
             {
@@ -49,11 +55,13 @@ namespace Penguin__REMS_Project
         }
         private void ScanDataProcessInterface(byte[] scanDataBuffer)
         {
-            if ((sw_scan != null) && (WriteFile == true) && (sw_scan.BaseStream != null))
+           // if ((sw_scan != null) && (WriteFile == true) && (sw_scan.BaseStream != null))
             {
-                DateTime _now = DateTime.Now;
-                string NowString = _now.ToString("yyyyMMddHHmmssffff-");   //Timestamp.
-                sw_scan.WriteLine(NowString + BitConverter.ToString(scanDataBuffer));
+              DateTime _now = DateTime.Now;
+              string NowString = _now.ToString("yyyyMMddHHmmssffff-");   //Timestamp.
+
+                pointCloudRawDataCollection.Add(NowString + BitConverter.ToString(scanDataBuffer));
+                //sw_scan.WriteLine(NowString + BitConverter.ToString(scanDataBuffer));
                 if (ScanTimes > 0xFFFFFFFFFFFFFFFF)
                     ScanTimes = 0;
                 else
@@ -86,7 +94,15 @@ namespace Penguin__REMS_Project
             {
                 WriteFile = true;
                 continuousReading = true;
-                //listener_Lidar.BeginReceive(new AsyncCallback(ReceiveScanData), s);
+
+                IPAddress ipAddressVelodyne = IPAddress.Parse("192.168.1.200");
+                int portLidar = 2368;
+                lidarEndPoint = new IPEndPoint(ipAddressVelodyne, portLidar);
+                listener_Lidar = new UdpClient(portLidar);
+                UdpState s = new UdpState();
+                s.e = lidarEndPoint;
+                s.u = listener_Lidar;
+                listener_Lidar.BeginReceive(new AsyncCallback(ReceiveScanData), s);
             }
             catch (Exception e)
             {
@@ -111,6 +127,25 @@ namespace Penguin__REMS_Project
                 listener_Lidar.BeginReceive(new AsyncCallback(ReceiveScanData), s);
             }
 
+        }
+
+       
+        public override string PullAFrame()
+        {
+           
+            
+
+
+            if (pointCloudRawDataCollection.Count() == 0) {
+                return "No Frame got";
+            }
+            return pointCloudRawDataCollection.Last();
+        }
+
+        public override void UpdateRawData(object sender, NotifyCollectionChangedEventArgs e)
+        {
+           // String lastFrame = pointCloudRawDataCollection.Last();
+           //sw_scan.WriteLine(lastFrame);
         }
         #endregion
         #region Inner Class Udp State

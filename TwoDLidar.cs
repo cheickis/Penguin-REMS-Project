@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using System.Net.Sockets;
 using System.IO;
+using System.Collections.Specialized;
 
 namespace Penguin__REMS_Project
 {
@@ -20,7 +21,7 @@ namespace Penguin__REMS_Project
         private StreamWriter fileWriter, writer;
        
         #endregion
-        public TwoDLidar(String name ,string strIp, int vport) : base( name, strIp, vport)
+        public TwoDLidar(String name, String strIp, int vport, String type) : base( name, strIp, vport, type)
         {
 
         }
@@ -56,7 +57,7 @@ namespace Penguin__REMS_Project
         /// Reads incoming data from the TCP-socket
         /// </summary>
         /// <returns>ASCII string containing the read data</returns>
-        private string readTCP()
+        private string ReadTCP()
         {
             String data = null;
             Byte[] bytes = new Byte[15000]; //big Array to be sure that we don't loose some datas
@@ -89,7 +90,7 @@ namespace Penguin__REMS_Project
         /// Reads incoming data from the TCP-socket
         /// </summary>
         /// <returns>Byte array containing read data</returns>
-        private Byte[] readTCPbyte()
+        private Byte[] ReadTCPbyte()
         {
             if (!stream.DataAvailable)
             {
@@ -103,7 +104,7 @@ namespace Penguin__REMS_Project
             }
             return null;
         }
-        private void updateDataFile(String data)
+        private void UpdateDataFile(String data)
         {
             // Change decimal separator from , to .
             System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
@@ -133,6 +134,15 @@ namespace Penguin__REMS_Project
             throw new NotImplementedException();
         }
 
-       
+      
+        public override string PullAFrame()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void UpdateRawData(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

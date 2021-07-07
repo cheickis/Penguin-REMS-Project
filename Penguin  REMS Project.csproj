@@ -111,6 +111,21 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="MetroFramework.txt" />
+    <None Include="Resources\Yellow.png" />
+    <None Include="Resources\Red.png" />
+    <None Include="Resources\Record.png" />
+    <None Include="Resources\Purple.png" />
+    <None Include="Resources\Play.png" />
+    <None Include="Resources\Pause.png" />
+    <None Include="Resources\Orange.png" />
+    <None Include="Resources\AdvancedSetting.png" />
+    <None Include="Resources\close.png" />
+    <None Include="Resources\Green.png" />
+    <Content Include="Resources\leishen.ico" />
+    <Content Include="Resources\leishen.png" />
+    <None Include="Resources\leishen2.png" />
+    <None Include="Resources\leishen1.ico" />
+    <None Include="Resources\leishen1.png" />
     <None Include="Resources\isckLMS.jpg" />
     <None Include="Resources\isckLMS.png" />
   </ItemGroup>
