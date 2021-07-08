@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net;
+using System.Net.Sockets;
+using System.IO;
 
 using System.Net.Sockets;
 using System.IO;
@@ -19,9 +22,9 @@ namespace Penguin__REMS_Project
         private TcpClient Tcp;
         private NetworkStream stream;
         private StreamWriter fileWriter, writer;
-       
         #endregion
         public TwoDLidar(String name, String strIp, int vport, String type) : base( name, strIp, vport, type)
+
         {
 
         }
