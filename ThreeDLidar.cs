@@ -74,11 +74,11 @@ namespace Penguin__REMS_Project
             DateTime _now = DateTime.Now;
             string NowString = _now.ToString("yyyyMMddHHmmssffff-");
             String data = NowString + BitConverter.ToString(scanDataBuffer);
-            if (Request == ConstantStringMessage.ONE_TELEGRAMM) {
+           // if (Request == ConstantStringMessage.ONE_TELEGRAMM) {
 
-                pointCloudRawDataCollection.Add(data);
-            }
-            else if ((sw_scan != null) && (WriteFile == true) && (sw_scan.BaseStream != null))
+             //   pointCloudRawDataCollection.Add(data);
+           // }
+           // else if ((sw_scan != null) && (WriteFile == true) && (sw_scan.BaseStream != null))
             {
         
                 pointCloudRawDataCollection.Add(data);
@@ -141,8 +141,15 @@ namespace Penguin__REMS_Project
         {
             String lastFrame = pointCloudRawDataCollection.Last();
 
-            if(sw_scan!=null)
-                 sw_scan.WriteLine(lastFrame);
+            if ((sw_scan != null) && (WriteFile == true) && (sw_scan.BaseStream != null) && (lastFrame != null))
+            {
+                lock (sw_scan)
+                {
+                    sw_scan.WriteLine(lastFrame);
+                }
+            
+            }   
+                
         }
 
      

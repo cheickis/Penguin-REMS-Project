@@ -15,6 +15,7 @@ using MetroFramework.Controls;
 using System.Threading;
 using System.Collections;
 using System.Windows.Forms;
+using System.IO;
 
 namespace Penguin__REMS_Project
 {
@@ -27,6 +28,7 @@ namespace Penguin__REMS_Project
         private object m_lockScan = new object();
         private bool m_isRunningScan = false;
         private bool m_isAbortRequestedScan = false;
+        StreamWriter writer, reader;
         #endregion
 
         #region 3D LIDAR
@@ -187,6 +189,46 @@ namespace Penguin__REMS_Project
 
         }
 
+
+
+        public void openLidarConfigFile() {
+
+            try
+            {
+                // Create an instance of StreamReader to read from a file.
+                // The using statement also closes the StreamReader.
+                using (StreamReader sr = new StreamReader("TestFile.txt"))
+                {
+                    string line;
+                    // Read and display lines from the file until the end of
+                    // the file is reached.
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        Console.WriteLine(line);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                // Let the user know what went wrong.
+                Console.WriteLine("The file could not be read:");
+                Console.WriteLine(e.Message);
+            }
+
+            writer = new StreamWriter(new FileStream(ConstantStringMessage.LIDARDEVICEFILE, FileMode.Create), Encoding.ASCII);
+        }
+        private void SaveNewLidarConfig() { 
+        
+        
+        
+        }
+
+        private void LoadPreviewLidar() { 
+        
+        
+        
+        
+        }
         #endregion
 
 
@@ -339,17 +381,19 @@ namespace Penguin__REMS_Project
         private void StartLidarsCommunications(String timeStamp)
         {
             SetSScansDatasFiles(timeStamp);
+          
             while (true)
             {
                 //ScanningTile.Text = " Scanning ...  ";
                 LidarsStartScan();
                 if (m_isAbortRequestedScan)
                 {
-                    DialogResult dr = MessageBox.Show(this, "Do you to stop Scanning? ", "", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                   
+                    DialogResult dr = ShowMessage("Do you to stop Scanning? ", "Stop Scanning Message", MessageBoxButtons.YesNo);
                  
                     if (dr == DialogResult.Yes)
                     {
-                        //ScanningTile.Text = " Stop Scanning  ";
+                        //ScanningTile.Text = " Stop Scanning  "; 
                        
                         CloseLidarsFiles();
                         return;
@@ -391,7 +435,21 @@ namespace Penguin__REMS_Project
         }
         #endregion
 
+        #region UI THREAD SAFE HELPER FUNCTION
 
+        public DialogResult ShowMessage(string msg, string caption, MessageBoxButtons buttons)
+        {
+            if (InvokeRequired)
+            {
+                Func<DialogResult> m = () => MessageBox.Show(msg, caption, buttons);
+                return (DialogResult)Invoke(m);
+            }
+            else
+            {
+                return MessageBox.Show(msg, caption, buttons);
+            }
+        }
+        #endregion
 
     }
 
