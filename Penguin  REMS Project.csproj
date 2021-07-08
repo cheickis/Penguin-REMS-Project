@@ -70,6 +70,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConstantStringMessage.cs" />
     <Compile Include="Lidar.cs" />
     <Compile Include="Realsens.cs" />
     <Compile Include="Remsform.cs">
