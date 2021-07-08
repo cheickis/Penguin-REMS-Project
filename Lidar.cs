@@ -25,6 +25,18 @@ namespace Penguin__REMS_Project
         protected string lidarFile;
         protected String lidarType;
         protected ObservableCollection<String> pointCloudRawDataCollection;
+        protected Boolean isConnected;
+
+        #region File Handler Variable
+        protected StreamWriter sw_scan;
+        protected bool continuousReading = true;
+        protected bool WriteFile = false;
+        protected byte[] ScanDataBuffer = new byte[1500];
+        protected UInt64 ScanTimes = 0;
+        protected bool stopscan = false;
+
+        protected String req;
+        #endregion
         #endregion
 
         #region Constructor 
@@ -37,21 +49,11 @@ namespace Penguin__REMS_Project
             this.lidarEndPoint = new IPEndPoint(this.ipAdr, this.port);
             pointCloudRawDataCollection = new ObservableCollection<string>();
             pointCloudRawDataCollection.CollectionChanged += UpdateRawData;
+            isConnected = false;
         }
-
-        public abstract void UpdateRawData(object sender, NotifyCollectionChangedEventArgs e);
-        
-
         #endregion
 
         #region  Function 
-        /***
-         * 
-         * function use principalement for the 3D lidar
-         **/
-        public abstract void ConnectToTheLidar();
-        public abstract void DisconnectTheLidar();
-
         public String PingLidarResponse() {
 
             Ping pingSender = new Ping();
@@ -76,15 +78,53 @@ namespace Penguin__REMS_Project
 
             return "No response ";
         }
+      
+        #endregion
 
+        #region Abstract METHODE
+        public abstract void ConnectToTheLidar();
+        public abstract void InitCommunication();
+        public abstract void DisconnectTheLidar();
+        public abstract void UpdateRawData(object sender, NotifyCollectionChangedEventArgs e);
         public abstract String PullAFrame();
-        public string LidarFile {
+        public abstract bool OpenFile();
+        public abstract void CloseFile();
+        #endregion
+
+        #region GETTER
+        public string LidarFile
+        {
 
             get => lidarFile;
 
-            set => lidarFile=value;
+            set => lidarFile = value;
         }
 
+        public string Name
+        {
+
+            get => name;
+            set => name = value;
+        }
+
+        public String Type
+        {
+
+            get => lidarType;
+            set => lidarType = value;
+
+        }
+
+
+        public String Request {
+
+            get => req;
+
+            set => req = value;
+        
+        
+        
+        }
         #endregion
     }
 }

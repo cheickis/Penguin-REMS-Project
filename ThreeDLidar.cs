@@ -9,60 +9,80 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Penguin__REMS_Project
 {
     class ThreeDLidar : Lidar
     {
-
-        #region VARIABLE
+        #region VARIABLES
         private UdpClient listener_Lidar; // the lidar Listener
         private UdpState udpState;  // the udp state
-        public StreamWriter sw_scan;
-        public bool continuousReading = true;
-        public bool WriteFile = false;
-        public byte[] ScanDataBuffer = new byte[1500];
-        private UInt64 ScanTimes = 0;
-        public bool stopscan = false;
-
-        
         #endregion
+        
         #region Constructor
         public ThreeDLidar(string name, string strIp, int vport , String type) : base(name, strIp, vport , type) { }
         #endregion
+        
         #region Functions
         public override void ConnectToTheLidar()
         {
             try
             {
                
-                this.listener_Lidar = new UdpClient();
-                udpState = new UdpState();
-                udpState.e = lidarEndPoint;
-                udpState.u = listener_Lidar;
-               
+                this.listener_Lidar = new UdpClient(port);
+                udpState = new UdpState
+                {
+                    e = lidarEndPoint,
+                    u = listener_Lidar
+                };
+                isConnected = true;
             }
-            catch
+            catch (Exception ex)
             {
 
-                // add the handling erro message here
+                MessageBox.Show( ex.ToString(), "Connnection Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             }
         }
 
+        public override void InitCommunication()
+        {
+            try
+            {
+                if (!isConnected) {
+                   ConnectToTheLidar();
+                }
+                WriteFile = true;
+                continuousReading = true;
+                listener_Lidar.BeginReceive(new AsyncCallback(ReceiveScanData), udpState);
+
+            }
+            catch (Exception e) // Must be check propertly to handle the exception
+            {
+                //MessageBox.Show(e.Message, "Connnection Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+             
+            };
+        }
         public override void DisconnectTheLidar()
         {
-            throw new NotImplementedException();
+            isConnected = false;
+
         }
         private void ScanDataProcessInterface(byte[] scanDataBuffer)
         {
-           // if ((sw_scan != null) && (WriteFile == true) && (sw_scan.BaseStream != null))
-            {
-              DateTime _now = DateTime.Now;
-              string NowString = _now.ToString("yyyyMMddHHmmssffff-");   //Timestamp.
+            DateTime _now = DateTime.Now;
+            string NowString = _now.ToString("yyyyMMddHHmmssffff-");
+            String data = NowString + BitConverter.ToString(scanDataBuffer);
+            if (Request == ConstantStringMessage.ONE_TELEGRAMM) {
 
-                pointCloudRawDataCollection.Add(NowString + BitConverter.ToString(scanDataBuffer));
-                //sw_scan.WriteLine(NowString + BitConverter.ToString(scanDataBuffer));
+                pointCloudRawDataCollection.Add(data);
+            }
+            else if ((sw_scan != null) && (WriteFile == true) && (sw_scan.BaseStream != null))
+            {
+        
+                pointCloudRawDataCollection.Add(data);
+        
                 if (ScanTimes > 0xFFFFFFFFFFFFFFFF)
                     ScanTimes = 0;
                 else
@@ -71,46 +91,20 @@ namespace Penguin__REMS_Project
             }
         }
 
-        public bool OpenFile(string FileName)
+        public override bool OpenFile()
         {
-            sw_scan = new StreamWriter(FileName);
+            sw_scan = new StreamWriter(lidarFile);
             if (sw_scan != null)
                 return true;
             else
                 return false;
         }
 
-        public void CloseFile()
+        public override void CloseFile()
         {
             WriteFile = false;
             if (sw_scan != null)
                 sw_scan.Close();
-        }
-
-
-        public void InitialScanner()
-        {
-
-            try
-            {
-                WriteFile = true;
-                continuousReading = true;
-
-                IPAddress ipAddressVelodyne = IPAddress.Parse("192.168.1.200");
-                int portLidar = 2368;
-                lidarEndPoint = new IPEndPoint(ipAddressVelodyne, portLidar);
-                listener_Lidar = new UdpClient(portLidar);
-                UdpState s = new UdpState();
-                s.e = lidarEndPoint;
-                s.u = listener_Lidar;
-                listener_Lidar.BeginReceive(new AsyncCallback(ReceiveScanData), s);
-            }
-            catch (Exception e)
-            {
-
-                Console.WriteLine(e.Message);
-            };
-
         }
 
         private void ReceiveScanData(IAsyncResult ar)
@@ -122,9 +116,11 @@ namespace Penguin__REMS_Project
             ScanDataProcessInterface(receiveBytes);
             if (stopscan == false)
             {
-                UdpState s = new UdpState();
-                s.e = lidarEndPoint;
-                s.u = listener_Lidar;
+                UdpState s = new UdpState
+                {
+                    e = lidarEndPoint,
+                    u = listener_Lidar
+                };
                 listener_Lidar.BeginReceive(new AsyncCallback(ReceiveScanData), s);
             }
 
@@ -133,22 +129,25 @@ namespace Penguin__REMS_Project
        
         public override string PullAFrame()
         {
-           
-            
-
-
+             InitCommunication();
+            Thread.Sleep(2);
             if (pointCloudRawDataCollection.Count() == 0) {
-                return "No Frame got";
+                return "No Frame received";
             }
             return pointCloudRawDataCollection.Last();
         }
 
         public override void UpdateRawData(object sender, NotifyCollectionChangedEventArgs e)
         {
-           // String lastFrame = pointCloudRawDataCollection.Last();
-           //sw_scan.WriteLine(lastFrame);
+            String lastFrame = pointCloudRawDataCollection.Last();
+
+            if(sw_scan!=null)
+                 sw_scan.WriteLine(lastFrame);
         }
+
+     
         #endregion
+
         #region Inner Class Udp State
         public class UdpState
         {

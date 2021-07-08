@@ -326,6 +326,7 @@ namespace Penguin__REMS_Project
             this.lidarConfigLogview.Location = new System.Drawing.Point(319, 15);
             this.lidarConfigLogview.Multiline = true;
             this.lidarConfigLogview.Name = "lidarConfigLogview";
+            this.lidarConfigLogview.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.lidarConfigLogview.Size = new System.Drawing.Size(492, 488);
             this.lidarConfigLogview.TabIndex = 3;
             // 

@@ -8,11 +8,13 @@ using System.Text;
 using System.Threading.Tasks;
 using MetroFramework;
 using MetroFramework.Forms;
-using System.Windows.Forms;
+
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using MetroFramework.Controls;
 using System.Threading;
+using System.Collections;
+using System.Windows.Forms;
 
 namespace Penguin__REMS_Project
 {
@@ -21,6 +23,10 @@ namespace Penguin__REMS_Project
 
         #region Variable
         static Lidar lidar;
+        static List<Lidar> lidars;
+        private object m_lockScan = new object();
+        private bool m_isRunningScan = false;
+        private bool m_isAbortRequestedScan = false;
         #endregion
 
         #region 3D LIDAR
@@ -46,13 +52,13 @@ namespace Penguin__REMS_Project
         Queue<Lidar> lidarQ;
         #endregion
 
-
-
+        #region Constructor
         public Remsform()
         {
             InitializeComponent();
             InitCollection();
         }
+        #endregion
 
         #region Collection Function 
 
@@ -64,6 +70,7 @@ namespace Penguin__REMS_Project
 
             twoDLidarCollections.CollectionChanged += upadteSickListForm;
             lidarQ = new Queue<Lidar>();
+            lidars = new List<Lidar>();
 
         }
 
@@ -72,8 +79,6 @@ namespace Penguin__REMS_Project
            // throw new NotImplementedException();
         }
         #endregion
-
-     
 
         #region Scan Button handler
         private void StartBtn_Click(object sender, EventArgs e)
@@ -85,7 +90,7 @@ namespace Penguin__REMS_Project
             // Perform three tasks in parallel :  2D lidar , 3D lidar, realsens, GPR ...
             Parallel.Invoke(() =>
             { 
-                TwoLidarHandlers(NowString);
+                LidarsThreadHandlers(NowString);
             },  
             () =>
             {
@@ -112,22 +117,13 @@ namespace Penguin__REMS_Project
 
         #endregion
 
-
         #region Two Lidar
-        private void TwoLidarHandlers(String timeStamp) {
+        private void LidarsThreadHandlers(String timeStamp) {
 
-
-            if (twoDLidarCollections.Count != 0)
-            {
-                foreach (var item in twoDLidarCollections)
-                {
-                    
-
-
-                }
-            }
+            LidarsThread(timeStamp);
         }
         #endregion
+
         #region Three D Lidar
         private void ThreeDLidarHandler(String timeStamp) {
             if (treeDLidarCollection.Count != 0)
@@ -141,18 +137,21 @@ namespace Penguin__REMS_Project
             }
         }
         #endregion
+
         #region Realsens
         private void RealsensHandler()
         {
 
         }
         #endregion
+
         #region  Talon handler
         private void TalonHandler()
         {
 
         }
         #endregion
+        
         #region  GPR (Ground prenetration radar handler
         private void GPRHandler()
         {
@@ -160,13 +159,11 @@ namespace Penguin__REMS_Project
         }
         #endregion
 
-
         #region Lidar Config Tab Function
         private void ResetLidarBtn_Click(object sender, EventArgs e)
         {
             ResetAddLidarForm(); 
         }
-
         private void AddLidarBtn_Click(object sender, EventArgs e)
         {
             String type = lidarTypeCbx.Text;
@@ -189,7 +186,6 @@ namespace Penguin__REMS_Project
 
 
         }
-
 
         #endregion
 
@@ -217,21 +213,14 @@ namespace Penguin__REMS_Project
         {
             ThreeDLidar newThreeDLidar = new ThreeDLidar(name, ip, port , type);
             treeDLidarCollection.Add(newThreeDLidar);
-            AddLidarTile(name, type);
-            ResetAddLidarForm();
-            lidarQ.Enqueue(newThreeDLidar);
-            lidar = newThreeDLidar;
+            SetLidarCollectionAndForm(newThreeDLidar);
         }
         private void  AddTwoDLidar(String name, String ip, int port, string type)
         {
 
             TwoDLidar newtwoDLidar = new TwoDLidar(name, ip, port, type);
-            ResetAddLidarForm();
             twoDLidarCollections.Add(newtwoDLidar);
-            AddLidarTile(name, type);
-            lidarQ.Enqueue(newtwoDLidar);
-            lidar = newtwoDLidar;
-
+            SetLidarCollectionAndForm(newtwoDLidar);
         }
         private void AddLidarTile(String name, String type) {
 
@@ -278,6 +267,14 @@ namespace Penguin__REMS_Project
 
         }
 
+
+        private void SetLidarCollectionAndForm(Lidar tlidar ) {
+            ResetAddLidarForm();
+            AddLidarTile(tlidar.Name, tlidar.Type);
+            lidarQ.Enqueue(tlidar);
+            lidar = tlidar;
+            lidars.Add(lidar);
+        }
         #endregion
 
         #region  Ping and  Pull
@@ -293,31 +290,109 @@ namespace Penguin__REMS_Project
         private void PullFrameBtn_Click(object sender, EventArgs e)
         {
 
-            ThreeDLidar temp = new ThreeDLidar("Leinshen", "192.168.1.200", 2368, "3D");
 
-            temp.ConnectToTheLidar();
-
-            while (true) {
-                temp.InitialScanner();
-
-                Thread.Sleep(1000);
-
-                lidarConfigLogview.Text = temp.PullAFrame();
-            }
-
-           /* if(lidar== null)
+            if(lidar== null)
                 lidar = lidarQ.Peek();
-            lidarConfigLogview.Clear();
+             lidarConfigLogview.Clear();
 
-            lidar.ConnectToTheLidar();
-
-           
-            lidarConfigLogview.Text = lidar.PullAFrame();
-            */
-
+                 lidar.Request = ConstantStringMessage.ONE_TELEGRAMM;
+                lidarConfigLogview.Text = lidar.PullAFrame();
+                lidarConfigLogview.Update();
+                lidarConfigLogview.Refresh();
         }
 
         #endregion
+
+
+        #region Handle Lidar Thread
+
+        private void LidarsThread(String timeStamp)
+        {
+            lock (m_lockScan)
+            {
+                if (m_isRunningScan)
+                {
+                    m_isAbortRequestedScan = true;
+                }
+                else
+                {
+                    m_isAbortRequestedScan = false;
+                    m_isRunningScan = true;
+                    ThreadPool.QueueUserWorkItem(o => LidarsScanningBackgroundMethod(timeStamp));
+                }
+            }
+        }
+        private void LidarsScanningBackgroundMethod(String timeStamp)
+        {
+            try
+            {
+                StartLidarsCommunications(timeStamp);
+            }
+            finally
+            {
+                lock (m_lockScan)
+                {
+                    m_isRunningScan = false;
+                }
+            }
+        }
+        private void StartLidarsCommunications(String timeStamp)
+        {
+            SetSScansDatasFiles(timeStamp);
+            while (true)
+            {
+                //ScanningTile.Text = " Scanning ...  ";
+                LidarsStartScan();
+                if (m_isAbortRequestedScan)
+                {
+                    DialogResult dr = MessageBox.Show(this, "Do you to stop Scanning? ", "", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                 
+                    if (dr == DialogResult.Yes)
+                    {
+                        //ScanningTile.Text = " Stop Scanning  ";
+                       
+                        CloseLidarsFiles();
+                        return;
+                    }
+                    else
+                    {
+                        m_isAbortRequestedScan = false;
+
+                    }
+                }
+               
+            }
+
+        }
+    
+        private void SetSScansDatasFiles(String NowString)
+        {
+          
+            foreach (var item in lidars)
+            {
+                item.LidarFile = @"C:\Scandatas\" + item.Name + "_ScanData_" + NowString + ".txt";
+                item.OpenFile();
+            }
+        }
+
+        private void CloseLidarsFiles() {
+
+            foreach (var item in lidars) {
+                item.CloseFile();
+            }
+        }
+        private void LidarsStartScan()
+        {
+            foreach (var item in lidars)
+            {
+                item.InitCommunication();
+            }
+            Thread.Sleep(500);
+        }
+        #endregion
+
+
+
     }
 
 }

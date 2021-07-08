@@ -39,15 +39,14 @@ namespace Penguin__REMS_Project
         {
             try
             {
-                Console.WriteLine("\tInit connection to SICK LMS 511");
+             
                 Tcp = new TcpClient();
                 Tcp.Connect(ipAdr, port);
                 stream = Tcp.GetStream();
-                // fileWriter = new StreamWriter(new FileStream("../../data.txt", FileMode.Create), Encoding.ASCII);
                 fileWriter = new StreamWriter(new FileStream(lidarFile, FileMode.Create), Encoding.ASCII);
                 stream.ReadTimeout = 1000;
                 writer = new StreamWriter(Tcp.GetStream(), Encoding.ASCII);
-                Console.WriteLine("\tConnection to SICK LMS 511 ok");
+              
 
             }
             catch (Exception Ex)
@@ -83,7 +82,6 @@ namespace Penguin__REMS_Project
                 {
                     endpoint = bytes.Length;
                 }
-                //return data.Substring(startpoint, endpoint);
                 return data;
 
             }
@@ -109,35 +107,22 @@ namespace Penguin__REMS_Project
         }
         private void UpdateDataFile(String data)
         {
-            // Change decimal separator from , to .
+         
             System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
             customCulture.NumberFormat.NumberDecimalSeparator = ".";
-            // Backup the current culture
             System.Globalization.CultureInfo defaultCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
             System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
-
-            ///fileWriter.WriteLine(DateTime.Now.ToString("hh:mm:ss.ff ") + data);
             fileWriter.WriteLine(data);
-           // Console.WriteLine("Data was update");
-            // Restore the , as default decimal separator
+  
             System.Threading.Thread.CurrentThread.CurrentCulture = defaultCulture;
 
         }
-        public void CloseFile()
-        {
-
-            fileWriter.Close();
-        }
-
-        public Boolean IsContainTheOpposite()
-        {
-            return false;
-        }
+      
+     
         public override void DisconnectTheLidar()
         {
             throw new NotImplementedException();
         }
-
 
       
         public override string PullAFrame()
@@ -146,6 +131,21 @@ namespace Penguin__REMS_Project
         }
 
         public override void UpdateRawData(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void InitCommunication()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool OpenFile()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void CloseFile()
         {
             throw new NotImplementedException();
         }
