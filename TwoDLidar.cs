@@ -43,11 +43,9 @@ namespace Penguin__REMS_Project
                 Tcp = new TcpClient();
                 Tcp.Connect(ipAdr, port);
                 stream = Tcp.GetStream();
-                fileWriter = new StreamWriter(new FileStream(lidarFile, FileMode.Create), Encoding.ASCII);
                 stream.ReadTimeout = 1000;
                 writer = new StreamWriter(Tcp.GetStream(), Encoding.ASCII);
-              
-
+                isConnected = Tcp.Connected;
             }
             catch (Exception Ex)
             {
@@ -67,7 +65,8 @@ namespace Penguin__REMS_Project
             int i;
             while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
             {
-                // Translate data bytes to a ASCII string.
+               
+
                 data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
 
                 // STX and ETX in HEX indicate start and end of messages
@@ -105,49 +104,79 @@ namespace Penguin__REMS_Project
             }
             return null;
         }
-        private void UpdateDataFile(String data)
-        {
-         
-            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
-            customCulture.NumberFormat.NumberDecimalSeparator = ".";
-            System.Globalization.CultureInfo defaultCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
-            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
-            fileWriter.WriteLine(data);
-  
-            System.Threading.Thread.CurrentThread.CurrentCulture = defaultCulture;
-
-        }
-      
+       
      
         public override void DisconnectTheLidar()
         {
-            throw new NotImplementedException();
+            stream.Close();
+
+           if(Tcp.Connected)
+               Tcp.Close();
+            
         }
 
       
         public override string PullAFrame()
         {
-            throw new NotImplementedException();
+             ReadScan();
+             return GetAFrameData();
         }
 
         public override void UpdateRawData(object sender, NotifyCollectionChangedEventArgs e)
         {
-            throw new NotImplementedException();
+           UpateScanFile();
         }
 
+        public void SetNoStopReading() { 
+        
+         writer.Write(READREQ);
+            writer.Flush();
+            // Wait for an answer
+            System.Threading.Thread.Sleep(200);  // Need to check 
+        
+        
+        }
         public override void InitCommunication()
         {
-            throw new NotImplementedException();
-        }
+            try
+            {
+                if (!isConnected) {
+                   
+                    ConnectToTheLidar();
+                }
+                WriteFile = true;
+                continuousReading = true;
+                ReadScan();
+            }catch(Exception ex) { 
+               // Handle
+           
+            }
+         }
 
-        public override bool OpenFile()
+        
+        /// <summary>
+        /// Read results of one measurement 
+        /// </summary>
+        /// <returns>RQAW DAta</returns>
+        public void  ReadScan()
         {
-            throw new NotImplementedException();
+         
+            //Request results from SICK LMS511 
+            writer.Write(READREQSUITE);
+            writer.Flush();
+            // Wait for an answer
+           System.Threading.Thread.Sleep(100);  // Need to check 
+           
+            DateTime _now = DateTime.Now;
+            String NowString = _now.ToString("yyyyMMddHHmmssffff-");
+            String  scanData = ReadTCP();  
+            if (scanData!=null && scanData.Contains("sRA") == true)
+            {
+                 pointCloudRawDataCollection.Add( NowString + scanData);
+                
+            }
+       
         }
-
-        public override void CloseFile()
-        {
-            throw new NotImplementedException();
-        }
+       
     }
 }

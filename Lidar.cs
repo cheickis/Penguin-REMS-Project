@@ -78,7 +78,45 @@ namespace Penguin__REMS_Project
 
             return "No response ";
         }
+        public  bool OpenFile()
+        {
+            sw_scan = new StreamWriter(lidarFile);
+            if (sw_scan != null)
+                return true;
+            else
+                return false;
+        }
+
+        public  void CloseFile()
+        {
+            WriteFile = false;
+            if (sw_scan != null)
+                sw_scan.Close();
+        }
       
+
+        public void UpateScanFile() { 
+        
+         String lastFrame = pointCloudRawDataCollection.Last();
+
+            if ((sw_scan != null) && (WriteFile == true) && (sw_scan.BaseStream != null) && (lastFrame != null))
+            {
+                lock (sw_scan)
+                {
+                    sw_scan.WriteLine(lastFrame);
+                }
+            
+            }   
+        }
+
+        public String GetAFrameData() { 
+        
+         if (pointCloudRawDataCollection.Count() == 0) {
+                return "No Frame received";
+            }
+            return pointCloudRawDataCollection.Last();
+        
+        }
         #endregion
 
         #region Abstract METHODE
@@ -87,8 +125,8 @@ namespace Penguin__REMS_Project
         public abstract void DisconnectTheLidar();
         public abstract void UpdateRawData(object sender, NotifyCollectionChangedEventArgs e);
         public abstract String PullAFrame();
-        public abstract bool OpenFile();
-        public abstract void CloseFile();
+       /* public abstract bool OpenFile();
+        public abstract void CloseFile();*/
         #endregion
 
         #region GETTER

@@ -91,7 +91,7 @@ namespace Penguin__REMS_Project
             }
         }
 
-        public override bool OpenFile()
+       /* public override bool OpenFile()
         {
             sw_scan = new StreamWriter(lidarFile);
             if (sw_scan != null)
@@ -106,6 +106,7 @@ namespace Penguin__REMS_Project
             if (sw_scan != null)
                 sw_scan.Close();
         }
+        */
 
         private void ReceiveScanData(IAsyncResult ar)
         {
@@ -131,25 +132,12 @@ namespace Penguin__REMS_Project
         {
              InitCommunication();
             Thread.Sleep(2);
-            if (pointCloudRawDataCollection.Count() == 0) {
-                return "No Frame received";
-            }
-            return pointCloudRawDataCollection.Last();
+           return GetAFrameData();
         }
 
         public override void UpdateRawData(object sender, NotifyCollectionChangedEventArgs e)
         {
-            String lastFrame = pointCloudRawDataCollection.Last();
-
-            if ((sw_scan != null) && (WriteFile == true) && (sw_scan.BaseStream != null) && (lastFrame != null))
-            {
-                lock (sw_scan)
-                {
-                    sw_scan.WriteLine(lastFrame);
-                }
-            
-            }   
-                
+           UpateScanFile();
         }
 
      

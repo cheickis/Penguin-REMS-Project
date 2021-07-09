@@ -322,7 +322,7 @@ namespace Penguin__REMS_Project
         #region  Ping and  Pull
         private void PingNewLidarBtn_Click(object sender, EventArgs e)
         {
-             lidar = lidarQ.Peek();
+             lidar = lidarQ.Last();
             if (lidar != null) {
                 lidar.ConnectToTheLidar();
                 lidarConfigLogview.Text = lidar.PingLidarResponse();
@@ -416,6 +416,7 @@ namespace Penguin__REMS_Project
             {
                 item.LidarFile = @"C:\Scandatas\" + item.Name + "_ScanData_" + NowString + ".txt";
                 item.OpenFile();
+                
             }
         }
 
