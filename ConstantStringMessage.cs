@@ -10,5 +10,8 @@ namespace Penguin__REMS_Project
     {
 
         public const String ONE_TELEGRAMM = "Pull a telegramm";
+        public const String TXTEXTENSION = ".txt";
+        public const String LIDARDEVICEFILE = "lidarConfig.txt";
+
     }
 }
