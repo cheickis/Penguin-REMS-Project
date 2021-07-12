@@ -450,19 +450,14 @@ namespace Penguin__REMS_Project
 
         #region MAIN TAB UI 
 
-        
-
         private void metroButton1_Click(object sender, EventArgs e)
         {
            
         }
-
         private void AddNewGroupBox(String ip, String name, String type)
         {
 
-         this.mainfLPl.Controls.Add(AddGroupBox(ip, name, type));
-
-
+           this.mainfLPl.Controls.Add(AddGroupBox(ip, name, type));
         }
 
         private GroupBox AddGroupBox(String ip, String name, String type) {
@@ -586,12 +581,8 @@ namespace Penguin__REMS_Project
 
             return groupBox1;
         }
-
-
         private void SetDeviceImage(MetroTile vMetroTile, String name)
         {
-
-         
 
                 if (name.Contains("LMS511"))
                 {
@@ -609,17 +600,15 @@ namespace Penguin__REMS_Project
                 }
                 else if (name.Contains("Leinshen"))
                 {
-                 // vMetroTile.Size = new System.Drawing.Size(202, 200);
-                vMetroTile.TileImage = global::Penguin__REMS_Project.Properties.Resources.leishen_res;
+                
+                      vMetroTile.TileImage = global::Penguin__REMS_Project.Properties.Resources.leishen_res;
                 }
                 else if (name.Contains("")) {
 
                     vMetroTile.TileImage = global::Penguin__REMS_Project.Properties.Resources.isckLMS;
 
                 }
-                       
-            
-    
+
         }
         #endregion
 
