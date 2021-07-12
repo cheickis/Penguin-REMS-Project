@@ -167,6 +167,11 @@ namespace Penguin__REMS_Project
             get => strIpAdress;
           
         }
+
+        public Boolean IsConnected {
+
+            get => isConnected;
+        }
         #endregion
     }
 }

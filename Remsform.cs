@@ -44,6 +44,8 @@ namespace Penguin__REMS_Project
         #endregion
 
         #region Observable COLLECTION
+
+        private ObservableCollection<Lidar> lidarCollections;
         private ObservableCollection<TwoDLidar> twoDLidarCollections;
         private ObservableCollection<ThreeDLidar> treeDLidarCollection;
         private ObservableCollection<Realsens> realsensCollection;
@@ -66,6 +68,7 @@ namespace Penguin__REMS_Project
 
         private void InitCollection()
         {
+            lidarCollections = new ObservableCollection<Lidar>();
             twoDLidarCollections = new ObservableCollection<TwoDLidar>();
             treeDLidarCollection = new ObservableCollection<ThreeDLidar>();
             realsensCollection = new ObservableCollection<Realsens>();
@@ -168,33 +171,33 @@ namespace Penguin__REMS_Project
         }
         private void AddLidarBtn_Click(object sender, EventArgs e)
         {
-            String type = lidarTypeCbx.Text;
-            String lidarName = lidarNameCbx.Text;
-            if (!lidarIPTxt.Equals("") && !lidarPortTxt.Equals("") && !lidarName.Equals("") && !type.Equals(""))
-            {
-        
-                String ip = lidarIPTxt.Text;
-                int port = Int32.Parse(lidarPortTxt.Text);
-                AddLidar( lidarName,ip, port, type);
-                pingNewLidarBtn.Visible = true;
-                pullFrameBtn.Visible = true;
-            }
-            else
-            {
-                // handle the error  herer
-            }
+            /* String type = lidarTypeCbx.Text;
+             String lidarName = lidarNameCbx.Text;
+             if (!lidarIPTxt.Equals("") && !lidarPortTxt.Equals("") && !lidarName.Equals("") && !type.Equals(""))
+             {
+
+                 String ip = lidarIPTxt.Text;
+                 int port = Int32.Parse(lidarPortTxt.Text);
+                 AddLidar( lidarName,ip, port, type);
+                 pingNewLidarBtn.Visible = true;
+                 pullFrameBtn.Visible = true;
+             }
+             else
+             {
+                 // handle the error  herer
+             }*/
+            OpenLidarConfigFile();
         }
         public void OpenLidarConfigFile() {
 
+            writer = new StreamWriter(new FileStream(ConstantStringMessage.LIDARDEVICEFILE, FileMode.OpenOrCreate), Encoding.ASCII);
             try
             {
-                // Create an instance of StreamReader to read from a file.
-                // The using statement also closes the StreamReader.
-                using (StreamReader sr = new StreamReader("TestFile.txt"))
+              
+                using (StreamReader sr = new StreamReader(ConstantStringMessage.LIDARDEVICEFILE))
                 {
                     string line;
-                    // Read and display lines from the file until the end of
-                    // the file is reached.
+                 
                     while ((line = sr.ReadLine()) != null)
                     {
                         Console.WriteLine(line);
@@ -208,12 +211,15 @@ namespace Penguin__REMS_Project
                 Console.WriteLine(e.Message);
             }
 
-            writer = new StreamWriter(new FileStream(ConstantStringMessage.LIDARDEVICEFILE, FileMode.Create), Encoding.ASCII);
+           
         }
-        private void SaveNewLidarConfig() { 
+        private void ParseTheConfigFile()
+        {
+
+        }
+        private void AddNewLidarInTheConfigFile() { 
         
-        
-        
+
         }
 
         private void LoadPreviewLidar() { 
@@ -224,7 +230,6 @@ namespace Penguin__REMS_Project
         }
         #endregion
 
-
         #region Helper
         private void ResetAddLidarForm()
         {
@@ -232,8 +237,6 @@ namespace Penguin__REMS_Project
             lidarPortTxt.Text = "";
            
         }
-
-
         private void AddLidar(String name, String ip, int port, String type) {
             if (type.Equals("2D"))
             {
@@ -301,15 +304,13 @@ namespace Penguin__REMS_Project
             lidarPicInfoTl.Refresh();
 
         }
-
-
         private void SetLidarCollectionAndForm(Lidar tlidar ) {
             ResetAddLidarForm();
             AddLidarTile(tlidar.Name, tlidar.Type);
             lidarQ.Enqueue(tlidar);
             lidar = tlidar;
             lidars.Add(lidar);
-
+            
             AddNewGroupBox(tlidar.STRIPAdresse, tlidar.Name, tlidar.Type);
         }
         #endregion
@@ -339,7 +340,6 @@ namespace Penguin__REMS_Project
         }
 
         #endregion
-
 
         #region Handle Lidar Thread
 
