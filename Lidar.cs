@@ -159,9 +159,13 @@ namespace Penguin__REMS_Project
             get => req;
 
             set => req = value;
-        
-        
-        
+
+        }
+
+        public String STRIPAdresse {
+
+            get => strIpAdress;
+          
         }
         #endregion
     }

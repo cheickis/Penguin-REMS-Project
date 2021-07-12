@@ -93,6 +93,16 @@ namespace Penguin__REMS_Project.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Green1 {
+            get {
+                object obj = ResourceManager.GetObject("Green1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap isckLMS {
             get {
                 object obj = ResourceManager.GetObject("isckLMS", resourceCulture);
@@ -116,6 +126,16 @@ namespace Penguin__REMS_Project.Properties {
         internal static System.Drawing.Bitmap leishen {
             get {
                 object obj = ResourceManager.GetObject("leishen", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap leishen_res {
+            get {
+                object obj = ResourceManager.GetObject("leishen_res", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -196,6 +216,26 @@ namespace Penguin__REMS_Project.Properties {
         internal static System.Drawing.Bitmap Red {
             get {
                 object obj = ResourceManager.GetObject("Red", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Red1 {
+            get {
+                object obj = ResourceManager.GetObject("Red1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Red2 {
+            get {
+                object obj = ResourceManager.GetObject("Red2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -181,17 +181,10 @@ namespace Penguin__REMS_Project
             }
             else
             {
-
                 // handle the error  herer
-
             }
-
-
         }
-
-
-
-        public void openLidarConfigFile() {
+        public void OpenLidarConfigFile() {
 
             try
             {
@@ -316,6 +309,8 @@ namespace Penguin__REMS_Project
             lidarQ.Enqueue(tlidar);
             lidar = tlidar;
             lidars.Add(lidar);
+
+            AddNewGroupBox(tlidar.STRIPAdresse, tlidar.Name, tlidar.Type);
         }
         #endregion
 
@@ -451,6 +446,185 @@ namespace Penguin__REMS_Project
             }
         }
         #endregion
+
+
+        #region MAIN TAB UI 
+
+        
+
+        private void metroButton1_Click(object sender, EventArgs e)
+        {
+           
+        }
+
+        private void AddNewGroupBox(String ip, String name, String type)
+        {
+
+         this.mainfLPl.Controls.Add(AddGroupBox(ip, name, type));
+
+
+        }
+
+        private GroupBox AddGroupBox(String ip, String name, String type) {
+
+            GroupBox   groupBox1 = new GroupBox();
+             MetroTile metroTile1 = new MetroTile();
+            MetroLabel metroLabel1 = new MetroLabel();
+            MetroLabel metroLabel2 = new MetroLabel();
+            MetroLabel metroLabel3 = new MetroLabel();
+            MetroLabel metroLabel4 = new MetroLabel();
+            MetroLabel mainIPLbl = new MetroLabel();
+            MetroLabel mainTypeLbl = new MetroLabel();
+            MetroLabel mainDataLbl = new MetroLabel();
+            PictureBox statusPicBx = new PictureBox();
+            // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(mainDataLbl);
+            groupBox1.Controls.Add(mainTypeLbl);
+            groupBox1.Controls.Add(mainIPLbl);
+            groupBox1.Controls.Add(metroLabel4);
+            groupBox1.Controls.Add(metroLabel3);
+            groupBox1.Controls.Add(metroLabel2);
+            groupBox1.Controls.Add(metroLabel1);
+            groupBox1.Controls.Add(metroTile1);
+            groupBox1.Controls.Add(statusPicBx);
+
+            groupBox1.Location = new System.Drawing.Point(3, 3);
+            groupBox1.Name = " ";
+            groupBox1.BackColor = System.Drawing.Color.White;
+            groupBox1.Size = new System.Drawing.Size(344, 242); 
+            groupBox1.Text = name;
+            // 
+            // metroTile1
+            // 
+            metroTile1.Location = new System.Drawing.Point(6, 19);
+            metroTile1.Name = "metroTile1";
+            metroTile1.Size = new System.Drawing.Size(152, 217);
+            metroTile1.Style = MetroFramework.MetroColorStyle.White;
+            metroTile1.TabIndex = 0;
+            metroTile1.Text = "metroTile1";
+
+            SetDeviceImage(metroTile1,  name);
+            metroTile1.UseTileImage = true;
+            // 
+            // metroLabel1
+            // 
+            metroLabel1.AutoSize = true;
+            metroLabel1.Location = new System.Drawing.Point(177, 19);
+            metroLabel1.Name = "metroLabel1";
+            metroLabel1.Size = new System.Drawing.Size(23, 19);
+            metroLabel1.TabIndex = 1;
+            metroLabel1.Text = "IP:";
+            // 
+            // metroLabel2
+            // 
+            metroLabel2.AutoSize = true;
+            metroLabel2.Location = new System.Drawing.Point(175, 70);
+            metroLabel2.Name = "metroLabel2";
+            metroLabel2.Size = new System.Drawing.Size(39, 19);
+            metroLabel2.TabIndex = 2;
+            metroLabel2.Text = "Type:";
+            // 
+            // metroLabel3
+            // 
+            metroLabel3.AutoSize = true;
+            metroLabel3.Location = new System.Drawing.Point(175, 125);
+            metroLabel3.Name = "metroLabel3";
+            metroLabel3.Size = new System.Drawing.Size(39, 19);
+            metroLabel3.Text = "Data:";
+            // 
+            // metroLabel4
+            // 
+            metroLabel4.AutoSize = true;
+            metroLabel4.Location = new System.Drawing.Point(175, 195);
+            metroLabel4.Name = "statuslbl";
+            metroLabel4.Size = new System.Drawing.Size(23, 19);
+            metroLabel4.TabIndex = 1;
+            metroLabel4.Text = "Status";
+            // 
+            // mainIPLbl
+            // 
+            mainIPLbl.AutoSize = true;
+            mainIPLbl.Location = new System.Drawing.Point(245, 19);
+            mainIPLbl.Name = "mainIPLbl";
+            mainIPLbl.Text = ip;
+            mainIPLbl.Size = new System.Drawing.Size(0, 0);
+            
+            // 
+            // mainTypeLbl
+            // 
+            mainTypeLbl.AutoSize = true;
+            mainTypeLbl.Location = new System.Drawing.Point(245, 70);
+            mainTypeLbl.Name = "mainTypeLbl";
+            mainTypeLbl.Text = type;
+            mainTypeLbl.Size = new System.Drawing.Size(0, 0);
+            mainTypeLbl.TabIndex = 5;
+            // 
+            // mainDataLbl
+            // 
+            mainDataLbl.AutoSize = true;
+            mainDataLbl.Location = new System.Drawing.Point(248, 125);
+            mainDataLbl.Name = "mainDataLbl";
+            mainDataLbl.Size = new System.Drawing.Size(0, 0);
+
+            // 
+            // pictureBox1
+            //
+           
+            statusPicBx.Image = global::Penguin__REMS_Project.Properties.Resources.Red1;
+            statusPicBx.Location = new System.Drawing.Point(265, 175);
+            statusPicBx.Name = name+"PicBx";
+            statusPicBx.Size = new System.Drawing.Size(48, 49);
+            statusPicBx.TabIndex = 2;
+            statusPicBx.TabStop = false;
+
+
+
+
+
+
+            return groupBox1;
+        }
+
+
+        private void SetDeviceImage(MetroTile vMetroTile, String name)
+        {
+
+         
+
+                if (name.Contains("LMS511"))
+                {
+                    vMetroTile.TileImage = global::Penguin__REMS_Project.Properties.Resources.isckLMS;
+                }
+                else if (name.Contains("MRS611"))
+                {
+                    vMetroTile.TileImage = global::Penguin__REMS_Project.Properties.Resources.isckLMS;
+
+                }
+                else if (name.Contains("VLP"))
+                {
+                    vMetroTile.TileImage = global::Penguin__REMS_Project.Properties.Resources.isckLMS;
+
+                }
+                else if (name.Contains("Leinshen"))
+                {
+                 // vMetroTile.Size = new System.Drawing.Size(202, 200);
+                vMetroTile.TileImage = global::Penguin__REMS_Project.Properties.Resources.leishen_res;
+                }
+                else if (name.Contains("")) {
+
+                    vMetroTile.TileImage = global::Penguin__REMS_Project.Properties.Resources.isckLMS;
+
+                }
+                       
+            
+    
+        }
+        #endregion
+
+
+
 
     }
 

@@ -112,6 +112,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="MetroFramework.txt" />
+    <None Include="Resources\Red1.jpg" />
+    <None Include="Resources\Red.jpg" />
+    <None Include="Resources\leishen_res.jpg" />
     <None Include="Resources\Yellow.png" />
     <None Include="Resources\Red.png" />
     <None Include="Resources\Record.png" />
@@ -122,6 +125,7 @@
     <None Include="Resources\AdvancedSetting.png" />
     <None Include="Resources\close.png" />
     <None Include="Resources\Green.png" />
+    <None Include="Resources\Green.jpg" />
     <Content Include="Resources\leishen.ico" />
     <Content Include="Resources\leishen.png" />
     <None Include="Resources\leishen2.png" />
