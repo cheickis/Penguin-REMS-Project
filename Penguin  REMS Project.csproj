@@ -71,7 +71,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConstantStringMessage.cs" />
+    <Compile Include="Helper.cs" />
     <Compile Include="Lidar.cs" />
+    <Compile Include="LidarGroupBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Realsens.cs" />
     <Compile Include="Remsform.cs">
       <SubType>Form</SubType>
