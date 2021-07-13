@@ -28,7 +28,8 @@ namespace Penguin__REMS_Project
         private object m_lockScan = new object();
         private bool m_isRunningScan = false;
         private bool m_isAbortRequestedScan = false;
-        StreamWriter writer, reader;
+        StreamWriter writer;
+        Dictionary<String, Lidar> listOfLidarInStory;
         #endregion
 
         #region 3D LIDAR
@@ -61,6 +62,7 @@ namespace Penguin__REMS_Project
         {
             InitializeComponent();
             InitCollection();
+            OpenLidarConfigFile();
         }
         #endregion
 
@@ -68,6 +70,7 @@ namespace Penguin__REMS_Project
 
         private void InitCollection()
         {
+            listOfLidarInStory = new Dictionary<string, Lidar>();
             lidarCollections = new ObservableCollection<Lidar>();
             twoDLidarCollections = new ObservableCollection<TwoDLidar>();
             treeDLidarCollection = new ObservableCollection<ThreeDLidar>();
@@ -171,7 +174,7 @@ namespace Penguin__REMS_Project
         }
         private void AddLidarBtn_Click(object sender, EventArgs e)
         {
-            /* String type = lidarTypeCbx.Text;
+             String type = lidarTypeCbx.Text;
              String lidarName = lidarNameCbx.Text;
              if (!lidarIPTxt.Equals("") && !lidarPortTxt.Equals("") && !lidarName.Equals("") && !type.Equals(""))
              {
@@ -184,49 +187,59 @@ namespace Penguin__REMS_Project
              }
              else
              {
-                 // handle the error  herer
-             }*/
-            OpenLidarConfigFile();
+                ShowMessage(ConstantStringMessage.DEVICEEXISTINGINSYSTEMMSG, ConstantStringMessage.ADDDEVICECAPTIONMSG, MessageBoxButtons.OK);// need change the message 
+            }
+           
         }
         public void OpenLidarConfigFile() {
 
-            writer = new StreamWriter(new FileStream(ConstantStringMessage.LIDARDEVICEFILE, FileMode.OpenOrCreate), Encoding.ASCII);
+          
             try
             {
               
                 using (StreamReader sr = new StreamReader(ConstantStringMessage.LIDARDEVICEFILE))
                 {
                     string line;
-                 
+                    int i = 0;
                     while ((line = sr.ReadLine()) != null)
                     {
-                        Console.WriteLine(line);
+                        i++;
+                        if (i > 1)
+                        {
+                            LinerParser(line);
+                        }
+                       
                     }
                 }
+                writer = new StreamWriter(new FileStream(ConstantStringMessage.LIDARDEVICEFILE, FileMode.OpenOrCreate | FileMode.Append), Encoding.ASCII);
             }
-            catch (Exception e)
+            catch (Exception e)  // need to check for best pratices
             {
-                // Let the user know what went wrong.
-                Console.WriteLine("The file could not be read:");
-                Console.WriteLine(e.Message);
+                writer = new StreamWriter(new FileStream(ConstantStringMessage.LIDARDEVICEFILE, FileMode.OpenOrCreate | FileMode.Append), Encoding.ASCII);
+                //ShowMessage(ConstantStringMessage.LOADINGCONFIGFILEERRORMSG+e.Message, ConstantStringMessage.LOADINGCONFIGFILEERRORMSG, MessageBoxButtons.OK);
+                writer.WriteLine(ConstantStringMessage.CONFIGFILEHEADER);
+                writer.Flush();
             }
 
            
         }
-        private void ParseTheConfigFile()
-        {
+     
 
-        }
-        private void AddNewLidarInTheConfigFile() { 
-        
+        private void LinerParser(String line) {
+            String[] result = line.Trim().Split(':');
+            String ip, name, type;
+            int port;
+            if (result.Length == 4) {
+                ip = result[1].Trim();
+                name = result[0].Trim();
+                port = Int32.Parse(result[2]);
+                type = result[3].Trim();
+                if (!listOfLidarInStory.ContainsKey(ip)) {
 
-        }
+                    listOfLidarInStory.Add(ip, GetLidar( name, ip,  port, type));
+                }
+            }
 
-        private void LoadPreviewLidar() { 
-        
-        
-        
-        
         }
         #endregion
 
@@ -238,13 +251,34 @@ namespace Penguin__REMS_Project
            
         }
         private void AddLidar(String name, String ip, int port, String type) {
-            if (type.Equals("2D"))
+
+            if (!listOfLidarInStory.ContainsKey(ip))
             {
-                AddTwoDLidar( name, ip, port, type);
+                String line =  name + " : " + ip + " : " +port+ " : "+type;
+                writer.WriteLine(line);
+                writer.Flush();
+                listOfLidarInStory.Add(ip, GetLidar(name, ip, port, type));
+            }
+            else
+            {
+
+                ShowMessage(ConstantStringMessage.ADDLIDARFORMCAPTIONMSQ, ConstantStringMessage.ADDLIDARFORMERRORMSQ, MessageBoxButtons.OK);
 
             }
-            else {
+
+        }
+
+        private Lidar GetLidar(String name, String ip, int port, string type) {
+
+            if (type.Equals("2D"))
+            {
+                AddTwoDLidar(name, ip, port, type);
+                return new TwoDLidar(name, ip, port, type);
+            }
+            else
+            {
                 AddThreeDLidar(name, ip, port, type);
+                return new ThreeDLidar(name, ip, port, type);
             }
         }
         private void AddThreeDLidar(String name, String ip, int port, string type)
@@ -318,6 +352,7 @@ namespace Penguin__REMS_Project
         #region  Ping and  Pull
         private void PingNewLidarBtn_Click(object sender, EventArgs e)
         {
+           
              lidar = lidarQ.Last();
             if (lidar != null) {
                 lidar.ConnectToTheLidar();
@@ -447,13 +482,9 @@ namespace Penguin__REMS_Project
         }
         #endregion
 
-
         #region MAIN TAB UI 
 
-        private void metroButton1_Click(object sender, EventArgs e)
-        {
-           
-        }
+      
         private void AddNewGroupBox(String ip, String name, String type)
         {
 
@@ -463,7 +494,7 @@ namespace Penguin__REMS_Project
         private GroupBox AddGroupBox(String ip, String name, String type) {
 
             GroupBox   groupBox1 = new GroupBox();
-             MetroTile metroTile1 = new MetroTile();
+            MetroTile lidarPicTile = new MetroTile();
             MetroLabel metroLabel1 = new MetroLabel();
             MetroLabel metroLabel2 = new MetroLabel();
             MetroLabel metroLabel3 = new MetroLabel();
@@ -482,7 +513,7 @@ namespace Penguin__REMS_Project
             groupBox1.Controls.Add(metroLabel3);
             groupBox1.Controls.Add(metroLabel2);
             groupBox1.Controls.Add(metroLabel1);
-            groupBox1.Controls.Add(metroTile1);
+            groupBox1.Controls.Add(lidarPicTile);
             groupBox1.Controls.Add(statusPicBx);
 
             groupBox1.Location = new System.Drawing.Point(3, 3);
@@ -493,15 +524,16 @@ namespace Penguin__REMS_Project
             // 
             // metroTile1
             // 
-            metroTile1.Location = new System.Drawing.Point(6, 19);
-            metroTile1.Name = "metroTile1";
-            metroTile1.Size = new System.Drawing.Size(152, 217);
-            metroTile1.Style = MetroFramework.MetroColorStyle.White;
-            metroTile1.TabIndex = 0;
-            metroTile1.Text = "metroTile1";
+            lidarPicTile.Location = new System.Drawing.Point(6, 19);
+            lidarPicTile.Name = name;
+            lidarPicTile.Size = new System.Drawing.Size(152, 217);
+            lidarPicTile.Style = MetroFramework.MetroColorStyle.White;
+            lidarPicTile.TabIndex = 0;
+            
 
-            SetDeviceImage(metroTile1,  name);
-            metroTile1.UseTileImage = true;
+            SetDeviceImage(lidarPicTile,  name);
+            lidarPicTile.UseTileImage = true;
+            
             // 
             // metroLabel1
             // 
@@ -562,6 +594,7 @@ namespace Penguin__REMS_Project
             mainDataLbl.Location = new System.Drawing.Point(248, 125);
             mainDataLbl.Name = "mainDataLbl";
             mainDataLbl.Size = new System.Drawing.Size(0, 0);
+            mainDataLbl.Text = "0 byte";
 
             // 
             // pictureBox1
@@ -574,11 +607,8 @@ namespace Penguin__REMS_Project
             statusPicBx.TabIndex = 2;
             statusPicBx.TabStop = false;
 
-
-
-
-
-
+            lidarPicTile.Click += new System.EventHandler(this.LidarGroupBox_On_Click);
+           // groupBox1.Click += new System.EventHandler(this.LidarGroupBox_On_Click);
             return groupBox1;
         }
         private void SetDeviceImage(MetroTile vMetroTile, String name)
@@ -610,11 +640,33 @@ namespace Penguin__REMS_Project
                 }
 
         }
+
+
+        private void LidarGroupBox_On_Click(object sender, EventArgs e)
+        {
+
+            MetroTile obj = (MetroTile)sender;
+         
+            lidarInfoPanel.Visible = true;
+            lidarInfoPanel.Show();
+            mainTb.Enabled = false;
+        }
+
+
+
         #endregion
 
+        private void CloseLidarPanelBtn_Click(object sender, EventArgs e)
+        {
+           
+            lidarInfoPanel.Visible = false;
+            mainTb.Enabled = true;
+        }
 
+        private void metroButton1_Click(object sender, EventArgs e)
+        {
 
-
+        }
     }
 
 }
