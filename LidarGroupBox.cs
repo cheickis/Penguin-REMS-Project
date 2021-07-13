@@ -71,7 +71,8 @@ namespace Penguin__REMS_Project
             // metroTile1
             // 
             lidarPicTile.Location = new System.Drawing.Point(6, 19);
-            lidarPicTile.Name = this.Name;
+            lidarPicTile.Name = name + ":" + ip; ;
+            lidarPicTile.Text = name+":"+ip;
             lidarPicTile.Size = new System.Drawing.Size(152, 217);
             lidarPicTile.Style = MetroFramework.MetroColorStyle.White;
             lidarPicTile.TabIndex = 0;
@@ -81,7 +82,7 @@ namespace Penguin__REMS_Project
 
             //lidarPicTile.TileImage = global::Penguin__REMS_Project.Properties.Resources.isckLMS;
              Helper.SetDeviceImage(lidarPicTile, this.Name); 
-            lidarPicTile.UseTileImage = true;
+             lidarPicTile.UseTileImage = true;
 
             // 
             // metroLabel1
@@ -182,6 +183,11 @@ namespace Penguin__REMS_Project
         public MetroTile LidarPicturTile {
             get => lidarPicTile;
         
+        }
+
+        public String IPString
+        {
+            get => mainIPLbl.Text;
         }
         #endregion
 

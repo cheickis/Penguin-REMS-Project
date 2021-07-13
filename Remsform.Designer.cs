@@ -536,6 +536,7 @@ namespace Penguin__REMS_Project
             this.pingNewLidarBtn.Size = new System.Drawing.Size(113, 27);
             this.pingNewLidarBtn.TabIndex = 5;
             this.pingNewLidarBtn.Text = "Ping";
+            this.pingNewLidarBtn.Click += new System.EventHandler(this.PingNewLidarBtn_Click);
             // 
             // pullFrameBtn
             // 
@@ -544,6 +545,7 @@ namespace Penguin__REMS_Project
             this.pullFrameBtn.Size = new System.Drawing.Size(106, 27);
             this.pullFrameBtn.TabIndex = 6;
             this.pullFrameBtn.Text = "Pull Frane";
+            this.pullFrameBtn.Click += new System.EventHandler(this.PullFrameBtn_Click);
             // 
             // tableLayoutPanel6
             // 

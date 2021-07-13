@@ -332,10 +332,10 @@ namespace Penguin__REMS_Project
                 threeDLidarFLPanel.Controls.Add(lidarTile);
                 threeDLidarFLPanel.Update();
             }
-            lidarPicInfoTl.TileImage = lidarTile.TileImage;
+            /*lidarPicInfoTl.TileImage = lidarTile.TileImage;
             lidarPicInfoTl.Text = lidarTile.Text;
             lidarPicInfoTl.Update();
-            lidarPicInfoTl.Refresh();
+            lidarPicInfoTl.Refresh();*/
 
         }
         private void SetLidarCollectionAndForm(Lidar tlidar ) {
@@ -353,7 +353,8 @@ namespace Penguin__REMS_Project
         private void PingNewLidarBtn_Click(object sender, EventArgs e)
         {
            
-             lidar = lidarQ.Last();
+
+          
             if (lidar != null) {
                 lidar.ConnectToTheLidar();
                 lidarConfigLogview.Text = lidar.PingLidarResponse();
@@ -364,15 +365,19 @@ namespace Penguin__REMS_Project
         {
 
 
-            if(lidar== null)
-                lidar = lidarQ.Peek();
-             lidarConfigLogview.Clear();
+            if (lidar != null) {
 
-                 lidar.Request = ConstantStringMessage.ONE_TELEGRAMM;
+               
+                lidarConfigLogview.Clear();
+
+                lidar.Request = ConstantStringMessage.ONE_TELEGRAMM;
                 lidarConfigLogview.Text = lidar.PullAFrame();
                 lidarConfigLogview.Update();
                 lidarConfigLogview.Refresh();
+            }
+
         }
+              
 
         #endregion
 
@@ -495,18 +500,41 @@ namespace Penguin__REMS_Project
 
 
             LidarGroupBox lidarGrpBox = new LidarGroupBox(name, ip, type);
-            lidarGrpBox.LidarPicturTile.Click += new System.EventHandler(this.LidarGroupBox_On_Click);
-          
+           lidarGrpBox.LidarPicturTile.Click += new System.EventHandler(this.LidarGroupBox_On_Click);
+            lidarGrpBox.Click += new System.EventHandler(this.LidarGroupBox_On_Click);
             return lidarGrpBox;
         }
-    
-
 
         private void LidarGroupBox_On_Click(object sender, EventArgs e)
         {
+            String ip = "";
+            if (sender is LidarGroupBox )
+            {
+                LidarGroupBox  obj =(LidarGroupBox ) sender;
+                lidarPicInfoTl.TileImage = obj.LidarPicturTile.TileImage;
+                lidarPicInfoTl.Text = obj.Text;
+                ip = obj.IPString;
 
-            MetroTile obj = (MetroTile)sender;
-         
+
+            }
+            else if (sender is MetroTile) {
+
+                MetroTile obj = (MetroTile)sender;
+                lidarPicInfoTl.TileImage = obj.TileImage;
+                lidarPicInfoTl.Text = obj.Text;
+                ip = obj.Text.Trim().Split(':')[1];
+            }
+
+            lidar = listOfLidarInStory[ip];
+
+
+
+            lidarPicInfoTl.Update();
+            lidarPicInfoTl.Refresh();
+           
+
+
+
             lidarInfoPanel.Visible = true;
             lidarInfoPanel.Show();
             mainTb.Enabled = false;
