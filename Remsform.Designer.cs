@@ -75,6 +75,7 @@ namespace Penguin__REMS_Project
             this.lidarPicInfoTl = new MetroFramework.Controls.MetroTile();
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.closeLidarPanelBtn = new MetroFramework.Controls.MetroButton();
+            this.lidarInfoTxtBox = new MetroFramework.Controls.MetroTextBox();
             this.mainTb.SuspendLayout();
             this.metroTabPage1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -552,12 +553,13 @@ namespace Penguin__REMS_Project
             this.tableLayoutPanel6.ColumnCount = 1;
             this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel6.Controls.Add(this.lidarPicInfoTl, 0, 0);
+            this.tableLayoutPanel6.Controls.Add(this.lidarInfoTxtBox, 0, 1);
             this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel6.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel6.Name = "tableLayoutPanel6";
             this.tableLayoutPanel6.RowCount = 2;
-            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 34.59916F));
-            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 65.40084F));
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 75.31645F));
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 24.68354F));
             this.tableLayoutPanel6.Size = new System.Drawing.Size(233, 474);
             this.tableLayoutPanel6.TabIndex = 1;
             // 
@@ -565,7 +567,7 @@ namespace Penguin__REMS_Project
             // 
             this.lidarPicInfoTl.Location = new System.Drawing.Point(3, 3);
             this.lidarPicInfoTl.Name = "lidarPicInfoTl";
-            this.lidarPicInfoTl.Size = new System.Drawing.Size(218, 157);
+            this.lidarPicInfoTl.Size = new System.Drawing.Size(227, 253);
             this.lidarPicInfoTl.Style = MetroFramework.MetroColorStyle.White;
             this.lidarPicInfoTl.TabIndex = 3;
             this.lidarPicInfoTl.UseTileImage = true;
@@ -592,6 +594,16 @@ namespace Penguin__REMS_Project
             this.closeLidarPanelBtn.TabIndex = 0;
             this.closeLidarPanelBtn.Text = "Close";
             this.closeLidarPanelBtn.Click += new System.EventHandler(this.CloseLidarPanelBtn_Click);
+            // 
+            // lidarInfoTxtBox
+            // 
+            this.lidarInfoTxtBox.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.lidarInfoTxtBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lidarInfoTxtBox.Location = new System.Drawing.Point(3, 359);
+            this.lidarInfoTxtBox.Multiline = true;
+            this.lidarInfoTxtBox.Name = "lidarInfoTxtBox";
+            this.lidarInfoTxtBox.Size = new System.Drawing.Size(227, 112);
+            this.lidarInfoTxtBox.TabIndex = 4;
             // 
             // Remsform
             // 
@@ -678,6 +690,7 @@ namespace Penguin__REMS_Project
         private MetroFramework.Controls.MetroTile lidarPicInfoTl;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
         private MetroFramework.Controls.MetroButton closeLidarPanelBtn;
+        private MetroFramework.Controls.MetroTextBox lidarInfoTxtBox;
     }
 }
 

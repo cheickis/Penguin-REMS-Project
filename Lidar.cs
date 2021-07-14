@@ -9,7 +9,8 @@ using System.IO;
 using System.Net.NetworkInformation;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-
+using MetroFramework.Controls;
+using System.Windows.Forms;
 
 namespace Penguin__REMS_Project
 {
@@ -25,7 +26,10 @@ namespace Penguin__REMS_Project
         protected string lidarFile;
         protected String lidarType;
         protected ObservableCollection<String> pointCloudRawDataCollection;
+        protected ObservableCollection<string> dataSizeCollection;
         protected Boolean isConnected;
+        protected MetroLabel dataLabel;
+        protected Int64 datasize = 0;
 
         #region File Handler Variable
         protected StreamWriter sw_scan;
@@ -48,7 +52,10 @@ namespace Penguin__REMS_Project
             this.port = vport;
             this.lidarEndPoint = new IPEndPoint(this.ipAdr, this.port);
             pointCloudRawDataCollection = new ObservableCollection<string>();
+            dataSizeCollection = new ObservableCollection<string>();
             pointCloudRawDataCollection.CollectionChanged += UpdateRawData;
+            dataSizeCollection.CollectionChanged += DatasSizeCollectionOnChange;
+           
             isConnected = false;
         }
         #endregion
@@ -89,7 +96,7 @@ namespace Penguin__REMS_Project
 
         public  void CloseFile()
         {
-            WriteFile = false;
+            //WriteFile = false;
             if (sw_scan != null)
                 sw_scan.Close();
         }
@@ -125,6 +132,7 @@ namespace Penguin__REMS_Project
         public abstract void DisconnectTheLidar();
         public abstract void UpdateRawData(object sender, NotifyCollectionChangedEventArgs e);
         public abstract String PullAFrame();
+        public abstract void StopScanning();
        /* public abstract bool OpenFile();
         public abstract void CloseFile();*/
         #endregion
@@ -168,9 +176,93 @@ namespace Penguin__REMS_Project
           
         }
 
+        /// <summary>
+        /// return the connection state : true or false
+        /// </summary>
         public Boolean IsConnected {
 
             get => isConnected;
+        }
+
+        /// <summary>
+        /// String Msg for the status
+        /// </summary>
+        /// <returns></returns>
+        public String IsConnectedStr() {
+
+            if (isConnected) {
+
+                return "Connected";
+            }
+            return "Disconnected";
+        
+        
+        }
+
+        public ObservableCollection<String> DataSizeCollection {
+
+            get => dataSizeCollection;
+       
+        }
+        public String ToString() {
+            String info ="Name :\t\t" + name + Environment.NewLine;
+            info += "IP Adress:\t\t" + strIpAdress + Environment.NewLine;
+            info += "Type:\t\t" + lidarType +Environment.NewLine;
+            info += "Port:\t\t" + port + Environment.NewLine;
+            info += "Status:\t\t" + IsConnectedStr();
+           
+
+            return info;
+        }
+
+        public void UpdateDataSize(String data) {
+
+
+            datasize += System.Text.Encoding.ASCII.GetByteCount(data);
+            dataSizeCollection.Add(Helper.FormatBytes(datasize));
+
+        }
+        private void DatasSizeCollectionOnChange(object sender, NotifyCollectionChangedEventArgs e)
+        {
+
+            UpdataDataLabelText();
+        }
+        public void UpdataDataLabelText() {
+
+            if (dataLabel!=null&&dataLabel.InvokeRequired)
+            {
+
+                dataLabel.Invoke(new MethodInvoker(delegate {
+
+                    if (dataSizeCollection.Count > 0)
+                    {
+
+                        //dataLabel.Text = (dataSizeCollection.ElementAt(dataSizeCollection.Count - 1));
+                        dataLabel.Text = dataSizeCollection.Last() ;
+
+                    }
+
+                }));
+            }
+            else if (dataSizeCollection.Count > 0 && dataLabel != null)
+            {
+
+               // dataLabel.Text = (dataSizeCollection.ElementAt(dataSizeCollection.Count - 1));
+                dataLabel.Text = dataSizeCollection.Last() ;
+            }
+
+        }
+        public MetroLabel DataLabel {
+
+            set => dataLabel = value;
+        
+        
+        }
+
+        public void ClearCollectionDAtas() {
+
+            pointCloudRawDataCollection.Clear();
+            dataSizeCollection.Clear();
         }
         #endregion
     }

@@ -7,8 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 
-using System.Net.Sockets;
-using System.IO;
+
 using System.Collections.Specialized;
 
 namespace Penguin__REMS_Project
@@ -67,8 +66,10 @@ namespace Penguin__REMS_Project
             {
                
 
-                data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
 
+                data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+                
+                
                 // STX and ETX in HEX indicate start and end of messages
                 int startpoint = data.IndexOf('\x02');
                 int endpoint = data.IndexOf('\x03');
@@ -143,9 +144,11 @@ namespace Penguin__REMS_Project
                 if (!isConnected) {
                    
                     ConnectToTheLidar();
+                    datasize = 0;
                 }
                 WriteFile = true;
                 continuousReading = true;
+               
                 ReadScan();
             }catch(Exception ex) { 
                // Handle
@@ -165,18 +168,27 @@ namespace Penguin__REMS_Project
             writer.Write(READREQSUITE);
             writer.Flush();
             // Wait for an answer
-           System.Threading.Thread.Sleep(100);  // Need to check 
+          // System.Threading.Thread.Sleep(10);  // Need to check 
            
             DateTime _now = DateTime.Now;
             String NowString = _now.ToString("yyyyMMddHHmmssffff-");
             String  scanData = ReadTCP();  
             if (scanData!=null && scanData.Contains("sRA") == true)
             {
-                 pointCloudRawDataCollection.Add( NowString + scanData);
+                String data = NowString + scanData;
+                 pointCloudRawDataCollection.Add( data);
+                 UpdateDataSize(data);
                 
             }
        
         }
-       
+
+        public override void StopScanning()
+        {
+            WriteFile = false;
+            continuousReading = false;
+            dataSizeCollection.Clear();
+            datasize = 0;
+        }
     }
 }

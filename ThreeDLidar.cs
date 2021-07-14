@@ -52,9 +52,12 @@ namespace Penguin__REMS_Project
             {
                 if (!isConnected) {
                    ConnectToTheLidar();
+                    datasize = 0;
                 }
-                WriteFile = true;
-                continuousReading = true;
+               WriteFile = true;
+              continuousReading = true;
+                stopscan = false;
+                
                 listener_Lidar.BeginReceive(new AsyncCallback(ReceiveScanData), udpState);
 
             }
@@ -63,6 +66,32 @@ namespace Penguin__REMS_Project
                 //MessageBox.Show(e.Message, "Connnection Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
              
             };
+        }
+
+        public void SetOrResetReadingData() {
+
+            if (WriteFile)
+            {
+                WriteFile = false;
+              
+            }
+            else {
+                WriteFile = true;
+              
+            
+            }
+            if (stopscan)
+            {
+                stopscan = false;
+               
+            }
+            else {
+                stopscan = true;
+                dataSizeCollection.Clear();
+                datasize = 0;
+            }
+        
+        
         }
         public override void DisconnectTheLidar()
         {
@@ -74,15 +103,12 @@ namespace Penguin__REMS_Project
             DateTime _now = DateTime.Now;
             string NowString = _now.ToString("yyyyMMddHHmmssffff-");
             String data = NowString + BitConverter.ToString(scanDataBuffer);
-           // if (Request == ConstantStringMessage.ONE_TELEGRAMM) {
-
-             //   pointCloudRawDataCollection.Add(data);
-           // }
-           // else if ((sw_scan != null) && (WriteFile == true) && (sw_scan.BaseStream != null))
+          
             {
-        
+               
                 pointCloudRawDataCollection.Add(data);
-        
+                UpdateDataSize(data);
+
                 if (ScanTimes > 0xFFFFFFFFFFFFFFFF)
                     ScanTimes = 0;
                 else
@@ -91,22 +117,7 @@ namespace Penguin__REMS_Project
             }
         }
 
-       /* public override bool OpenFile()
-        {
-            sw_scan = new StreamWriter(lidarFile);
-            if (sw_scan != null)
-                return true;
-            else
-                return false;
-        }
-
-        public override void CloseFile()
-        {
-            WriteFile = false;
-            if (sw_scan != null)
-                sw_scan.Close();
-        }
-        */
+    
 
         private void ReceiveScanData(IAsyncResult ar)
         {
@@ -140,7 +151,14 @@ namespace Penguin__REMS_Project
            UpateScanFile();
         }
 
-     
+        public override void StopScanning()
+        {
+            SetOrResetReadingData();
+           
+          
+        }
+
+
         #endregion
 
         #region Inner Class Udp State

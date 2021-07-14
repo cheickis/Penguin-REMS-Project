@@ -1,9 +1,11 @@
 ﻿using MetroFramework.Controls;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Penguin__REMS_Project
 {
@@ -38,6 +40,43 @@ namespace Penguin__REMS_Project
 
             }
             vMetroTile.Refresh();
+        }
+
+        public static string FormatBytes(Int64 bytes)
+        {
+            if (bytes >= 0x1000000000000000) { return ((double)(bytes >> 50) / 1024).ToString("0.### EB"); }
+            if (bytes >= 0x4000000000000) { return ((double)(bytes >> 40) / 1024).ToString("0.### PB"); }
+            if (bytes >= 0x10000000000) { return ((double)(bytes >> 30) / 1024).ToString("0.### TB"); }
+            if (bytes >= 0x40000000) { return ((double)(bytes >> 20) / 1024).ToString("0.### GB"); }
+            if (bytes >= 0x100000) { return ((double)(bytes >> 10) / 1024).ToString("0.### MB"); }
+            if (bytes >= 0x400) { return ((double)(bytes) / 1024).ToString("0.###") + " KB"; }
+            return bytes.ToString("0 Bytes");
+        }
+
+        public static void UpdateTxtBWithDataCollector(MetroTextBox txtB, ObservableCollection<string> obs)
+        {
+
+            if (txtB.InvokeRequired)
+            {
+
+                txtB.Invoke(new MethodInvoker(delegate {
+
+                    if (obs.Count > 0)
+                    {
+
+                        txtB.AppendText(obs.ElementAt(obs.Count - 1));
+                        txtB.AppendText(Environment.NewLine);
+                    }
+
+                }));
+            }
+            else if (obs.Count > 0)
+            {
+
+                txtB.AppendText(obs.ElementAt(obs.Count - 1));
+                txtB.AppendText(Environment.NewLine);
+            }
+
         }
     }
 }

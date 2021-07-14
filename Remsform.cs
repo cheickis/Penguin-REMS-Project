@@ -30,6 +30,8 @@ namespace Penguin__REMS_Project
         private bool m_isAbortRequestedScan = false;
         StreamWriter writer;
         Dictionary<String, Lidar> listOfLidarInStory;
+
+        Dictionary<String, LidarGroupBox> lidarGroupoxList;
         #endregion
 
         #region 3D LIDAR
@@ -50,6 +52,8 @@ namespace Penguin__REMS_Project
         private ObservableCollection<TwoDLidar> twoDLidarCollections;
         private ObservableCollection<ThreeDLidar> treeDLidarCollection;
         private ObservableCollection<Realsens> realsensCollection;
+
+       
         #endregion
 
         #region Queue
@@ -77,8 +81,10 @@ namespace Penguin__REMS_Project
             realsensCollection = new ObservableCollection<Realsens>();
 
             twoDLidarCollections.CollectionChanged += upadteSickListForm;
+           
             lidarQ = new Queue<Lidar>();
             lidars = new List<Lidar>();
+            lidarGroupoxList = new Dictionary<String, LidarGroupBox>();
 
         }
 
@@ -216,7 +222,6 @@ namespace Penguin__REMS_Project
             catch (Exception e)  // need to check for best pratices
             {
                 writer = new StreamWriter(new FileStream(ConstantStringMessage.LIDARDEVICEFILE, FileMode.OpenOrCreate | FileMode.Append), Encoding.ASCII);
-                //ShowMessage(ConstantStringMessage.LOADINGCONFIGFILEERRORMSG+e.Message, ConstantStringMessage.LOADINGCONFIGFILEERRORMSG, MessageBoxButtons.OK);
                 writer.WriteLine(ConstantStringMessage.CONFIGFILEHEADER);
                 writer.Flush();
             }
@@ -332,11 +337,7 @@ namespace Penguin__REMS_Project
                 threeDLidarFLPanel.Controls.Add(lidarTile);
                 threeDLidarFLPanel.Update();
             }
-            /*lidarPicInfoTl.TileImage = lidarTile.TileImage;
-            lidarPicInfoTl.Text = lidarTile.Text;
-            lidarPicInfoTl.Update();
-            lidarPicInfoTl.Refresh();*/
-
+           
         }
         private void SetLidarCollectionAndForm(Lidar tlidar ) {
             ResetAddLidarForm();
@@ -351,13 +352,11 @@ namespace Penguin__REMS_Project
 
         #region  Ping and  Pull
         private void PingNewLidarBtn_Click(object sender, EventArgs e)
-        {
-           
-
-          
+        { 
             if (lidar != null) {
                 lidar.ConnectToTheLidar();
                 lidarConfigLogview.Text = lidar.PingLidarResponse();
+                UpdateLidarTxtBox();
             }
         }
 
@@ -366,10 +365,7 @@ namespace Penguin__REMS_Project
 
 
             if (lidar != null) {
-
-               
                 lidarConfigLogview.Clear();
-
                 lidar.Request = ConstantStringMessage.ONE_TELEGRAMM;
                 lidarConfigLogview.Text = lidar.PullAFrame();
                 lidarConfigLogview.Update();
@@ -419,7 +415,7 @@ namespace Penguin__REMS_Project
           
             while (true)
             {
-                //ScanningTile.Text = " Scanning ...  ";
+                //ScanningTile.Text = " Scanning ...  "; // Status message info Here
                 LidarsStartScan();
                 if (m_isAbortRequestedScan)
                 {
@@ -449,9 +445,9 @@ namespace Penguin__REMS_Project
           
             foreach (var item in lidars)
             {
-                item.LidarFile = @"C:\Scandatas\" + item.Name + "_ScanData_" + NowString + ".txt";
+                item.LidarFile = ConstantStringMessage.FOLDERPATH  + item.Name + ConstantStringMessage.FOLDERSUFFIX + NowString + ConstantStringMessage.TXTEXTENSION;
                 item.OpenFile();
-                
+              
             }
         }
 
@@ -459,16 +455,25 @@ namespace Penguin__REMS_Project
 
             foreach (var item in lidars) {
                 item.CloseFile();
+                item.StopScanning();
+               
             }
         }
         private void LidarsStartScan()
         {
             foreach (var item in lidars)
             {
+                
+             
+
+                lidar = item;
+                UpdateLidarStatus();
                 item.InitCommunication();
             }
             Thread.Sleep(500);
         }
+
+       
         #endregion
 
         #region UI THREAD SAFE HELPER FUNCTION
@@ -492,18 +497,18 @@ namespace Penguin__REMS_Project
       
         private void AddNewGroupBox(String ip, String name, String type)
         {
-
-           this.mainfLPl.Controls.Add(AddGroupBox(ip, name, type));
-        }
-
-        private GroupBox AddGroupBox(String ip, String name, String type) {
-
-
             LidarGroupBox lidarGrpBox = new LidarGroupBox(name, ip, type);
-           lidarGrpBox.LidarPicturTile.Click += new System.EventHandler(this.LidarGroupBox_On_Click);
+            lidarGrpBox.LidarPicturTile.Click += new System.EventHandler(this.LidarGroupBox_On_Click);
             lidarGrpBox.Click += new System.EventHandler(this.LidarGroupBox_On_Click);
-            return lidarGrpBox;
+            this.mainfLPl.Controls.Add(lidarGrpBox);
+
+            if (!lidarGroupoxList.ContainsKey(lidar.STRIPAdresse)) {
+                lidarGroupoxList.Add(lidar.STRIPAdresse, lidarGrpBox);
+
+
+            }
         }
+
 
         private void LidarGroupBox_On_Click(object sender, EventArgs e)
         {
@@ -514,7 +519,6 @@ namespace Penguin__REMS_Project
                 lidarPicInfoTl.TileImage = obj.LidarPicturTile.TileImage;
                 lidarPicInfoTl.Text = obj.Text;
                 ip = obj.IPString;
-
 
             }
             else if (sender is MetroTile) {
@@ -531,8 +535,8 @@ namespace Penguin__REMS_Project
 
             lidarPicInfoTl.Update();
             lidarPicInfoTl.Refresh();
-           
 
+            UpdateLidarTxtBox();
 
 
             lidarInfoPanel.Visible = true;
@@ -541,14 +545,37 @@ namespace Penguin__REMS_Project
         }
 
 
+        private void UpdateLidarTxtBox() {
 
+
+            lidarInfoTxtBox.Text = "";
+            lidarInfoTxtBox.AppendText(lidar.ToString());
+            lidarInfoTxtBox.AppendText(Environment.NewLine);
+
+        }
+
+        private void UpdateLidarStatus() {
+
+            LidarGroupBox grpBx = lidarGroupoxList[lidar.STRIPAdresse];
+
+            if (grpBx != null) lidar.DataLabel = grpBx.DataLabel;
+            if (lidar.IsConnected && grpBx!=null) {
+
+                grpBx.SetStatusIcon(lidar.IsConnected);
+            }
+
+           
+
+        }
         #endregion
 
         private void CloseLidarPanelBtn_Click(object sender, EventArgs e)
         {
            
             lidarInfoPanel.Visible = false;
+            lidarConfigLogview.Clear();
             mainTb.Enabled = true;
+            UpdateLidarStatus();
         }
 
         private void metroButton1_Click(object sender, EventArgs e)
