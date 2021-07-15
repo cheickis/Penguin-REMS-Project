@@ -127,6 +127,8 @@ namespace Penguin__REMS_Project
             this.flowLayoutPanel7 = new System.Windows.Forms.FlowLayoutPanel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.groupBox13 = new System.Windows.Forms.GroupBox();
+            this.cmb_VMSType = new System.Windows.Forms.ComboBox();
             this.mainTb.SuspendLayout();
             this.metroTabPage1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -172,6 +174,7 @@ namespace Penguin__REMS_Project
             this.flowLayoutPanel7.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
+            this.groupBox13.SuspendLayout();
             this.SuspendLayout();
             // 
             // mainTb
@@ -519,7 +522,7 @@ namespace Penguin__REMS_Project
             this.lidarInfoPanel.HorizontalScrollbarBarColor = true;
             this.lidarInfoPanel.HorizontalScrollbarHighlightOnWheel = false;
             this.lidarInfoPanel.HorizontalScrollbarSize = 10;
-            this.lidarInfoPanel.Location = new System.Drawing.Point(107, 31);
+            this.lidarInfoPanel.Location = new System.Drawing.Point(708, 31);
             this.lidarInfoPanel.Name = "lidarInfoPanel";
             this.lidarInfoPanel.Size = new System.Drawing.Size(680, 570);
             this.lidarInfoPanel.TabIndex = 0;
@@ -697,10 +700,11 @@ namespace Penguin__REMS_Project
             this.tableLayoutPanel8.Controls.Add(this.groupBox10, 0, 4);
             this.tableLayoutPanel8.Controls.Add(this.groupBox11, 0, 5);
             this.tableLayoutPanel8.Controls.Add(this.groupBox12, 0, 6);
+            this.tableLayoutPanel8.Controls.Add(this.groupBox13, 0, 7);
             this.tableLayoutPanel8.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel8.Location = new System.Drawing.Point(233, 3);
             this.tableLayoutPanel8.Name = "tableLayoutPanel8";
-            this.tableLayoutPanel8.RowCount = 7;
+            this.tableLayoutPanel8.RowCount = 8;
             this.tableLayoutPanel8.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10.6599F));
             this.tableLayoutPanel8.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 15.56684F));
             this.tableLayoutPanel8.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 15.90525F));
@@ -708,6 +712,7 @@ namespace Penguin__REMS_Project
             this.tableLayoutPanel8.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.07445F));
             this.tableLayoutPanel8.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 12.85956F));
             this.tableLayoutPanel8.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 17.25888F));
+            this.tableLayoutPanel8.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 98F));
             this.tableLayoutPanel8.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel8.Size = new System.Drawing.Size(133, 615);
             this.tableLayoutPanel8.TabIndex = 0;
@@ -847,7 +852,7 @@ namespace Penguin__REMS_Project
             this.metroLabel2.FontWeight = MetroFramework.MetroLabelWeight.Bold;
             this.metroLabel2.Location = new System.Drawing.Point(3, 0);
             this.metroLabel2.Name = "metroLabel2";
-            this.metroLabel2.Size = new System.Drawing.Size(127, 65);
+            this.metroLabel2.Size = new System.Drawing.Size(127, 55);
             this.metroLabel2.TabIndex = 2;
             this.metroLabel2.Text = "UTM Position";
             this.metroLabel2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -945,9 +950,9 @@ namespace Penguin__REMS_Project
             this.groupBox7.Controls.Add(this.tb_ZoneID);
             this.groupBox7.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox7.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox7.Location = new System.Drawing.Point(3, 163);
+            this.groupBox7.Location = new System.Drawing.Point(3, 138);
             this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Size = new System.Drawing.Size(127, 91);
+            this.groupBox7.Size = new System.Drawing.Size(127, 76);
             this.groupBox7.TabIndex = 3;
             this.groupBox7.TabStop = false;
             this.groupBox7.Text = "Position";
@@ -958,9 +963,9 @@ namespace Penguin__REMS_Project
             this.groupBox8.Controls.Add(this.rb_NSphere);
             this.groupBox8.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox8.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox8.Location = new System.Drawing.Point(3, 68);
+            this.groupBox8.Location = new System.Drawing.Point(3, 58);
             this.groupBox8.Name = "groupBox8";
-            this.groupBox8.Size = new System.Drawing.Size(127, 89);
+            this.groupBox8.Size = new System.Drawing.Size(127, 74);
             this.groupBox8.TabIndex = 4;
             this.groupBox8.TabStop = false;
             this.groupBox8.Text = "Semisphere";
@@ -970,9 +975,9 @@ namespace Penguin__REMS_Project
             this.groupBox9.Controls.Add(this.tb_Easting);
             this.groupBox9.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox9.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox9.Location = new System.Drawing.Point(3, 260);
+            this.groupBox9.Location = new System.Drawing.Point(3, 220);
             this.groupBox9.Name = "groupBox9";
-            this.groupBox9.Size = new System.Drawing.Size(127, 64);
+            this.groupBox9.Size = new System.Drawing.Size(127, 53);
             this.groupBox9.TabIndex = 5;
             this.groupBox9.TabStop = false;
             this.groupBox9.Text = "Easting (m)";
@@ -982,9 +987,9 @@ namespace Penguin__REMS_Project
             this.groupBox10.Controls.Add(this.tb_Northing);
             this.groupBox10.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox10.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox10.Location = new System.Drawing.Point(3, 330);
+            this.groupBox10.Location = new System.Drawing.Point(3, 279);
             this.groupBox10.Name = "groupBox10";
-            this.groupBox10.Size = new System.Drawing.Size(127, 93);
+            this.groupBox10.Size = new System.Drawing.Size(127, 77);
             this.groupBox10.TabIndex = 6;
             this.groupBox10.TabStop = false;
             this.groupBox10.Text = "Northing (m)";
@@ -994,9 +999,9 @@ namespace Penguin__REMS_Project
             this.groupBox11.Controls.Add(this.tb_Elevation);
             this.groupBox11.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox11.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox11.Location = new System.Drawing.Point(3, 429);
+            this.groupBox11.Location = new System.Drawing.Point(3, 362);
             this.groupBox11.Name = "groupBox11";
-            this.groupBox11.Size = new System.Drawing.Size(127, 73);
+            this.groupBox11.Size = new System.Drawing.Size(127, 60);
             this.groupBox11.TabIndex = 7;
             this.groupBox11.TabStop = false;
             this.groupBox11.Text = "Elevation (m)";
@@ -1006,9 +1011,9 @@ namespace Penguin__REMS_Project
             this.groupBox12.Controls.Add(this.tb_DatumID);
             this.groupBox12.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox12.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox12.Location = new System.Drawing.Point(3, 508);
+            this.groupBox12.Location = new System.Drawing.Point(3, 428);
             this.groupBox12.Name = "groupBox12";
-            this.groupBox12.Size = new System.Drawing.Size(127, 104);
+            this.groupBox12.Size = new System.Drawing.Size(127, 83);
             this.groupBox12.TabIndex = 8;
             this.groupBox12.TabStop = false;
             this.groupBox12.Text = "Datum ID";
@@ -1263,6 +1268,35 @@ namespace Penguin__REMS_Project
             this.panel2.Size = new System.Drawing.Size(56, 32);
             this.panel2.TabIndex = 1;
             // 
+            // groupBox13
+            // 
+            this.groupBox13.Controls.Add(this.cmb_VMSType);
+            this.groupBox13.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBox13.Location = new System.Drawing.Point(3, 517);
+            this.groupBox13.Name = "groupBox13";
+            this.groupBox13.Size = new System.Drawing.Size(127, 95);
+            this.groupBox13.TabIndex = 9;
+            this.groupBox13.TabStop = false;
+            this.groupBox13.Text = "Coordinate Reference Code";
+            // 
+            // cmb_VMSType
+            // 
+            this.cmb_VMSType.FormattingEnabled = true;
+            this.cmb_VMSType.Items.AddRange(new object[] {
+            "Invalid",
+            " Geodetic",
+            "        UTM",
+            "                       UPS",
+            "                            MGRS",
+            "                           None",
+            "                           SNG",
+            "                           UDG",
+            "                            FNG"});
+            this.cmb_VMSType.Location = new System.Drawing.Point(0, 43);
+            this.cmb_VMSType.Name = "cmb_VMSType";
+            this.cmb_VMSType.Size = new System.Drawing.Size(121, 21);
+            this.cmb_VMSType.TabIndex = 0;
+            // 
             // Remsform
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1330,6 +1364,7 @@ namespace Penguin__REMS_Project
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
+            this.groupBox13.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1435,6 +1470,8 @@ namespace Penguin__REMS_Project
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel7;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.GroupBox groupBox13;
+        private System.Windows.Forms.ComboBox cmb_VMSType;
     }
 }
 

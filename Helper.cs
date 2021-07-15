@@ -78,5 +78,31 @@ namespace Penguin__REMS_Project
             }
 
         }
+
+
+        #region  Tatlin Structure
+        public struct TalinModeConfigure
+        {
+            public int VMSType;
+            public string DatumID;
+            public int ZoneID;
+            public bool NorthSemishpere;
+            public bool UseSurfaceMode;
+            public string FileName;// 
+            public TalinModeConfigure(string ConfigureString)
+            {
+                string[] fields = ConfigureString.Split(',', '=', ' ');
+                string valuetoremove2 = "";
+                fields = fields.Where(val => val != valuetoremove2).ToArray();
+                FileName = fields[0].Trim();
+                UseSurfaceMode = Boolean.Parse(fields[1].Trim());
+                NorthSemishpere = Boolean.Parse(fields[2].Trim());
+                VMSType = int.Parse(fields[3].Trim());
+                DatumID = fields[5].Trim();
+                ZoneID = int.Parse(fields[4].Trim());
+            }
+        }
+        #endregion
+
     }
 }

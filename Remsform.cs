@@ -16,6 +16,10 @@ using System.Threading;
 using System.Collections;
 using System.Windows.Forms;
 using System.IO;
+using System.Windows;
+using System.Windows.Threading;
+using System.Windows.Input;
+using System.Text.RegularExpressions;
 
 namespace Penguin__REMS_Project
 {
@@ -33,6 +37,20 @@ namespace Penguin__REMS_Project
 
         Dictionary<String, LidarGroupBox> lidarGroupoxList;
         #endregion
+
+        #region TALIN
+        TalinModeLibrary TML = new TalinModeLibrary();
+        static TalinDataProcess TDP = new TalinDataProcess();
+        //static string ComNum = "Com4";
+        public byte[] TalinCommandArray = new byte[40];
+        Helper.TalinModeConfigure TMC = new Helper.TalinModeConfigure();
+        static bool Test_TalinInclude = true;
+        string FileName = "";
+        uint filecounter = 0;
+
+
+        #endregion
+
 
         #region 3D LIDAR
 
@@ -65,6 +83,7 @@ namespace Penguin__REMS_Project
         public Remsform()
         {
             InitializeComponent();
+            //InitTalin();// Init Talin 
             InitCollection();
             OpenLidarConfigFile();
         }
@@ -123,9 +142,9 @@ namespace Penguin__REMS_Project
                      RealsensHandler();
                }
 
-             ); 
+             );
 
-           
+            filecounter++;
             #endregion
         }
 
@@ -482,12 +501,12 @@ namespace Penguin__REMS_Project
         {
             if (InvokeRequired)
             {
-                Func<DialogResult> m = () => MessageBox.Show(msg, caption, buttons);
+                Func<DialogResult> m = () => System.Windows.Forms.MessageBox.Show(msg, caption, buttons);
                 return (DialogResult)Invoke(m);
             }
             else
             {
-                return MessageBox.Show(msg, caption, buttons);
+                return System.Windows.Forms.MessageBox.Show(msg, caption, buttons);
             }
         }
         #endregion
@@ -582,6 +601,418 @@ namespace Penguin__REMS_Project
         {
 
         }
+
+        #region Talin_position_InOutput
+
+
+        private void StartTalinNavigation() {
+
+            if (Test_TalinInclude == true)
+            {
+              // TalinThread = new Thread(TDP.startNavigation);
+                //TDP.StartWriteFile(@"C:\Scandatas\TalinData_" + NowString + ".txt");
+                //TalinThread.Start();
+            }
+        }
+        private void InitTalin() {
+
+            if (TDP.Talin_Initial() == true)
+            {
+               /* if (lb_Status != null)
+                    lb_Status.Content = "Talin is Connected!";
+                */
+               /* bt_StartScan.Enabled = true;
+                bt_StopScan.Enabled = false;*/
+                bt_UpdatePosition.Enabled = true;
+            }
+            else
+            {
+               /* if (lb_Status != null)
+                    lb_Status.Content = "Talin is not Connected!";*/
+                if (Test_TalinInclude == false)
+                {
+                  /*  bt_StartScan.IsEnabled = true;
+                    bt_StopScan.IsEnabled = false;
+                    bt_UpdatePosition.IsEnabled = false;
+                    */
+                }
+                else
+                {
+                    /*bt_StartScan.IsEnabled = false;
+                    bt_StopScan.IsEnabled = false;
+                    bt_UpdatePosition.IsEnabled = false;*/
+                }
+            }
+            FileName = DateTime.Now.ToString("yyyyMMdd");
+            //Following code shall be load in the parent class.
+            TMC.DatumID = "WGD";
+            TMC.FileName = "TalinPositionList.txt";
+            TMC.UseSurfaceMode = true;
+            TMC.NorthSemishpere = true;
+            TMC.ZoneID = 17;
+            TMC.VMSType = 2;
+
+            LoadPositionList();
+            rb_surface.Checked = TMC.UseSurfaceMode;
+            rb_underground.Checked = !(TMC.UseSurfaceMode);
+            tb_DatumID.Text = TMC.DatumID;
+            tb_ZoneID.Text = TMC.ZoneID.ToString();
+            rb_NSphere.Checked = TMC.NorthSemishpere;
+            rb_SSphere.Checked = !(TMC.NorthSemishpere);
+            cmb_VMSType.SelectedIndex = TMC.VMSType;
+
+
+
+        }
+
+        private void tb_ZoneID_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {   //For all text box required number
+            Regex regex = new Regex(@"^[0-9]+$");
+            e.Handled = !regex.IsMatch((sender as TextBox).Text.Insert((sender as TextBox).SelectionStart, e.Text));
+        }
+
+        private void tb_Float_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {   //For all text box required number
+            Regex regex = new Regex(@"^[-+]?\d*\.?\d*$");
+            e.Handled = !regex.IsMatch((sender as TextBox).Text.Insert((sender as TextBox).SelectionStart, e.Text));
+        }
+
+        private void tb_PositiveFloat_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {   //For all text box required number
+            Regex regex = new Regex(@"^\d*\.?\d*[0-9]*$");
+            e.Handled = !regex.IsMatch((sender as TextBox).Text.Insert((sender as TextBox).SelectionStart, e.Text));
+        }
+
+
+
+        private void LoadPositionList()
+        {
+            if (lstb_Position != null)
+            { lstb_Position.Items.Clear(); }
+            else
+            { return; }
+
+            using (StreamReader sr = new StreamReader(TMC.FileName)) //Shall be a database in future
+            {
+                //List<string> lines = new List<string>();
+                string line;
+                int i = 0;
+                while (((line = sr.ReadLine()) != null) && (line != ""))
+                {
+                    string datastring;
+
+                    datastring = line.Substring(21);
+                    //a++;
+                    i++;
+                    lstb_Position.Items.Add(datastring);
+                }
+            }
+        }
+
+        private void LoadPosition()
+        {
+            //Select the item and load to Talin
+            try
+            {
+                string results = lstb_Position.SelectedItem.ToString();
+                string[] fields = results.Split('=', ',', ' ');
+                if (fields.Length < 8)
+                {
+                    System.Windows.MessageBox.Show("The saved position NOT contains all required data", "Surface");
+                    return;
+                }
+                string valuetoremove2 = "";
+                bool gravityMode = false;
+                fields = fields.Where(val => val != valuetoremove2).ToArray();
+                tb_PositionName.Text = fields[0].Trim();
+                string ModeString = fields[1].Trim();
+                if ((ModeString[0] == 's') || (ModeString[0] == 'S'))
+                {
+                    rb_surface.Checked = true;
+                }
+                else
+                {
+                    rb_underground.Checked = true;
+                    if (fields.Length < 12)
+                    {
+                        System.Windows.MessageBox.Show("The saved position NOT contains all required data", "Underground");
+                        return;
+                    }
+                    gravityMode = true;
+                }
+                string temp1 = fields[2].Trim();
+                if ((temp1[0] == 'N') || (temp1[0] == 'n'))
+                {
+                    rb_NSphere.Checked = true;
+                }
+                else
+                {
+                    if ((temp1[0] == 'S') || (temp1[0] == 's'))
+                    {
+                        rb_SSphere.Checked = true;
+                    }
+                    else
+                    {
+                        UInt16 format = UInt16.Parse(fields[2]);
+                        if ((UInt16)(format & 0x8000) > 0)
+                        {
+                            rb_SSphere.Checked = true;
+                        }
+                        else
+                        {
+                            rb_NSphere.Checked = true;
+                        }
+                    }
+                }
+
+                cmb_VMSType.SelectedIndex = TMC.VMSType;
+
+                tb_ZoneID.Text = fields[3].Trim();
+                tb_Easting.Text = fields[4].Trim();
+                tb_Northing.Text = fields[5].Trim();
+                tb_Elevation.Text = fields[6].Trim();
+                tb_DatumID.Text = fields[7].Trim();
+                if (gravityMode)
+                {
+                    tb_ReferenceGravity.Text = fields[8].Trim();
+                    tb_MaterialDensity.Text = fields[9].Trim();
+                    tb_deflection1.Text = fields[10].Trim();
+                    tb_deflection2.Text = fields[11].Trim();
+                }
+            }
+            catch
+            {
+                System.Windows.MessageBox.Show("The saved position format is wrong");
+            }
+
+        }
+
+        private void lstb_Position_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            LoadPosition();
+        }
+
+        private string[] getPositionData()
+        {
+            string[] results;
+            if (rb_surface.Checked == true)
+            {
+                results = new string[10];
+                results[3] = "Surface";
+            }
+            else
+            {
+                results = new string[14];
+                results[3] = "Underground";
+                results[10] = tb_ReferenceGravity.Text;
+                results[11] = tb_MaterialDensity.Text;
+                results[12] = tb_deflection1.Text;
+                results[13] = tb_deflection2.Text;
+            }
+            results[2] = tb_PositionName.Text.Trim();
+            //UInt16 Format = 0;
+            if (rb_NSphere.Checked == true)
+            {
+                //Format = 0;
+                results[4] = "North";
+            }
+            else
+            {
+                //Format = 0x8000;
+                results[4] = "South";
+            }
+            //Format = (UInt16)(Format + cmb_VMSType.SelectedIndex);
+            DateTime DT = DateTime.Now;
+            results[0] = DT.ToString("yyyy-MM-dd");
+            results[1] = DT.ToString("HH:mm:ss");
+            //results[4] = Format.ToString();
+            results[2] = tb_PositionName.Text;
+            UInt16 temp;
+            if ((UInt16.TryParse(tb_ZoneID.Text.Trim(), out temp) == false) || (temp == 0))
+            {
+                System.Windows.MessageBox.Show(" Zone Number must larger than zero.");
+                return null;
+            }
+            if (temp > 60)
+            {
+                System.Windows.MessageBox.Show(" Zone Number must ssmaller than 60.");
+                return null;
+            }
+            results[5] = temp.ToString();
+            results[6] = tb_Easting.Text.Trim();
+            results[7] = tb_Northing.Text.Trim();
+            results[8] = tb_Elevation.Text.Trim();
+            if (tb_DatumID.Text.Trim() == "WGS-48")
+            {
+                results[9] = "WGD";
+            }
+            else
+            {
+                results[9] = tb_DatumID.Text.Trim();
+            }
+            return results;
+
+        }
+        private System.Timers.Timer TT = new System.Timers.Timer(500);
+        Thread TalinPositionUpdateThread;
+        private void bt_UpdatePosition_Click(object sender, RoutedEventArgs e)
+        {
+            string[] results = getPositionData();
+            if (results == null)
+            {
+                System.Windows.MessageBox.Show("Input position format is incorrect. ", "Update Failed!");
+                return;
+            }
+            if ((double.Parse(results[6]) == 0) || (double.Parse(results[7]) == 0) || (double.Parse(results[8]) == 0))
+            {
+                System.Windows.MessageBox.Show("Input Easting, Northing and Elevation value shall not be zero. ", "Update Failed!");
+                return;
+            }
+            byte[] command = TML.generatePositionUpdateCommand(results, (UInt16)cmb_VMSType.SelectedIndex);
+            TDP.PositionUpdateCommand = command;
+            //System.Buffer.BlockCopy(command, 0, TalinCommandArray, 0, command.Length);
+            TalinPositionUpdateThread = new Thread(TDP.Talin_InitialPosition);
+            TalinPositionUpdateThread.Start();
+            //TDP.Talin_InitialPosition(command);
+            TT.Elapsed += TT_Elapsed;
+            TT.Start();
+        }
+
+        private
+        void TT_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+
+           /* if (TalinDataProcess.AlignmentTime == 0)
+            {
+                Dispatcher.Invoke(DispatcherPriority.Normal, (Action)(() =>
+                {
+                    TalinPositionUpdateThread.Abort();
+                   // bt_StartScan.IsEnabled = true;   // button start connexion
+                    TT.Stop();
+                 //  lb_Status.Content = " Talin Aligned. Scan can Start.";
+                    talinLogTxt.Text = " Talin Aligned. Scan can Start.";
+                }));
+            }
+            else
+            {
+                Dispatcher.Invoke(DispatcherPriority.Normal, (Action)(() =>
+                {
+                   // lb_Status.Content = "Talin Alignment Time = " + TalinDataProcess.AlignmentTime.ToString();
+                    talinLogTxt.Text = "Talin Alignment Time = " + TalinDataProcess.AlignmentTime.ToString();
+                }));
+            }*/
+        }
+
+        private void bt_SavePosition_Click(object sender, RoutedEventArgs e)
+        {
+            string[] results = getPositionData();
+            if (results == null)
+                return;
+            string return_value = results[0] + " " + results[1];
+            for (int i = 2; i < results.Length; i++)
+            {
+                return_value += (", " + results[i]);
+            }
+
+            string[] str = new string[lstb_Position.Items.Count + 1];
+            bool rewrite = false;
+            int j = 0;
+            //Read the list
+            using (StreamReader sr = new StreamReader(TMC.FileName)) //Shall be a database in future
+            {
+                //List<string> lines = new List<string>();
+                string line;
+
+                while (((line = sr.ReadLine()) != null) && (line != ""))
+                {
+                    string[] fields = line.Split(',', '=', ' ');
+                    string valuetoremove2 = "";
+                    fields = fields.Where(val => val != valuetoremove2).ToArray();
+                    if (fields[2].Trim() == results[2]) //if same name rewrite the file
+                    {
+                        str[j] = (return_value + "\n");
+                        rewrite = true;
+                    }
+                    else
+                    {
+                        str[j] = line;
+                    }
+                    j++;
+
+                }
+            }
+            if (rewrite == false)  //add new one
+            {
+                str[j] = return_value;
+            }
+            else
+            {
+                j--;
+            }
+            using (StreamWriter sw = new StreamWriter(TMC.FileName))
+            {
+                for (int k = 0; k <= j; k++)
+                    sw.WriteLine(str[k]);
+            }
+
+            LoadPositionList();
+
+        }
+
+        private void bt_DeletePosition_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                //Since we load everything to the list even nonvalid data, following code can work
+                int temp = lstb_Position.SelectedIndex;
+                string[] str = new string[lstb_Position.Items.Count - 1];
+                int i = 0;
+                using (StreamReader sr = new StreamReader(TMC.FileName)) //Shall be a database in future
+                {
+                    //List<string> lines = new List<string>();
+                    string line;
+                    int j = 0;
+                    while (((line = sr.ReadLine()) != null) && (line != ""))
+                    {
+                        string[] fields = line.Split(',', '=', ' ');
+                        string valuetoremove2 = "";
+                        fields = fields.Where(val => val != valuetoremove2).ToArray();
+                        if (j != temp) //if same name rewrite the file
+                        {
+                            str[i] += line;
+                            i++;
+                            //if (i >= lstb_Position.Items.Count)
+                            //    break;
+                        }
+                        j++;
+
+                    }
+                }
+                using (StreamWriter sw = new StreamWriter(TMC.FileName))
+                {
+                    for (int k = 0; k < i; k++)
+                        sw.WriteLine(str[k]);
+                }
+
+                LoadPositionList();
+            }
+            catch (Exception er)
+            {
+                System.Windows.MessageBox.Show("Failed to delete this position. Error \n" + er.ToString());
+            }
+        }
+
+        public byte[] ReturnTalinCommand()  //The returned byte is for server-client application
+        {
+            return TalinCommandArray;
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            if (Test_TalinInclude == true)
+                TDP.stopNavigation();
+        }
+        #endregion
     }
 
 }
