@@ -866,9 +866,6 @@ namespace Penguin__REMS_Project
             }
             catch (Exception err)
             {
-                //Console.SetCursorPosition(1, 2);
-                //Console.WriteLine("Talin Connection is failed.");
-                ////Console.WriteLine(err.ToString());
                 return false;
             }
             sp.ReceivedBytesThreshold = 1;
@@ -876,8 +873,7 @@ namespace Penguin__REMS_Project
             sp.ErrorReceived += sp_ErrorReceived;
             sp.ReadTimeout = 200;
             sp.WriteTimeout = 200;
-            //Console.SetCursorPosition(1, 2);
-            //Console.WriteLine("Talin is connected at " + ComNo + " baudrate: " + sp.BaudRate.ToString() + " .");
+           
             return true;
         }
 
@@ -885,7 +881,6 @@ namespace Penguin__REMS_Project
         {
             if (sp != null)
                 sp.Close();
-            //Console.WriteLine("Talin is disconnected.");
         }
 
         public void ShutdownTalin()
@@ -909,17 +904,17 @@ namespace Penguin__REMS_Project
             }
             catch (TimeoutException err)
             {
-                //Console.WriteLine("Sending Command to Talin is time out.");
+                
                 return false;
             }
             catch (NullReferenceException er)
             {
-                //Console.WriteLine("Talin isn't connected.");
+                
                 return false;
             }
             catch (Exception e)
             {
-                //Console.WriteLine("Talin isn't connected or terminated.");
+               
                 return false;
             }
         }
@@ -1189,8 +1184,7 @@ namespace Penguin__REMS_Project
                     if (FullReadFrame[1] == 10)  //Vehicle Configuration 1
                     {
                         readConfiguration1 = BitConverter.ToString(_data);
-                        ////Console.SetCursorPosition(1, 22);
-                        ////Console.WriteLine(readConfiguration1);
+                       
                         receiveConfiguration1.Set();
                     }
                     if (FullReadFrame[1] == 20)  //Vehicle Configuration 2
@@ -1201,15 +1195,13 @@ namespace Penguin__REMS_Project
                     if (FullReadFrame[1] == 161)  //Bore Sight
                     {
                         readBoreSight1 = BitConverter.ToString(_data);
-                        ////Console.SetCursorPosition(1, 32);
-                        ////Console.WriteLine(readBoreSight1);
+                      
                         receiveBoreSight1.Set();
                     }
                     if (FullReadFrame[1] == 140)  //Lever Arm
                     {
                         readLeverArm = BitConverter.ToString(_data);
-                        ////Console.SetCursorPosition(1, 42);
-                        ////Console.WriteLine(readLeverArm);
+                   
                         receiveLeverArm.Set();
                     }
                     if (FullReadFrame[1] == 151)  //Rotation Point
@@ -1261,14 +1253,3 @@ namespace Penguin__REMS_Project
         #endregion
     }
 }
-
-
-
-
-
-
-
-
-
-
-
