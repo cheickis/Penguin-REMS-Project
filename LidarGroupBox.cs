@@ -167,11 +167,14 @@ namespace Penguin__REMS_Project
             }
             else {
 
-
-                statusPicBx.Image = global::Penguin__REMS_Project.Properties.Resources.Red1;
+                 statusPicBx.Image = global::Penguin__REMS_Project.Properties.Resources.Red1;
 
             }
-            statusPicBx.Refresh();
+            if (statusPicBx.InvokeRequired) {
+
+               // statusPicBx.Refresh();
+            }
+           
         }
 
 
@@ -188,6 +191,10 @@ namespace Penguin__REMS_Project
         public String IPString
         {
             get => mainIPLbl.Text;
+        }
+
+        public MetroLabel DataLabel {
+            get => mainDataLbl;
         }
         #endregion
 

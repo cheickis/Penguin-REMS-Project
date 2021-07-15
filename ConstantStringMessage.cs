@@ -28,7 +28,13 @@ namespace Penguin__REMS_Project
         #region ADD NEW LIDAR MSS
         public const String ADDLIDARFORMCAPTIONMSQ = "ADD Lidar Form";
         public const String ADDLIDARFORMERRORMSQ = "ALL Field of the form must be  filled";
-        
+
+        #endregion
+
+        #region Scan Folder
+       public  const String FOLDERPATH = @"C:\Scandatas\";
+      public   const String FOLDERSUFFIX = "_ScanData_"; 
+
         #endregion
 
 
