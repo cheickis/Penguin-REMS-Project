@@ -12,12 +12,15 @@ using System.Threading;
 
 namespace Penguin__REMS_Project
 {
+    #region Delegate
     delegate void ObtainPositonDelegate(double x, double y, double z);
     delegate void ObtainOrientationDelegate(double r, double p, double y);
 
-
+    #endregion
+   
     class TalinDataProcess
     {
+        #region Variable
         delegate void DataProcessDelegate(byte[] _data);
 
         public bool Write2File = false;
@@ -90,7 +93,9 @@ namespace Penguin__REMS_Project
 
         private byte singlebyte = 0x00;
         private bool singlebyteexist = false;
+        #endregion
 
+        #region Structure
         public struct TalinStatus
         {
             public bool NavigationMode;
@@ -118,7 +123,7 @@ namespace Penguin__REMS_Project
             }
 
         }
-
+        #endregion
 
         #region TalinCommandRegion
 
@@ -344,18 +349,19 @@ namespace Penguin__REMS_Project
 
         #endregion
 
+        #region File Handler
         public void StartWriteFile(string FileName)
         {
             sw = new StreamWriter(FileName);
            
         }
-
         public void EndWriteFile()
         {
             sw.Close();
             Write2File = false;
         }
-
+        #endregion
+       
         #region Talin_InitialProcess
         private bool readPresetData()
         {
@@ -644,6 +650,7 @@ namespace Penguin__REMS_Project
         }
         #endregion
 
+        #region Status
         public bool startReadStatus(bool start)
         {
             //Read Status in 1Hz;
@@ -685,51 +692,53 @@ namespace Penguin__REMS_Project
               
                 if (TS.AlignmentTimeLeft != 0)
                 {
-                    //Console.WriteLine("Align Time Left {0}", TS.AlignmentTimeLeft.ToString());
+                  
                 }
                 else
                 {
-                    //Console.WriteLine("Talin is Aligned!                      ");
+                   
                 }
                 AlignmentTime = TS.AlignmentTimeLeft;
                 //Console.SetCursorPosition(1, 7);
                 if (TS.OutofTravelLock)
                 {
-                    //Console.WriteLine("Talin is out of travel lock!");
+                  
                     results = results | 0x04;
                 }
                 else
                 {
-                    //Console.WriteLine("Talin in travel lock!");
+                   
                     results = results & 0xFB;
                 }
                 //Console.SetCursorPosition(1, 9);
                 if (TS.NavigationMode)
                 {
-                    //Console.WriteLine("Talin is in Navigation Mode!");
+                   
                     results = results | 0x08;
                 }
                 else
                 {
-                    //Console.WriteLine("Talin is not in Navigation Mode!");
+                    
                     results = results & 0xF7;
                 }
                 //Console.SetCursorPosition(1, 11);
 
                 if (TS.InitialPositionReceived)
                 {
-                    //Console.WriteLine("Talin Initial Position received!");
+                    
                     results = results | 0x10;
                 }
                 else
                 {
-                    //Console.WriteLine("Talin Initial Position is not received or lost!");
+                   
                     results = results & 0xEF;
                 }
             }
             return results;
         }
-
+        #endregion
+       
+        #region Navigation
         public void startNavigation()
         {
             Write2File = true;
@@ -793,6 +802,8 @@ namespace Penguin__REMS_Project
             }
         }
 
+        #endregion
+        
         #region SerialPort
 
         private byte[] CommandAddHex10(byte[] Command)
@@ -1147,8 +1158,7 @@ namespace Penguin__REMS_Project
 
                     byte[] altitudebyte = { FullReadFrame[24], FullReadFrame[25], FullReadFrame[26], FullReadFrame[27] };
                     double altitude = TalinDoubleWordsFloat_Double(altitudebyte, positionaccuracy);
-                    //Console.SetCursorPosition(1, 10);
-                    //Console.WriteLine("Current Elevation = {0}.                     ", altitude.ToString("F3"));
+                 
                     if (Write2File == true)
                         sw.WriteLine(NowString + "-" + BitConverter.ToString(Temp));
 
