@@ -263,6 +263,26 @@ namespace Penguin__REMS_Project.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap talin {
+            get {
+                object obj = ResourceManager.GetObject("talin", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap talin_pic {
+            get {
+                object obj = ResourceManager.GetObject("talin_pic", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap TalonGreenStatus {
             get {
                 object obj = ResourceManager.GetObject("TalonGreenStatus", resourceCulture);

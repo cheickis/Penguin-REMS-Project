@@ -33,9 +33,20 @@ namespace Penguin__REMS_Project
             this.metroTabPage1 = new MetroFramework.Controls.MetroTabPage();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.mainfLPl = new System.Windows.Forms.FlowLayoutPanel();
+            this.talinGrpBx = new System.Windows.Forms.GroupBox();
+            this.talinPortGrpBx = new MetroFramework.Controls.MetroLabel();
+            this.metroLabel6 = new MetroFramework.Controls.MetroLabel();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.talinStatusGrpPicBx = new System.Windows.Forms.PictureBox();
+            this.metroLabel11 = new MetroFramework.Controls.MetroLabel();
+            this.label1 = new System.Windows.Forms.Label();
+            this.talinPixBox = new System.Windows.Forms.PictureBox();
             this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
             this.startBtn = new MetroFramework.Controls.MetroButton();
             this.metroButton1 = new MetroFramework.Controls.MetroButton();
+            this.metroTabPage6 = new MetroFramework.Controls.MetroTabPage();
+            this.threeDLidarFLPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.metroTabPage2 = new MetroFramework.Controls.MetroTabPage();
             this.tableLayoutPanel7 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel8 = new System.Windows.Forms.TableLayoutPanel();
@@ -97,6 +108,7 @@ namespace Penguin__REMS_Project
             this.panel1 = new System.Windows.Forms.Panel();
             this.Status_lbl = new MetroFramework.Controls.MetroLabel();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.talinStatusPicBox = new System.Windows.Forms.PictureBox();
             this.metroTabPage7 = new MetroFramework.Controls.MetroTabPage();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.metroPanel2 = new MetroFramework.Controls.MetroPanel();
@@ -110,9 +122,8 @@ namespace Penguin__REMS_Project
             this.metroLabel7 = new MetroFramework.Controls.MetroLabel();
             this.metroLabel8 = new MetroFramework.Controls.MetroLabel();
             this.metroLabel9 = new MetroFramework.Controls.MetroLabel();
-            this.metroPanel3 = new MetroFramework.Controls.MetroPanel();
-            this.metroTabPage6 = new MetroFramework.Controls.MetroTabPage();
-            this.threeDLidarFLPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.metroTabPage5 = new MetroFramework.Controls.MetroTabPage();
+            this.sickFLPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.metroTabPage3 = new MetroFramework.Controls.MetroTabPage();
             this.metroTabPage4 = new MetroFramework.Controls.MetroTabPage();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
@@ -134,13 +145,16 @@ namespace Penguin__REMS_Project
             this.lidarInfoTxtBox = new MetroFramework.Controls.MetroTextBox();
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.closeLidarPanelBtn = new MetroFramework.Controls.MetroButton();
-            this.talinStatusPicBox = new System.Windows.Forms.PictureBox();
-            this.metroTabPage5 = new MetroFramework.Controls.MetroTabPage();
-            this.sickFLPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.metroPanel3 = new MetroFramework.Controls.MetroPanel();
             this.mainTb.SuspendLayout();
             this.metroTabPage1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
+            this.mainfLPl.SuspendLayout();
+            this.talinGrpBx.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.talinStatusGrpPicBx)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.talinPixBox)).BeginInit();
             this.flowLayoutPanel3.SuspendLayout();
+            this.metroTabPage6.SuspendLayout();
             this.metroTabPage2.SuspendLayout();
             this.tableLayoutPanel7.SuspendLayout();
             this.tableLayoutPanel8.SuspendLayout();
@@ -172,10 +186,11 @@ namespace Penguin__REMS_Project
             this.flowLayoutPanel7.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.talinStatusPicBox)).BeginInit();
             this.metroTabPage7.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
             this.metroPanel2.SuspendLayout();
-            this.metroTabPage6.SuspendLayout();
+            this.metroTabPage5.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.lidarInfoPanel.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -184,17 +199,15 @@ namespace Penguin__REMS_Project
             this.flowLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel6.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.talinStatusPicBox)).BeginInit();
-            this.metroTabPage5.SuspendLayout();
             this.SuspendLayout();
             // 
             // mainTb
             // 
             this.mainTb.Appearance = System.Windows.Forms.TabAppearance.Buttons;
             this.mainTb.Controls.Add(this.metroTabPage1);
+            this.mainTb.Controls.Add(this.metroTabPage7);
             this.mainTb.Controls.Add(this.metroTabPage6);
             this.mainTb.Controls.Add(this.metroTabPage2);
-            this.mainTb.Controls.Add(this.metroTabPage7);
             this.mainTb.Controls.Add(this.metroTabPage5);
             this.mainTb.Controls.Add(this.metroTabPage3);
             this.mainTb.Controls.Add(this.metroTabPage4);
@@ -202,7 +215,7 @@ namespace Penguin__REMS_Project
             this.mainTb.FontWeight = MetroFramework.MetroTabControlWeight.Regular;
             this.mainTb.Location = new System.Drawing.Point(20, 84);
             this.mainTb.Name = "mainTb";
-            this.mainTb.SelectedIndex = 2;
+            this.mainTb.SelectedIndex = 0;
             this.mainTb.Size = new System.Drawing.Size(1150, 663);
             this.mainTb.TabIndex = 0;
             this.mainTb.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -237,11 +250,106 @@ namespace Penguin__REMS_Project
             // mainfLPl
             // 
             this.mainfLPl.AutoScroll = true;
+            this.mainfLPl.Controls.Add(this.talinGrpBx);
             this.mainfLPl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.mainfLPl.Location = new System.Drawing.Point(3, 3);
             this.mainfLPl.Name = "mainfLPl";
             this.mainfLPl.Size = new System.Drawing.Size(1136, 534);
             this.mainfLPl.TabIndex = 4;
+            // 
+            // talinGrpBx
+            // 
+            this.talinGrpBx.BackColor = System.Drawing.Color.White;
+            this.talinGrpBx.Controls.Add(this.talinPortGrpBx);
+            this.talinGrpBx.Controls.Add(this.metroLabel6);
+            this.talinGrpBx.Controls.Add(this.label3);
+            this.talinGrpBx.Controls.Add(this.label2);
+            this.talinGrpBx.Controls.Add(this.talinStatusGrpPicBx);
+            this.talinGrpBx.Controls.Add(this.metroLabel11);
+            this.talinGrpBx.Controls.Add(this.label1);
+            this.talinGrpBx.Controls.Add(this.talinPixBox);
+            this.talinGrpBx.Location = new System.Drawing.Point(3, 3);
+            this.talinGrpBx.Name = "talinGrpBx";
+            this.talinGrpBx.Size = new System.Drawing.Size(325, 243);
+            this.talinGrpBx.TabIndex = 0;
+            this.talinGrpBx.TabStop = false;
+            this.talinGrpBx.Text = "Talin";
+            // 
+            // talinPortGrpBx
+            // 
+            this.talinPortGrpBx.AutoSize = true;
+            this.talinPortGrpBx.Location = new System.Drawing.Point(262, 79);
+            this.talinPortGrpBx.Name = "talinPortGrpBx";
+            this.talinPortGrpBx.Size = new System.Drawing.Size(48, 19);
+            this.talinPortGrpBx.TabIndex = 8;
+            this.talinPortGrpBx.Text = "COM3";
+            // 
+            // metroLabel6
+            // 
+            this.metroLabel6.AutoSize = true;
+            this.metroLabel6.Location = new System.Drawing.Point(155, 79);
+            this.metroLabel6.Name = "metroLabel6";
+            this.metroLabel6.Size = new System.Drawing.Size(34, 19);
+            this.metroLabel6.TabIndex = 7;
+            this.metroLabel6.Text = "Port";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(257, 113);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(53, 21);
+            this.label3.TabIndex = 6;
+            this.label3.Text = "0 byte";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(151, 113);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(49, 21);
+            this.label2.TabIndex = 5;
+            this.label2.Text = "Data :";
+            // 
+            // talinStatusGrpPicBx
+            // 
+            this.talinStatusGrpPicBx.Image = global::Penguin__REMS_Project.Properties.Resources.Red1;
+            this.talinStatusGrpPicBx.Location = new System.Drawing.Point(256, 172);
+            this.talinStatusGrpPicBx.Name = "talinStatusGrpPicBx";
+            this.talinStatusGrpPicBx.Size = new System.Drawing.Size(54, 50);
+            this.talinStatusGrpPicBx.TabIndex = 4;
+            this.talinStatusGrpPicBx.TabStop = false;
+            // 
+            // metroLabel11
+            // 
+            this.metroLabel11.AutoSize = true;
+            this.metroLabel11.Location = new System.Drawing.Point(155, 184);
+            this.metroLabel11.Name = "metroLabel11";
+            this.metroLabel11.Size = new System.Drawing.Size(43, 19);
+            this.metroLabel11.TabIndex = 3;
+            this.metroLabel11.Text = "Status";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(184, 19);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(71, 37);
+            this.label1.TabIndex = 1;
+            this.label1.Text = "Talin";
+            // 
+            // talinPixBox
+            // 
+            this.talinPixBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+            this.talinPixBox.BackgroundImage = global::Penguin__REMS_Project.Properties.Resources.talin_pic;
+            this.talinPixBox.Location = new System.Drawing.Point(20, 19);
+            this.talinPixBox.Name = "talinPixBox";
+            this.talinPixBox.Size = new System.Drawing.Size(121, 102);
+            this.talinPixBox.TabIndex = 0;
+            this.talinPixBox.TabStop = false;
             // 
             // flowLayoutPanel3
             // 
@@ -271,6 +379,25 @@ namespace Penguin__REMS_Project
             this.metroButton1.Text = "Stop Scans";
             this.metroButton1.Click += new System.EventHandler(this.metroButton1_Click);
             // 
+            // metroTabPage6
+            // 
+            this.metroTabPage6.Controls.Add(this.threeDLidarFLPanel);
+            this.metroTabPage6.HorizontalScrollbarBarColor = true;
+            this.metroTabPage6.Location = new System.Drawing.Point(4, 38);
+            this.metroTabPage6.Name = "metroTabPage6";
+            this.metroTabPage6.Size = new System.Drawing.Size(1142, 621);
+            this.metroTabPage6.TabIndex = 5;
+            this.metroTabPage6.Text = "3D Lidar";
+            this.metroTabPage6.VerticalScrollbarBarColor = true;
+            // 
+            // threeDLidarFLPanel
+            // 
+            this.threeDLidarFLPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.threeDLidarFLPanel.Location = new System.Drawing.Point(0, 0);
+            this.threeDLidarFLPanel.Name = "threeDLidarFLPanel";
+            this.threeDLidarFLPanel.Size = new System.Drawing.Size(1142, 621);
+            this.threeDLidarFLPanel.TabIndex = 7;
+            // 
             // metroTabPage2
             // 
             this.metroTabPage2.Controls.Add(this.tableLayoutPanel7);
@@ -287,7 +414,7 @@ namespace Penguin__REMS_Project
             this.tableLayoutPanel7.ColumnCount = 3;
             this.tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 62.21663F));
             this.tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 37.78337F));
-            this.tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 777F));
+            this.tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 779F));
             this.tableLayoutPanel7.Controls.Add(this.tableLayoutPanel8, 1, 0);
             this.tableLayoutPanel7.Controls.Add(this.tableLayoutPanel9, 0, 0);
             this.tableLayoutPanel7.Controls.Add(this.tableLayoutPanel10, 2, 0);
@@ -312,7 +439,7 @@ namespace Penguin__REMS_Project
             this.tableLayoutPanel8.Controls.Add(this.groupBox12, 0, 6);
             this.tableLayoutPanel8.Controls.Add(this.groupBox13, 0, 7);
             this.tableLayoutPanel8.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel8.Location = new System.Drawing.Point(230, 3);
+            this.tableLayoutPanel8.Location = new System.Drawing.Point(228, 3);
             this.tableLayoutPanel8.Name = "tableLayoutPanel8";
             this.tableLayoutPanel8.RowCount = 8;
             this.tableLayoutPanel8.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10.6599F));
@@ -527,7 +654,7 @@ namespace Penguin__REMS_Project
             this.tableLayoutPanel9.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 14.7482F));
             this.tableLayoutPanel9.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 14.7482F));
             this.tableLayoutPanel9.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 14.7482F));
-            this.tableLayoutPanel9.Size = new System.Drawing.Size(221, 615);
+            this.tableLayoutPanel9.Size = new System.Drawing.Size(219, 615);
             this.tableLayoutPanel9.TabIndex = 1;
             // 
             // groupBox6
@@ -537,7 +664,7 @@ namespace Penguin__REMS_Project
             this.groupBox6.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox6.Location = new System.Drawing.Point(3, 523);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(215, 89);
+            this.groupBox6.Size = new System.Drawing.Size(213, 89);
             this.groupBox6.TabIndex = 9;
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "Deflection North/South (arc/s)";
@@ -557,7 +684,7 @@ namespace Penguin__REMS_Project
             this.groupBox5.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox5.Location = new System.Drawing.Point(3, 433);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(215, 84);
+            this.groupBox5.Size = new System.Drawing.Size(213, 84);
             this.groupBox5.TabIndex = 8;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Deflection East/West (arc/s)";
@@ -577,7 +704,7 @@ namespace Penguin__REMS_Project
             this.groupBox4.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox4.Location = new System.Drawing.Point(3, 343);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(215, 84);
+            this.groupBox4.Size = new System.Drawing.Size(213, 84);
             this.groupBox4.TabIndex = 7;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Material Density (kg/m^3)";
@@ -597,7 +724,7 @@ namespace Penguin__REMS_Project
             this.groupBox3.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox3.Location = new System.Drawing.Point(3, 253);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(215, 84);
+            this.groupBox3.Size = new System.Drawing.Size(213, 84);
             this.groupBox3.TabIndex = 6;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Reference Gravity (g)";
@@ -617,7 +744,7 @@ namespace Penguin__REMS_Project
             this.groupBox2.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox2.Location = new System.Drawing.Point(3, 163);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(215, 84);
+            this.groupBox2.Size = new System.Drawing.Size(213, 84);
             this.groupBox2.TabIndex = 5;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Mode";
@@ -664,7 +791,7 @@ namespace Penguin__REMS_Project
             this.metroLabel3.FontWeight = MetroFramework.MetroLabelWeight.Bold;
             this.metroLabel3.Location = new System.Drawing.Point(3, 0);
             this.metroLabel3.Name = "metroLabel3";
-            this.metroLabel3.Size = new System.Drawing.Size(215, 66);
+            this.metroLabel3.Size = new System.Drawing.Size(213, 66);
             this.metroLabel3.TabIndex = 3;
             this.metroLabel3.Text = "Position Mode";
             this.metroLabel3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -677,7 +804,7 @@ namespace Penguin__REMS_Project
             this.groupBox1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox1.Location = new System.Drawing.Point(3, 69);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(215, 88);
+            this.groupBox1.Size = new System.Drawing.Size(213, 88);
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Position Identification";
@@ -696,12 +823,12 @@ namespace Penguin__REMS_Project
             this.tableLayoutPanel10.Controls.Add(this.tableLayoutPanel11, 0, 0);
             this.tableLayoutPanel10.Controls.Add(this.flowLayoutPanel4, 0, 1);
             this.tableLayoutPanel10.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel10.Location = new System.Drawing.Point(367, 3);
+            this.tableLayoutPanel10.Location = new System.Drawing.Point(365, 3);
             this.tableLayoutPanel10.Name = "tableLayoutPanel10";
             this.tableLayoutPanel10.RowCount = 2;
             this.tableLayoutPanel10.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel10.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 61F));
-            this.tableLayoutPanel10.Size = new System.Drawing.Size(772, 615);
+            this.tableLayoutPanel10.Size = new System.Drawing.Size(774, 615);
             this.tableLayoutPanel10.TabIndex = 2;
             // 
             // tableLayoutPanel11
@@ -716,7 +843,7 @@ namespace Penguin__REMS_Project
             this.tableLayoutPanel11.Name = "tableLayoutPanel11";
             this.tableLayoutPanel11.RowCount = 1;
             this.tableLayoutPanel11.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel11.Size = new System.Drawing.Size(766, 548);
+            this.tableLayoutPanel11.Size = new System.Drawing.Size(768, 548);
             this.tableLayoutPanel11.TabIndex = 0;
             // 
             // tableLayoutPanel12
@@ -731,7 +858,7 @@ namespace Penguin__REMS_Project
             this.tableLayoutPanel12.RowCount = 2;
             this.tableLayoutPanel12.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel12.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 478F));
-            this.tableLayoutPanel12.Size = new System.Drawing.Size(448, 542);
+            this.tableLayoutPanel12.Size = new System.Drawing.Size(449, 542);
             this.tableLayoutPanel12.TabIndex = 1;
             // 
             // metroLabel1
@@ -742,7 +869,7 @@ namespace Penguin__REMS_Project
             this.metroLabel1.FontWeight = MetroFramework.MetroLabelWeight.Bold;
             this.metroLabel1.Location = new System.Drawing.Point(3, 0);
             this.metroLabel1.Name = "metroLabel1";
-            this.metroLabel1.Size = new System.Drawing.Size(442, 64);
+            this.metroLabel1.Size = new System.Drawing.Size(443, 64);
             this.metroLabel1.TabIndex = 1;
             this.metroLabel1.Text = "Previous Position";
             this.metroLabel1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -778,7 +905,7 @@ namespace Penguin__REMS_Project
             // 
             this.flowLayoutPanel9.Controls.Add(this.groupBox14);
             this.flowLayoutPanel9.Controls.Add(this.groupBox15);
-            this.flowLayoutPanel9.Location = new System.Drawing.Point(457, 3);
+            this.flowLayoutPanel9.Location = new System.Drawing.Point(458, 3);
             this.flowLayoutPanel9.Name = "flowLayoutPanel9";
             this.flowLayoutPanel9.Size = new System.Drawing.Size(306, 542);
             this.flowLayoutPanel9.TabIndex = 2;
@@ -875,7 +1002,7 @@ namespace Penguin__REMS_Project
             this.flowLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel4.Location = new System.Drawing.Point(3, 557);
             this.flowLayoutPanel4.Name = "flowLayoutPanel4";
-            this.flowLayoutPanel4.Size = new System.Drawing.Size(766, 55);
+            this.flowLayoutPanel4.Size = new System.Drawing.Size(768, 55);
             this.flowLayoutPanel4.TabIndex = 1;
             // 
             // tableLayoutPanel13
@@ -962,6 +1089,15 @@ namespace Penguin__REMS_Project
             this.panel2.Size = new System.Drawing.Size(56, 32);
             this.panel2.TabIndex = 1;
             // 
+            // talinStatusPicBox
+            // 
+            this.talinStatusPicBox.Image = global::Penguin__REMS_Project.Properties.Resources.RedTalon1;
+            this.talinStatusPicBox.Location = new System.Drawing.Point(9, 4);
+            this.talinStatusPicBox.Name = "talinStatusPicBox";
+            this.talinStatusPicBox.Size = new System.Drawing.Size(30, 27);
+            this.talinStatusPicBox.TabIndex = 4;
+            this.talinStatusPicBox.TabStop = false;
+            // 
             // metroTabPage7
             // 
             this.metroTabPage7.Controls.Add(this.flowLayoutPanel1);
@@ -1002,7 +1138,7 @@ namespace Penguin__REMS_Project
             this.metroPanel2.HorizontalScrollbarSize = 10;
             this.metroPanel2.Location = new System.Drawing.Point(3, 3);
             this.metroPanel2.Name = "metroPanel2";
-            this.metroPanel2.Size = new System.Drawing.Size(318, 0);
+            this.metroPanel2.Size = new System.Drawing.Size(318, 513);
             this.metroPanel2.TabIndex = 4;
             this.metroPanel2.VerticalScrollbarBarColor = true;
             this.metroPanel2.VerticalScrollbarHighlightOnWheel = false;
@@ -1023,6 +1159,7 @@ namespace Penguin__REMS_Project
             this.lidarNameCbx.Size = new System.Drawing.Size(183, 29);
             this.lidarNameCbx.Sorted = true;
             this.lidarNameCbx.TabIndex = 13;
+            this.lidarNameCbx.Theme = MetroFramework.MetroThemeStyle.Dark;
             // 
             // lidarTypeCbx
             // 
@@ -1107,37 +1244,26 @@ namespace Penguin__REMS_Project
             this.metroLabel9.Text = "Name";
             this.metroLabel9.Theme = MetroFramework.MetroThemeStyle.Dark;
             // 
-            // metroPanel3
+            // metroTabPage5
             // 
-            this.metroPanel3.HorizontalScrollbarBarColor = true;
-            this.metroPanel3.HorizontalScrollbarHighlightOnWheel = false;
-            this.metroPanel3.HorizontalScrollbarSize = 10;
-            this.metroPanel3.Location = new System.Drawing.Point(3, 9);
-            this.metroPanel3.Name = "metroPanel3";
-            this.metroPanel3.Size = new System.Drawing.Size(827, 513);
-            this.metroPanel3.TabIndex = 5;
-            this.metroPanel3.VerticalScrollbarBarColor = true;
-            this.metroPanel3.VerticalScrollbarHighlightOnWheel = false;
-            this.metroPanel3.VerticalScrollbarSize = 10;
+            this.metroTabPage5.BackgroundImage = global::Penguin__REMS_Project.Properties.Resources.isckLMS;
+            this.metroTabPage5.Controls.Add(this.sickFLPanel);
+            this.metroTabPage5.HorizontalScrollbarBarColor = true;
+            this.metroTabPage5.Location = new System.Drawing.Point(4, 38);
+            this.metroTabPage5.Name = "metroTabPage5";
+            this.metroTabPage5.Size = new System.Drawing.Size(1142, 621);
+            this.metroTabPage5.TabIndex = 4;
+            this.metroTabPage5.Text = "2D Sick Lidar";
+            this.metroTabPage5.Theme = MetroFramework.MetroThemeStyle.Light;
+            this.metroTabPage5.VerticalScrollbarBarColor = true;
             // 
-            // metroTabPage6
+            // sickFLPanel
             // 
-            this.metroTabPage6.Controls.Add(this.threeDLidarFLPanel);
-            this.metroTabPage6.HorizontalScrollbarBarColor = true;
-            this.metroTabPage6.Location = new System.Drawing.Point(4, 38);
-            this.metroTabPage6.Name = "metroTabPage6";
-            this.metroTabPage6.Size = new System.Drawing.Size(1142, 621);
-            this.metroTabPage6.TabIndex = 5;
-            this.metroTabPage6.Text = "3D Lidar";
-            this.metroTabPage6.VerticalScrollbarBarColor = true;
-            // 
-            // threeDLidarFLPanel
-            // 
-            this.threeDLidarFLPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.threeDLidarFLPanel.Location = new System.Drawing.Point(0, 0);
-            this.threeDLidarFLPanel.Name = "threeDLidarFLPanel";
-            this.threeDLidarFLPanel.Size = new System.Drawing.Size(1142, 621);
-            this.threeDLidarFLPanel.TabIndex = 7;
+            this.sickFLPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.sickFLPanel.Location = new System.Drawing.Point(0, 0);
+            this.sickFLPanel.Name = "sickFLPanel";
+            this.sickFLPanel.Size = new System.Drawing.Size(1142, 621);
+            this.sickFLPanel.TabIndex = 6;
             // 
             // metroTabPage3
             // 
@@ -1363,35 +1489,20 @@ namespace Penguin__REMS_Project
             this.closeLidarPanelBtn.Text = "Close";
             this.closeLidarPanelBtn.Click += new System.EventHandler(this.CloseLidarPanelBtn_Click);
             // 
-            // talinStatusPicBox
+            // metroPanel3
             // 
-            this.talinStatusPicBox.Image = global::Penguin__REMS_Project.Properties.Resources.RedTalon1;
-            this.talinStatusPicBox.Location = new System.Drawing.Point(9, 4);
-            this.talinStatusPicBox.Name = "talinStatusPicBox";
-            this.talinStatusPicBox.Size = new System.Drawing.Size(30, 27);
-            this.talinStatusPicBox.TabIndex = 4;
-            this.talinStatusPicBox.TabStop = false;
-            // 
-            // metroTabPage5
-            // 
-            this.metroTabPage5.BackgroundImage = global::Penguin__REMS_Project.Properties.Resources.isckLMS;
-            this.metroTabPage5.Controls.Add(this.sickFLPanel);
-            this.metroTabPage5.HorizontalScrollbarBarColor = true;
-            this.metroTabPage5.Location = new System.Drawing.Point(4, 38);
-            this.metroTabPage5.Name = "metroTabPage5";
-            this.metroTabPage5.Size = new System.Drawing.Size(1142, 621);
-            this.metroTabPage5.TabIndex = 4;
-            this.metroTabPage5.Text = "2D Sick Lidar";
-            this.metroTabPage5.Theme = MetroFramework.MetroThemeStyle.Light;
-            this.metroTabPage5.VerticalScrollbarBarColor = true;
-            // 
-            // sickFLPanel
-            // 
-            this.sickFLPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.sickFLPanel.Location = new System.Drawing.Point(0, 0);
-            this.sickFLPanel.Name = "sickFLPanel";
-            this.sickFLPanel.Size = new System.Drawing.Size(1142, 621);
-            this.sickFLPanel.TabIndex = 6;
+            this.metroPanel3.BackColor = System.Drawing.Color.Transparent;
+            this.metroPanel3.HorizontalScrollbarBarColor = true;
+            this.metroPanel3.HorizontalScrollbarHighlightOnWheel = false;
+            this.metroPanel3.HorizontalScrollbarSize = 10;
+            this.metroPanel3.Location = new System.Drawing.Point(327, 3);
+            this.metroPanel3.Name = "metroPanel3";
+            this.metroPanel3.Size = new System.Drawing.Size(812, 513);
+            this.metroPanel3.TabIndex = 5;
+            this.metroPanel3.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this.metroPanel3.VerticalScrollbarBarColor = true;
+            this.metroPanel3.VerticalScrollbarHighlightOnWheel = false;
+            this.metroPanel3.VerticalScrollbarSize = 10;
             // 
             // Remsform
             // 
@@ -1408,7 +1519,13 @@ namespace Penguin__REMS_Project
             this.mainTb.ResumeLayout(false);
             this.metroTabPage1.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
+            this.mainfLPl.ResumeLayout(false);
+            this.talinGrpBx.ResumeLayout(false);
+            this.talinGrpBx.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.talinStatusGrpPicBx)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.talinPixBox)).EndInit();
             this.flowLayoutPanel3.ResumeLayout(false);
+            this.metroTabPage6.ResumeLayout(false);
             this.metroTabPage2.ResumeLayout(false);
             this.tableLayoutPanel7.ResumeLayout(false);
             this.tableLayoutPanel8.ResumeLayout(false);
@@ -1448,11 +1565,12 @@ namespace Penguin__REMS_Project
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.talinStatusPicBox)).EndInit();
             this.metroTabPage7.ResumeLayout(false);
             this.flowLayoutPanel1.ResumeLayout(false);
             this.metroPanel2.ResumeLayout(false);
             this.metroPanel2.PerformLayout();
-            this.metroTabPage6.ResumeLayout(false);
+            this.metroTabPage5.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.lidarInfoPanel.ResumeLayout(false);
@@ -1463,8 +1581,6 @@ namespace Penguin__REMS_Project
             this.flowLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel6.ResumeLayout(false);
             this.tableLayoutPanel4.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.talinStatusPicBox)).EndInit();
-            this.metroTabPage5.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1500,7 +1616,6 @@ namespace Penguin__REMS_Project
         private MetroFramework.Controls.MetroTextBox lidarIPTxt;
         private MetroFramework.Controls.MetroLabel metroLabel8;
         private MetroFramework.Controls.MetroLabel metroLabel9;
-        private MetroFramework.Controls.MetroPanel metroPanel3;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private MetroFramework.Controls.MetroComboBox lidarNameCbx;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
@@ -1580,6 +1695,16 @@ namespace Penguin__REMS_Project
         private MetroFramework.Controls.MetroComboBox talinPortCbx;
         private MetroFramework.Controls.MetroLabel metroLabel5;
         private System.Windows.Forms.GroupBox groupBox15;
+        private System.Windows.Forms.GroupBox talinGrpBx;
+        private System.Windows.Forms.PictureBox talinPixBox;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.PictureBox talinStatusGrpPicBx;
+        private MetroFramework.Controls.MetroLabel metroLabel11;
+        private System.Windows.Forms.Label label1;
+        private MetroFramework.Controls.MetroLabel talinPortGrpBx;
+        private MetroFramework.Controls.MetroLabel metroLabel6;
+        private MetroFramework.Controls.MetroPanel metroPanel3;
     }
 }
 

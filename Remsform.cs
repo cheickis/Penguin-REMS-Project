@@ -26,7 +26,8 @@ namespace Penguin__REMS_Project
     public partial class Remsform : MetroForm
     {
 
-        #region Variable
+        #region Variables
+
         static Lidar lidar;
         static List<Lidar> lidars;
         private object m_lockScan = new object();
@@ -36,7 +37,6 @@ namespace Penguin__REMS_Project
         Dictionary<String, Lidar> listOfLidarInStory;
 
         Dictionary<String, LidarGroupBox> lidarGroupoxList;
-        #endregion
 
         #region TALIN
         TalinModeLibrary TML = new TalinModeLibrary();
@@ -47,7 +47,8 @@ namespace Penguin__REMS_Project
         static bool Test_TalinInclude = true;
         string FileName = "";
         uint filecounter = 0;
-
+        private System.Timers.Timer TT = new System.Timers.Timer(500);
+        Thread TalinPositionUpdateThread;
 
         #endregion
 
@@ -71,12 +72,13 @@ namespace Penguin__REMS_Project
         private ObservableCollection<ThreeDLidar> treeDLidarCollection;
         private ObservableCollection<Realsens> realsensCollection;
         private ObservableCollection<String> talinLogCollection;
-       
+
         #endregion
 
         #region Queue
 
         Queue<Lidar> lidarQ;
+        #endregion
         #endregion
 
         #region Constructor
@@ -371,6 +373,8 @@ namespace Penguin__REMS_Project
             
             AddNewGroupBox(tlidar.STRIPAdresse, tlidar.Name, tlidar.Type);
         }
+
+
         #endregion
 
         #region  Ping and  Pull
@@ -434,12 +438,14 @@ namespace Penguin__REMS_Project
         }
         private void StartLidarsCommunications(String timeStamp)
         {
-            SetSScansDatasFiles(timeStamp);
-          
+            //SetSScansDatasFiles(timeStamp);
+           // SetTalinDataFile(timeStamp);
+            SetLidarsAndTalinDatasFiles(timeStamp);
             while (true)
             {
                 //ScanningTile.Text = " Scanning ...  "; // Status message info Here
-                LidarsStartScan();
+               // LidarsStartScan();
+                StartTalinNavigation();
                 if (m_isAbortRequestedScan)
                 {
                    
@@ -448,8 +454,10 @@ namespace Penguin__REMS_Project
                     if (dr == DialogResult.Yes)
                     {
                         //ScanningTile.Text = " Stop Scanning  "; 
-                       
-                        CloseLidarsFiles();
+
+                        //CloseLidarsFiles();
+                        // CloseTalinFile();
+                        CloseLidarAndTalinsFiles();
                         return;
                     }
                     else
@@ -462,7 +470,55 @@ namespace Penguin__REMS_Project
             }
 
         }
-    
+
+
+
+        private void SetLidarsAndTalinDatasFiles(String NowString) {
+            SetTalinDataFile( NowString);
+            SetSScansDatasFiles(NowString);
+        }
+        private void StartScanningAndNavigation() {
+
+            LidarsStartScan();
+            StartTalinNavigation();
+        }
+
+        private void CloseLidarAndTalinsFiles() {
+
+            //CloseLidarsFiles();
+            CloseTalinFile();
+
+        }
+        private void SetTalinDataFile(String NowString) {
+
+            if (Test_TalinInclude == true)
+            {
+                String fileName = ConstantStringMessage.FOLDERPATH  + ConstantStringMessage.TalinFOLDERSUFFIX + NowString + ConstantStringMessage.TXTEXTENSION;
+                TDP.StartWriteFile(fileName);
+               
+            }
+
+
+        }
+
+       private void StartTalinNavigation() {
+            if (Test_TalinInclude == true)
+            {
+                if (Test_TalinInclude == true)
+                {
+                    TDP.startNavigation();
+                   
+
+                }
+            }
+
+        }
+        private void CloseTalinFile()
+        {
+
+            if (Test_TalinInclude == true)
+                TDP.EndWriteFile();
+        }
         private void SetSScansDatasFiles(String NowString)
         {
           
@@ -487,8 +543,6 @@ namespace Penguin__REMS_Project
             foreach (var item in lidars)
             {
                 
-             
-
                 lidar = item;
                 UpdateLidarStatus();
                 item.InitCommunication();
@@ -609,15 +663,7 @@ namespace Penguin__REMS_Project
         #region Talin_position_InOutput
 
 
-        private void StartTalinNavigation() {
-
-            if (Test_TalinInclude == true)
-            {
-              // TalinThread = new Thread(TDP.startNavigation);
-                //TDP.StartWriteFile(@"C:\Scandatas\TalinData_" + NowString + ".txt");
-                //TalinThread.Start();
-            }
-        }
+    
         private void InitTalin() {
 
             if (TDP.Talin_Initial() == true )
@@ -863,9 +909,8 @@ namespace Penguin__REMS_Project
             return results;
 
         }
-        private System.Timers.Timer TT = new System.Timers.Timer(500);
-        Thread TalinPositionUpdateThread;
-        private void bt_UpdatePosition_Click(object sender, RoutedEventArgs e)
+      
+        private void Bt_UpdatePosition_Click(object sender, RoutedEventArgs e)
         {
             string[] results = getPositionData();
             if (results == null)
@@ -892,25 +937,21 @@ namespace Penguin__REMS_Project
         void TT_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
 
-           /* if (TalinDataProcess.AlignmentTime == 0)
+            if (TalinDataProcess.AlignmentTime == 0)
             {
-                Dispatcher.Invoke(DispatcherPriority.Normal, (Action)(() =>
-                {
+
                     TalinPositionUpdateThread.Abort();
                    // bt_StartScan.IsEnabled = true;   // button start connexion
                     TT.Stop();
                  //  lb_Status.Content = " Talin Aligned. Scan can Start.";
-                    talinLogTxt.Text = " Talin Aligned. Scan can Start.";
-                }));
+                    talinLogCollection.Add( " Talin Aligned. Scan can Start.");
+
             }
             else
             {
-                Dispatcher.Invoke(DispatcherPriority.Normal, (Action)(() =>
-                {
-                   // lb_Status.Content = "Talin Alignment Time = " + TalinDataProcess.AlignmentTime.ToString();
-                    talinLogTxt.Text = "Talin Alignment Time = " + TalinDataProcess.AlignmentTime.ToString();
-                }));
-            }*/
+                talinLogCollection.Add("Talin Alignment Time = " + TalinDataProcess.AlignmentTime.ToString());
+              
+            }
         }
 
         private void bt_SavePosition_Click(object sender, RoutedEventArgs e)
@@ -1040,6 +1081,8 @@ namespace Penguin__REMS_Project
         private void DisconnectedToTalinBtn_Click(object sender, EventArgs e)
         {
             TDP.Disconnect_Talin();
+
+            talinLogCollection.Add("Talin is  disconnected!");
            
             EnableOrDiseableTalinConnectGroupoxItem();
         }
@@ -1059,20 +1102,26 @@ namespace Penguin__REMS_Project
         private void TalinStatusBtn_Click(object sender, EventArgs e)
         {
 
+
+
         }
         #endregion
 
         #region TALIN CONFIG UI HANDLER
 
         public void SetTalinStatusIcon() {
+            talinPortGrpBx.Text = TDP.TalinPort;
             if (TDP.IsConnected) {
 
                 talinStatusPicBox.Image = global::Penguin__REMS_Project.Properties.Resources.TalonGreenStatus;
+                talinStatusGrpPicBx.Image = global::Penguin__REMS_Project.Properties.Resources.Green1;
+                
                 talinStatusPicBox.Refresh();
             }
             else
             {
                 talinStatusPicBox.Image = global::Penguin__REMS_Project.Properties.Resources.RedTalon1;
+                talinStatusGrpPicBx.Image = global::Penguin__REMS_Project.Properties.Resources.Red1;
                 talinStatusPicBox.Refresh();
             }
 
@@ -1081,8 +1130,11 @@ namespace Penguin__REMS_Project
 
         public void UpdateTalinLog(object sender, NotifyCollectionChangedEventArgs e)
         {
-
+            Helper.UpdateTxtBWithDataCollector(talinLogTxt,talinLogCollection);
         }
+
+
+        
         #endregion
 
 

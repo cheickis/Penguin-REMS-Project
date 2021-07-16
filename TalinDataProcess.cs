@@ -8,7 +8,7 @@ using System.IO;
 using System.IO.Ports;
 using System.Diagnostics;
 using System.Threading;
-
+using System.Collections.ObjectModel;
 
 namespace Penguin__REMS_Project
 {
@@ -21,6 +21,9 @@ namespace Penguin__REMS_Project
     class TalinDataProcess
     {
         #region Variable
+
+        static UInt64 size = 0;
+        private ObservableCollection<String> dataSizeCollection;
         delegate void DataProcessDelegate(byte[] _data);
 
         public bool Write2File = false;
@@ -130,11 +133,13 @@ namespace Penguin__REMS_Project
 
         public TalinDataProcess(String port) {
             this.CommPort = port;
-        
-        
+
+            dataSizeCollection = new ObservableCollection<string>();
+
         }
 
         #endregion
+
         #region TalinCommandRegion
 
         private static readonly byte[] TalinShutDown = new byte[] { 0x41, 0x00, 0x3C, 0x00, 0x00, 0x00, 0x0A };
@@ -1191,17 +1196,19 @@ namespace Penguin__REMS_Project
 
             DateTime _now = DateTime.Now;
             string NowString = _now.ToString("yyyyMMddHHmmssffff");
-
+            String dataValue = NowString + "-" + BitConverter.ToString(Temp);
             switch (dataGroup)
             {
                 case 3:
 
                     byte[] altitudebyte = { FullReadFrame[24], FullReadFrame[25], FullReadFrame[26], FullReadFrame[27] };
                     double altitude = TalinDoubleWordsFloat_Double(altitudebyte, positionaccuracy);
-                 
-                    if (Write2File == true)
-                        sw.WriteLine(NowString + "-" + BitConverter.ToString(Temp));
 
+                    if (Write2File == true) {
+                        sw.WriteLine(NowString + "-" + BitConverter.ToString(Temp));
+                        dataSizeCollection.Add(dataValue);
+                     }
+                       
                     break;
                 case 2:
                     if (Write2File == true)
@@ -1273,6 +1280,15 @@ namespace Penguin__REMS_Project
             }
         }
 
+        private void AddUpdateFileAndCollection(String dataValue) {
+            if (Write2File == true)
+            {
+                sw.WriteLine(dataValue);
+                dataSizeCollection.Add(dataValue);
+               
+            }
+          
+        }
         private void dataprocess4save(byte[] _data)
         {
             int[] ReadingGroup_Index = new int[50];
