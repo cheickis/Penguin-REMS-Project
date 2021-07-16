@@ -79,7 +79,22 @@ namespace Penguin__REMS_Project
 
         }
 
+        public static void EnableOrDisableButton(MetroButton btn)
+        {
+            if (btn.Enabled)
+                btn.Enabled = false;
+            else
+                btn.Enabled = true;
 
+        }
+        public  static void EnableOrDisableComboBox(MetroComboBox cbx)
+        {
+            if (cbx.Enabled)
+                cbx.Enabled = false;
+            else
+                cbx.Enabled = true;
+
+        }
         #region  Tatlin Structure
         public struct TalinModeConfigure
         {

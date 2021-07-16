@@ -40,7 +40,7 @@ namespace Penguin__REMS_Project
 
         #region TALIN
         TalinModeLibrary TML = new TalinModeLibrary();
-        static TalinDataProcess TDP = new TalinDataProcess();
+        static TalinDataProcess TDP = new TalinDataProcess("COM3"); // Initial Talin To COM3 as default
         //static string ComNum = "Com4";
         public byte[] TalinCommandArray = new byte[40];
         Helper.TalinModeConfigure TMC = new Helper.TalinModeConfigure();
@@ -70,7 +70,7 @@ namespace Penguin__REMS_Project
         private ObservableCollection<TwoDLidar> twoDLidarCollections;
         private ObservableCollection<ThreeDLidar> treeDLidarCollection;
         private ObservableCollection<Realsens> realsensCollection;
-
+        private ObservableCollection<String> talinLogCollection;
        
         #endregion
 
@@ -83,8 +83,8 @@ namespace Penguin__REMS_Project
         public Remsform()
         {
             InitializeComponent();
-            //InitTalin();// Init Talin 
             InitCollection();
+            InitTalin();// Init Talin 
             OpenLidarConfigFile();
         }
         #endregion
@@ -104,6 +104,10 @@ namespace Penguin__REMS_Project
             lidarQ = new Queue<Lidar>();
             lidars = new List<Lidar>();
             lidarGroupoxList = new Dictionary<String, LidarGroupBox>();
+
+
+            talinLogCollection = new ObservableCollection<string>();
+            talinLogCollection.CollectionChanged  += UpdateTalinLog;
 
         }
 
@@ -616,25 +620,31 @@ namespace Penguin__REMS_Project
         }
         private void InitTalin() {
 
-            if (TDP.Talin_Initial() == true)
+            if (TDP.Talin_Initial() == true )
             {
-               /* if (lb_Status != null)
-                    lb_Status.Content = "Talin is Connected!";
-                */
+                SetTalinStatusIcon();
+                talinLogCollection.Add("Talin is Connected!");
+
+                ConnectToTalinBtn.Enabled = false;
+                talinPortCbx.Enabled = false;
+               
                /* bt_StartScan.Enabled = true;
                 bt_StopScan.Enabled = false;*/
                 bt_UpdatePosition.Enabled = true;
             }
             else
             {
-               /* if (lb_Status != null)
-                    lb_Status.Content = "Talin is not Connected!";*/
+                talinLogCollection.Add("Talin is not Connected!");
+                
                 if (Test_TalinInclude == false)
                 {
-                  /*  bt_StartScan.IsEnabled = true;
-                    bt_StopScan.IsEnabled = false;
-                    bt_UpdatePosition.IsEnabled = false;
-                    */
+                    ConnectToTalinBtn.Enabled = false;
+                    talinPortCbx.Enabled = false;
+                    bt_UpdatePosition.Enabled = false;
+                    /*  bt_StartScan.IsEnabled = true;
+                      bt_StopScan.IsEnabled = false;
+                      bt_UpdatePosition.IsEnabled = false;
+                      */
                 }
                 else
                 {
@@ -1013,6 +1023,69 @@ namespace Penguin__REMS_Project
                 TDP.stopNavigation();
         }
         #endregion
+
+        #region Talin  Config UI  Button Handler
+        private void ConnectToTalinBtn_Click(object sender, EventArgs e)
+        {
+            String port = talinPortCbx.Text;
+
+            if (!TDP.IsConnected) {
+
+                TDP.TalinPort = port;
+                TDP.Connect_Talin();
+                EnableOrDiseableTalinConnectGroupoxItem();
+            }
+        }
+
+        private void DisconnectedToTalinBtn_Click(object sender, EventArgs e)
+        {
+            TDP.Disconnect_Talin();
+           
+            EnableOrDiseableTalinConnectGroupoxItem();
+        }
+
+        private void EnableOrDiseableTalinConnectGroupoxItem() {
+
+            Helper.EnableOrDisableButton(ConnectToTalinBtn);
+            Helper.EnableOrDisableButton(DisconnectedToTalinBtn);
+            Helper.EnableOrDisableButton(TalinStatusBtn);
+            Helper.EnableOrDisableComboBox(talinPortCbx);
+            SetTalinStatusIcon();
+
+
+        }
+    
+      
+        private void TalinStatusBtn_Click(object sender, EventArgs e)
+        {
+
+        }
+        #endregion
+
+        #region TALIN CONFIG UI HANDLER
+
+        public void SetTalinStatusIcon() {
+            if (TDP.IsConnected) {
+
+                talinStatusPicBox.Image = global::Penguin__REMS_Project.Properties.Resources.TalonGreenStatus;
+                talinStatusPicBox.Refresh();
+            }
+            else
+            {
+                talinStatusPicBox.Image = global::Penguin__REMS_Project.Properties.Resources.RedTalon1;
+                talinStatusPicBox.Refresh();
+            }
+
+        }
+
+
+        public void UpdateTalinLog(object sender, NotifyCollectionChangedEventArgs e)
+        {
+
+        }
+        #endregion
+
+
     }
 
 }

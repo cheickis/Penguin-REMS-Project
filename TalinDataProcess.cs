@@ -57,7 +57,7 @@ namespace Penguin__REMS_Project
         private byte[] GravityReferencePresetCommand;
         private static ManualResetEvent receiveGravityReference = new ManualResetEvent(false);
         private string CommPort = "COM7";
-
+        private Boolean isConnected = false;
         private byte presetInitialZone;
         private byte[] presetInitialEasting = new byte[4];
         private byte[] presetInitialNorthing = new byte[4];
@@ -125,6 +125,16 @@ namespace Penguin__REMS_Project
         }
         #endregion
 
+
+        #region Constructor
+
+        public TalinDataProcess(String port) {
+            this.CommPort = port;
+        
+        
+        }
+
+        #endregion
         #region TalinCommandRegion
 
         private static readonly byte[] TalinShutDown = new byte[] { 0x41, 0x00, 0x3C, 0x00, 0x00, 0x00, 0x0A };
@@ -877,6 +887,7 @@ namespace Penguin__REMS_Project
             }
             catch (Exception err)
             {
+                isConnected = false;
                 return false;
             }
             sp.ReceivedBytesThreshold = 1;
@@ -884,14 +895,43 @@ namespace Penguin__REMS_Project
             sp.ErrorReceived += sp_ErrorReceived;
             sp.ReadTimeout = 200;
             sp.WriteTimeout = 200;
-           
+            isConnected = true;
             return true;
         }
 
-        public void Disconnect_Talin()
+        public void Connect_Talin()
         {
+            ComNo = CommPort ;
             if (sp != null)
                 sp.Close();
+
+            sp = new SerialPort(ComNo, baudrate, Parity.None, 8, StopBits.One);
+            try
+            {
+                sp.Open();
+            }
+            catch (Exception err)
+            {
+                isConnected = false; 
+            }
+            sp.ReceivedBytesThreshold = 1;
+            sp.DataReceived += sp_DataReceived;
+            sp.ErrorReceived += sp_ErrorReceived;
+            sp.ReadTimeout = 200;
+            sp.WriteTimeout = 200;
+
+            isConnected = true;
+        }
+
+
+        public void Disconnect_Talin()
+        {
+            if (sp != null) {
+
+                sp.Close();
+                isConnected = false;
+            }
+                
         }
 
         public void ShutdownTalin()
@@ -1261,5 +1301,26 @@ namespace Penguin__REMS_Project
         }
 
         #endregion
+
+
+
+        #region GETTER
+         
+        public String TalinPort {
+
+            get => CommPort;
+            set => CommPort = value;
+        
+        }
+
+
+        public bool IsConnected {
+
+            get => isConnected;
+        }
+
+
+        #endregion
+
     }
 }

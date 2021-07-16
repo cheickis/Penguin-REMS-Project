@@ -118,6 +118,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="MetroFramework.txt" />
+    <None Include="Resources\TalonGreenStatus.jpg" />
     <None Include="Resources\RedTalon1.jpg" />
     <None Include="Resources\RedTalon.jpg" />
     <None Include="Resources\Red1.jpg" />
