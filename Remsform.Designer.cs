@@ -36,7 +36,7 @@ namespace Penguin__REMS_Project
             this.talinGrpBx = new System.Windows.Forms.GroupBox();
             this.talinPortGrpBx = new MetroFramework.Controls.MetroLabel();
             this.metroLabel6 = new MetroFramework.Controls.MetroLabel();
-            this.label3 = new System.Windows.Forms.Label();
+            this.talinDataLbl = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.talinStatusGrpPicBx = new System.Windows.Forms.PictureBox();
             this.metroLabel11 = new MetroFramework.Controls.MetroLabel();
@@ -262,7 +262,7 @@ namespace Penguin__REMS_Project
             this.talinGrpBx.BackColor = System.Drawing.Color.White;
             this.talinGrpBx.Controls.Add(this.talinPortGrpBx);
             this.talinGrpBx.Controls.Add(this.metroLabel6);
-            this.talinGrpBx.Controls.Add(this.label3);
+            this.talinGrpBx.Controls.Add(this.talinDataLbl);
             this.talinGrpBx.Controls.Add(this.label2);
             this.talinGrpBx.Controls.Add(this.talinStatusGrpPicBx);
             this.talinGrpBx.Controls.Add(this.metroLabel11);
@@ -280,9 +280,9 @@ namespace Penguin__REMS_Project
             this.talinPortGrpBx.AutoSize = true;
             this.talinPortGrpBx.Location = new System.Drawing.Point(262, 79);
             this.talinPortGrpBx.Name = "talinPortGrpBx";
-            this.talinPortGrpBx.Size = new System.Drawing.Size(48, 19);
+            this.talinPortGrpBx.Size = new System.Drawing.Size(41, 19);
             this.talinPortGrpBx.TabIndex = 8;
-            this.talinPortGrpBx.Text = "COM3";
+            this.talinPortGrpBx.Text = "None";
             // 
             // metroLabel6
             // 
@@ -293,15 +293,15 @@ namespace Penguin__REMS_Project
             this.metroLabel6.TabIndex = 7;
             this.metroLabel6.Text = "Port";
             // 
-            // label3
+            // talinDataLbl
             // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(257, 113);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(53, 21);
-            this.label3.TabIndex = 6;
-            this.label3.Text = "0 byte";
+            this.talinDataLbl.AutoSize = true;
+            this.talinDataLbl.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.talinDataLbl.Location = new System.Drawing.Point(257, 113);
+            this.talinDataLbl.Name = "talinDataLbl";
+            this.talinDataLbl.Size = new System.Drawing.Size(53, 21);
+            this.talinDataLbl.TabIndex = 6;
+            this.talinDataLbl.Text = "0 byte";
             // 
             // label2
             // 
@@ -1697,7 +1697,7 @@ namespace Penguin__REMS_Project
         private System.Windows.Forms.GroupBox groupBox15;
         private System.Windows.Forms.GroupBox talinGrpBx;
         private System.Windows.Forms.PictureBox talinPixBox;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label talinDataLbl;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.PictureBox talinStatusGrpPicBx;
         private MetroFramework.Controls.MetroLabel metroLabel11;

@@ -9,6 +9,8 @@ using System.IO.Ports;
 using System.Diagnostics;
 using System.Threading;
 using System.Collections.ObjectModel;
+using System.Windows.Threading;
+using System.Collections.Specialized;
 
 namespace Penguin__REMS_Project
 {
@@ -22,11 +24,14 @@ namespace Penguin__REMS_Project
     {
         #region Variable
 
-        static UInt64 size = 0;
+        
         private ObservableCollection<String> dataSizeCollection;
+        private ObservableCollection<String> logDataCollection;
+      
         delegate void DataProcessDelegate(byte[] _data);
 
         public bool Write2File = false;
+        public bool GetStatus = false; //
         private StreamWriter sw;
         public bool WriteRawData = false;
         public bool AllowRewriteConfigure = false;
@@ -99,11 +104,12 @@ namespace Penguin__REMS_Project
         #endregion
 
         #region Structure
+        #region TALIN STATUS
         public struct TalinStatus
         {
             public bool NavigationMode;
             public bool OutofTravelLock;
-            public int AlignmentTimeLeft;
+            public int  AlignmentTimeLeft;
             public bool Configuration1Presence;
             public bool BoreSightPresence;
             public bool AbleCompleteAlign;
@@ -128,6 +134,401 @@ namespace Penguin__REMS_Project
         }
         #endregion
 
+        #region INUStatusDataAnalyze
+        public struct INUStatus
+        {
+            public bool ZuptinProgress;
+            public bool NavigationMode;
+            public bool PowerUp;
+            public bool PowerDown;
+
+            public bool ZuptStopRequest;
+            public bool PositionUpdateRequest;
+            public bool PositionUpdateInProgress;
+            public bool InertialAltitudeFixed;
+            public bool VehicleInMotion;
+            public bool INUMoving;
+            public bool ZoneExtension;
+            public bool TravelLockStatus;
+            public bool ZuptEnable;
+            public bool GPSEnable;
+            public bool GPSDataSyncInProgress;
+
+            public bool PreviuosShutdownAbnormal;
+            public bool BoreSightNotPresent;
+            public bool ConfigurationDataNotPresent;
+            public bool InitialPositionNotReceived;
+            public bool UnableCompleteAlignment;
+            //public bool AlignInterrupt;
+            public bool PositionUpdateInterrupt;
+            public bool ZuptInterrupt;
+
+            public bool GPSWarningPresent;
+            public bool GPS1PPSFault;
+            public bool GPSINSDatumDifferent;
+            public bool GSPAntennaFault;
+            public bool GPSUnkey;
+            public bool GPSDataTransferFailure;
+            public bool MotionDuringShutdown;
+            public bool MotionDuringUpdateRequest;
+            public bool MotionDuring_OutofTravelLock;
+            public bool AltitudePositionUpdateRejected;
+            public bool GPS_PositionUpdate_Different;
+            public bool HorizontalPositionUpdateRejected;
+
+
+            public uint TimeTag;  //MicroSecond
+            public uint AlignTime2Go;
+            public uint ShockTimes;
+            public double EstimateHeadingError;
+            public double EstimateHorizontalError;
+            public double EstimateVerticalError;
+            public double SphericalErrorProbability;
+            public uint ZuptIntervalTimer;
+
+            public INUStatus(byte Mode1, byte Mode2, byte Status11, byte Status12, byte Status21, byte Status22, byte Alert11, byte Alert12, byte Alert21, byte Alert22, byte Alert32, uint tt, uint AlignT, uint ShockT, double HeadError, double HorizontalError, double VerticalError, double SphericalError, uint ZIT)
+            {
+
+                AlignTime2Go = AlignT;
+                ShockTimes = ShockT;
+                EstimateHeadingError = HeadError;
+                EstimateHorizontalError = HorizontalError;
+                EstimateVerticalError = VerticalError;
+                SphericalErrorProbability = SphericalError;
+                TimeTag = tt;
+                ZuptIntervalTimer = ZIT;
+
+                #region Readmode
+                if ((Mode1 & 0x10) == 0x10)
+                    PowerUp = true;
+                else
+                    PowerUp = false;
+
+                if ((Mode1 & 0x02) == 2)
+                    PowerDown = true;
+                else
+                    PowerDown = false;
+
+                if ((Mode2 & 0x08) == 0x08)
+                    ZuptinProgress = true;
+                else
+                    ZuptinProgress = false;
+
+                if ((Mode2 & 0x40) == 0x40)
+                    NavigationMode = true;
+                else
+                    NavigationMode = false;
+                #endregion
+
+                #region ReadStatus
+                //Status word ------------------------------
+                if ((Status11 & 0x80) == 0x80)
+                    ZuptStopRequest = true;
+                else
+                    ZuptStopRequest = false;
+
+                if ((Status11 & 0x40) == 0x40)
+                    PositionUpdateRequest = true;
+                else
+                    PositionUpdateRequest = false;
+
+                if ((Status11 & 0x04) == 0x04)
+                    PositionUpdateInProgress = true;
+                else
+                    PositionUpdateInProgress = false;
+
+                if ((Status12 & 0x40) == 0x40)
+                    InertialAltitudeFixed = true;
+                else
+                    InertialAltitudeFixed = false;
+
+                if ((Status12 & 0x20) == 0x20)
+                    VehicleInMotion = true;
+                else
+                    VehicleInMotion = false;
+
+                if ((Status12 & 0x10) == 0x10)
+                    INUMoving = true;
+                else
+                    INUMoving = false;
+
+                if ((Status12 & 0x04) == 0x04)
+                    ZoneExtension = true;
+                else
+                    ZoneExtension = false;
+
+                if ((Status12 & 0x02) == 0x02)
+                    TravelLockStatus = true;
+                else
+                    TravelLockStatus = false;
+
+                if ((Status21 & 0x80) == 0x80)
+                    GPSEnable = true;
+                else
+                    GPSEnable = false;
+
+                if ((Status21 & 0x40) == 0x40)
+                    GPSDataSyncInProgress = true;
+                else
+                    GPSDataSyncInProgress = false;
+
+                if ((Status22 & 0x01) == 0x01)
+                    ZuptEnable = true;
+                else
+                    ZuptEnable = false;
+
+                #endregion
+
+                #region ReadAlert
+                if ((Alert11 & 0x80) == 0x80)
+                    PreviuosShutdownAbnormal = true;
+                else
+                    PreviuosShutdownAbnormal = false;
+
+                if ((Alert11 & 0x40) == 0x40)
+                    BoreSightNotPresent = true;
+                else
+                    BoreSightNotPresent = false;
+
+                if ((Alert11 & 0x20) == 0x20)
+                    ConfigurationDataNotPresent = true;
+                else
+                    ConfigurationDataNotPresent = false;
+
+                if ((Alert11 & 0x10) == 0x10)
+                    InitialPositionNotReceived = true;
+                else
+                    InitialPositionNotReceived = false;
+
+                if ((Alert11 & 0x08) == 0x08)
+                    UnableCompleteAlignment = true;
+                else
+                    UnableCompleteAlignment = false;
+
+                if ((Alert11 & 0x02) == 0x02)
+                    PositionUpdateInterrupt = true;
+                else
+                    PositionUpdateInterrupt = false;
+
+                if ((Alert11 & 0x01) == 0x01)
+                    ZuptInterrupt = true;
+                else
+                    ZuptInterrupt = false;
+
+
+                if ((Alert12 & 0x01) == 0x01)
+                    GPSWarningPresent = true;
+                else
+                    GPSWarningPresent = false;
+
+                if ((Alert21 & 0x80) == 0x80)
+                    GPS1PPSFault = true;
+                else
+                    GPS1PPSFault = false;
+
+                if ((Alert21 & 0x40) == 0x40)
+                    GPSINSDatumDifferent = true;
+                else
+                    GPSINSDatumDifferent = false;
+
+                if ((Alert21 & 0x20) == 0x20)
+                    GSPAntennaFault = true;
+                else
+                    GSPAntennaFault = false;
+
+                if ((Alert21 & 0x10) == 0x10)
+                    GPSUnkey = true;
+                else
+                    GPSUnkey = false;
+
+                if ((Alert21 & 0x08) == 0x08)
+                    MotionDuringShutdown = true;
+                else
+                    MotionDuringShutdown = false;
+
+                if ((Alert21 & 0x02) == 0x02)
+                    MotionDuringUpdateRequest = true;
+                else
+                    MotionDuringUpdateRequest = false;
+
+                if ((Alert21 & 0x01) == 0x01)
+                    MotionDuring_OutofTravelLock = true;
+                else
+                    MotionDuring_OutofTravelLock = false;
+
+                if ((Alert22 & 0x80) == 0x80)
+                    GPSDataTransferFailure = true;
+                else
+                    GPSDataTransferFailure = false;
+
+                if ((Alert32 & 0x10) == 0x10)
+                    GPS_PositionUpdate_Different = true;
+                else
+                    GPS_PositionUpdate_Different = false;
+
+                if ((Alert32 & 0x08) == 0x08)
+                    AltitudePositionUpdateRejected = true;
+                else
+                    AltitudePositionUpdateRejected = false;
+
+                if ((Alert32 & 0x04) == 0x04)
+                    HorizontalPositionUpdateRejected = true;
+                else
+                    HorizontalPositionUpdateRejected = false;
+
+                #endregion
+            }
+
+        }
+
+        public StringBuilder INUStatus4Display(INUStatus _status)
+        {
+            StringBuilder str = new StringBuilder();
+            if (_status.TimeTag != 0)
+                str.Append("Talin Timestamp (microsecond): " + _status.TimeTag.ToString());
+            else
+                str.Append("Data has error, Timestamp shall not be Zero.");
+           
+            str.Append(Environment.NewLine);
+        
+
+            if (_status.AlignTime2Go != 0)
+                str.Append("Talin Align Time to GO (second): " + _status.AlignTime2Go.ToString() );
+            else
+                str.Append("Talin Aligned!.");
+
+            str.Append(Environment.NewLine);
+
+            if (_status.ConfigurationDataNotPresent == true)
+                str.Append("Talin Vehicle Configuration not present!");
+            else
+                str.Append("Talin Vehicle Configuration present!.");
+
+            str.Append(Environment.NewLine);
+
+            if (_status.BoreSightNotPresent == true)
+                str.Append("Talin Bore Sight not present!");
+            else
+                str.Append("Talin Bore Sight present!.");
+
+            str.Append(Environment.NewLine);
+
+            if (_status.InitialPositionNotReceived == true)
+                str.Append("Talin Initial Position not Received!");
+            else
+                str.Append("Talin Initial Position Received!.");
+            
+            str.Append(Environment.NewLine);
+
+            if (_status.ZuptIntervalTimer != 0)
+                str.Append("Talin last Zupt is in" + _status.ZuptIntervalTimer.ToString() + " ago!");
+            else
+                str.Append("Talin just Zupted or data error!.");
+
+            str.Append(Environment.NewLine);
+
+            if (_status.ZuptEnable == true)
+                str.Append("Talin Zupt is Enabled!");
+            else
+                str.Append("Talin Zupt is Disabled!.");
+
+            str.Append(Environment.NewLine);
+
+            if (_status.ZuptinProgress == true)
+                str.Append("Talin Zupt is in progress!");
+            else
+                str.Append("Talin not Zupting!.");
+            
+            str.Append(Environment.NewLine);
+
+            if (_status.ZuptIntervalTimer != 0)
+                str.Append("Talin last Zupt is in" + _status.ZuptIntervalTimer.ToString() + " ago!");
+            str.Append(Environment.NewLine);
+            
+            if (_status.TravelLockStatus == true)
+                str.Append("Talin is in travel lock condition!");
+            else
+                str.Append("Talin is not in travel lock condition!!.");
+            //str.Append(Environment.NewLine);
+            
+            if (_status.UnableCompleteAlignment == true)
+                str.Append("Talin can not complete alignment! Stop motion of the INU.\n");
+            str.Append(Environment.NewLine);
+            
+            if (_status.NavigationMode == true)
+                str.Append("Talin Mode : In Navigation Mode.");
+            else
+                str.Append("Talin Mode : Not In Navigation Mode.");
+            str.Append(Environment.NewLine);
+            
+            if (_status.PowerUp == true)
+                str.Append("Talin Mode : In Power Up Mode.");
+            else
+                str.Append("Talin Mode : Not In Power Up Mode.");
+            str.Append(Environment.NewLine);
+            
+            if (_status.PowerDown == true)
+                str.Append("Talin Mode : In Power Down Mode.");
+            else
+                str.Append("Talin Mode : Not In Power Down Mode.");
+            str.Append(Environment.NewLine);
+
+            if (_status.ZuptinProgress == true)
+                str.Append("Talin Mode : Zupt in Progress.");
+            else
+                str.Append("Talin Mode : Zupt not in Progress.");
+            
+            
+            return str;
+
+        }
+
+        public INUStatus InterpretStatusData(byte[] buffer)
+        {
+            byte[] TimeStampbyte = { buffer[4], buffer[5] };
+            byte[] AlignTimebyte = { buffer[26], buffer[27] };
+            byte[] HeadErrorbyte = { buffer[28], buffer[29] };
+            byte[] HorizontalErrorbyte = { buffer[30], buffer[31], buffer[32], buffer[33] };
+            byte[] VerticalErrorbyte = { buffer[34], buffer[35], buffer[36], buffer[37] };
+            byte[] ShockCounterbyte = { buffer[38], buffer[39] };
+            byte[] SphericalErrorbyte = { buffer[40], buffer[41], buffer[42], buffer[43] };
+            byte[] ZuptIntervalbyte = { buffer[50], buffer[51] };
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(AlignTimebyte);
+                Array.Reverse(TimeStampbyte);
+                Array.Reverse(ZuptIntervalbyte);
+                Array.Reverse(ShockCounterbyte);
+            }
+            uint shock = BitConverter.ToUInt16(ShockCounterbyte, 0);
+            uint ZIT = BitConverter.ToUInt16(ZuptIntervalbyte, 0);
+            double Head = TalinSingleWordsFloat_Double(HeadErrorbyte, headingerroraccuracy) * 180.0;
+            double Horizontal = TalinDoubleWordsFloat_Double(HorizontalErrorbyte, positionaccuracy);
+            double Vertical = TalinDoubleWordsFloat_Double(VerticalErrorbyte, positionaccuracy);
+            double Spherical = TalinDoubleWordsFloat_Double(SphericalErrorbyte, positionaccuracy);
+            uint t = BitConverter.ToUInt16(TimeStampbyte, 0);
+            uint At = BitConverter.ToUInt16(AlignTimebyte, 0);
+            byte mode1 = buffer[0];
+            byte mode2 = buffer[1];
+            byte status11 = buffer[10];
+            byte status12 = buffer[11];
+            byte status21 = buffer[12];
+            byte status22 = buffer[13];
+            byte Alert11 = buffer[18];
+            byte Alert12 = buffer[19];
+            byte Alert21 = buffer[20];
+            byte Alert22 = buffer[21];
+            byte Alert32 = buffer[23];
+
+
+            INUStatus results = new INUStatus(mode1, mode2, status11, status12, status21, status22, Alert11, Alert12, Alert21, Alert22, Alert32, t, At, shock, Head, Horizontal, Vertical, Spherical, ZIT);
+
+            return results;
+
+        }
+        #endregion
+
+        #endregion
 
         #region Constructor
 
@@ -135,8 +536,12 @@ namespace Penguin__REMS_Project
             this.CommPort = port;
 
             dataSizeCollection = new ObservableCollection<string>();
-
+            logDataCollection = new ObservableCollection<string>();
+           
+            
         }
+
+        
 
         #endregion
 
@@ -520,7 +925,7 @@ namespace Penguin__REMS_Project
 
                 if (Connect_Talin(CommPort) != true)
                 { return false; }
-
+                
                 return true;
             }
             catch (Exception er)
@@ -563,7 +968,7 @@ namespace Penguin__REMS_Project
                 SerialSend(OrginazedCommand);
                 receiveGeneralCommand.WaitOne(new TimeSpan(0, 0, 15), true);
 
-                startReadStatus(true);
+                StartReadStatus(true);
                 return;// results;
             }
             catch (Exception e)
@@ -573,7 +978,7 @@ namespace Penguin__REMS_Project
         }
        
 
-        private byte[] generatePositionUpdateCommand(string PositionArray)
+        private byte[] GeneratePositionUpdateCommand(string PositionArray)
         {
             try
             {
@@ -666,11 +1071,13 @@ namespace Penguin__REMS_Project
         #endregion
 
         #region Status
-        public bool startReadStatus(bool start)
+        public bool StartReadStatus(bool start)
         {
+           
             //Read Status in 1Hz;
             try
-            {
+             {
+                GetTalinStatus = start;
                 //Send Out of Travel Control Command:
                 byte[] OrginazedCommand;
                 byte[] Command = ReadStatus1Hz;
@@ -683,14 +1090,18 @@ namespace Penguin__REMS_Project
                 }
                 OrginazedCommand = SerialSendCommand(Command);
                 SerialSend(OrginazedCommand);
-            
+
                 receiveStatus.WaitOne(new TimeSpan(0, 0, 15));
+
+                
                 return true;
-            }
-            catch (Exception er)
-            {
-                return false;
-            }
+             }
+             catch (Exception er)
+             {
+                 return false;
+             } 
+
+            
         }
         public static int AlignmentTime = 600;
         private int StatusDisplay(TalinStatus TS)
@@ -698,7 +1109,6 @@ namespace Penguin__REMS_Project
             int results = 0x00;
             if (!TS.AbleCompleteAlign)
             {
-                
                 results = 0xFF;
             }
             else
@@ -711,10 +1121,9 @@ namespace Penguin__REMS_Project
                 }
                 else
                 {
-                   
                 }
                 AlignmentTime = TS.AlignmentTimeLeft;
-                //Console.SetCursorPosition(1, 7);
+               
                 if (TS.OutofTravelLock)
                 {
                   
@@ -722,13 +1131,11 @@ namespace Penguin__REMS_Project
                 }
                 else
                 {
-                   
                     results = results & 0xFB;
                 }
-                //Console.SetCursorPosition(1, 9);
+              
                 if (TS.NavigationMode)
                 {
-                   
                     results = results | 0x08;
                 }
                 else
@@ -736,23 +1143,20 @@ namespace Penguin__REMS_Project
                     
                     results = results & 0xF7;
                 }
-                //Console.SetCursorPosition(1, 11);
-
                 if (TS.InitialPositionReceived)
                 {
-                    
                     results = results | 0x10;
                 }
                 else
                 {
-                   
                     results = results & 0xEF;
                 }
             }
             return results;
         }
+
         #endregion
-       
+
         #region Navigation
         public void startNavigation()
         {
@@ -896,8 +1300,8 @@ namespace Penguin__REMS_Project
                 return false;
             }
             sp.ReceivedBytesThreshold = 1;
-            sp.DataReceived += sp_DataReceived;
-            sp.ErrorReceived += sp_ErrorReceived;
+            sp.DataReceived += Sp_DataReceived;
+            sp.ErrorReceived += Sp_ErrorReceived;
             sp.ReadTimeout = 200;
             sp.WriteTimeout = 200;
             isConnected = true;
@@ -920,15 +1324,13 @@ namespace Penguin__REMS_Project
                 isConnected = false; 
             }
             sp.ReceivedBytesThreshold = 1;
-            sp.DataReceived += sp_DataReceived;
-            sp.ErrorReceived += sp_ErrorReceived;
+            sp.DataReceived += Sp_DataReceived;
+            sp.ErrorReceived += Sp_ErrorReceived;
             sp.ReadTimeout = 200;
             sp.WriteTimeout = 200;
 
             isConnected = true;
         }
-
-
         public void Disconnect_Talin()
         {
             if (sp != null) {
@@ -938,7 +1340,6 @@ namespace Penguin__REMS_Project
             }
                 
         }
-
         public void ShutdownTalin()
         {
             byte[] OrginazedCommand = SerialSendCommand(TalinShutDown);
@@ -975,7 +1376,7 @@ namespace Penguin__REMS_Project
             }
         }
 
-        void sp_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
+        void Sp_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
         {
             SerialPort _sp = (SerialPort)sender;
             _sp.DiscardInBuffer();
@@ -986,7 +1387,7 @@ namespace Penguin__REMS_Project
 
         int ReadArrayBuilderOffset = 0;
         bool ReadArrayBuilderEnd = false;
-        void sp_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        void Sp_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             SerialPort sp = (SerialPort)sender;
             try
@@ -1131,13 +1532,18 @@ namespace Penguin__REMS_Project
             int dataEndlocation = 64;  //32 word for all received message
             int dataOffset = 0;
             int dataGroup = _data[2];
+            StringBuilder sb = new StringBuilder();
             //
             if ((_data[0] != 0x10) || (_data[1] != 0x02) || (_data[Length - 2] != 0x10) || (_data[Length - 1] != 0x03)) //(DataReading Error)
             {
+                sb.Append("0\n Invalid Data.\n Data Obtained:");
+                sb.Append(BitConverter.ToString(_data));
                 return;
             }
             if ((_data[3] != 0x00) || (_data[4] != 0x00))  //Protocol Error
             {
+                sb.Append("0\n Protocol error.\n Data Obtained:");
+                sb.Append(BitConverter.ToString(_data));
                 return;
             }
             else
@@ -1145,11 +1551,15 @@ namespace Penguin__REMS_Project
                 if ((dataGroup == 0x41) && (Length < 10)) //The update command is proper Received
                 {
                     receiveGeneralCommand.Set();
+                    sb.Append("41\n Request Command is send.\n Data Obtained:");
+                    sb.Append(BitConverter.ToString(_data));
                     return;
                 }
             }
             if (Length < 12)  //No Data Include
             {
+                sb.Append("-1\n No valid Data include.\n Data Obtained:");
+                sb.Append(BitConverter.ToString(_data));
                 return;
             }
             if ((_data[5] == 0x10) && (_data[6] == 0x10))
@@ -1157,12 +1567,14 @@ namespace Penguin__REMS_Project
                 dataEndlocation = (_data[7] & 0x3F);
                 dataStartlocation = ((_data[6] & 0x0F) << 2) + (_data[7] >> 6);
                 dataOffset = 8;
+                sb.Append(dataGroup.ToString() + "\n");
             }
             else
             {
                 dataEndlocation = (_data[6] & 0x3F);
                 dataStartlocation = ((_data[5] & 0x0F) << 2) + (_data[6] >> 6);
                 dataOffset = 7;
+                sb.Append(dataGroup.ToString() + "\n");
             }
             //Length = (dataEndlocation - dataStartlocation + 1) * 2 + dataOffset+3;
             byte[] Temp = new byte[Length - 5];
@@ -1175,6 +1587,9 @@ namespace Penguin__REMS_Project
             
             if ((CheckSumValue != _data[Length - 3])) // && (CheckSumValue != _data[(dataEndlocation - dataStartlocation + 1) * 2 + dataOffset-1]))  //status reading crazy
             {
+                sb.Append("CheckSum Value is not match. Received Data may be broken.\n Data Obtained:");
+                sb.Append(BitConverter.ToString(_data));
+
                 if ((dataGroup != 0x04) && (dataGroup != 1))
                 {
                     return;    //Since there are repeat data obtained from Talin for all readings. This cause the checksum error So ignored this error for status and Vehicle Configuration Setup now.
@@ -1190,10 +1605,13 @@ namespace Penguin__REMS_Project
                 System.Buffer.BlockCopy(RegulatedData, dataOffset, FullReadFrame, (dataStartlocation - 1) * 2, (dataEndlocation - dataStartlocation + 1) * 2);
             else  //Data Length is different from requested (something wrong);
             {
+                sb.Append("The obtained Data length is not match the requested data length.\n Data Obtained:");
+                sb.Append(BitConverter.ToString(_data));
+
                 return;
             }
 
-
+           
             DateTime _now = DateTime.Now;
             string NowString = _now.ToString("yyyyMMddHHmmssffff");
             String dataValue = NowString + "-" + BitConverter.ToString(Temp);
@@ -1204,22 +1622,22 @@ namespace Penguin__REMS_Project
                     byte[] altitudebyte = { FullReadFrame[24], FullReadFrame[25], FullReadFrame[26], FullReadFrame[27] };
                     double altitude = TalinDoubleWordsFloat_Double(altitudebyte, positionaccuracy);
 
-                    if (Write2File == true) {
-                        sw.WriteLine(NowString + "-" + BitConverter.ToString(Temp));
-                        dataSizeCollection.Add(dataValue);
-                     }
-                       
-                    break;
-                case 2:
-                    if (Write2File == true)
-                        sw.WriteLine(NowString + "-" + BitConverter.ToString(Temp));
+                    AddUpdateFileAndCollection(dataValue);
+                 
 
                     break;
+                case 2:
+                   
+                    AddUpdateFileAndCollection(dataValue);
+                  
+                    break;
                 case 4:
-                    if (Write2File == true)
-                        sw.WriteLine(NowString + "-" + BitConverter.ToString(Temp));
+                    if (Write2File == true) {  //Not Optimal
+                        AddUpdateFileAndCollection(dataValue);
+                    }
                     else
                     {
+
                         byte mode1 = FullReadFrame[0];
                         byte mode2 = FullReadFrame[1];
                         byte status11 = FullReadFrame[10];
@@ -1234,6 +1652,18 @@ namespace Penguin__REMS_Project
                         TS = new TalinStatus(mode2, Alert11, status12, FullReadFrame[26], FullReadFrame[27]);
                         StatusDisplay(TS);
 
+
+                        if (GetTalinStatus) {
+
+                            INUStatus SResults = InterpretStatusData(FullReadFrame);
+                            StringBuilder Str = INUStatus4Display(SResults);
+                            TalinLogCollection.Add(Str.ToString());
+                            GetTalinStatus = false;
+                        }
+
+
+                       
+                       
                         receiveStatus.Set();
                     }
                     break;
@@ -1285,7 +1715,6 @@ namespace Penguin__REMS_Project
             {
                 sw.WriteLine(dataValue);
                 dataSizeCollection.Add(dataValue);
-               
             }
           
         }
@@ -1318,8 +1747,6 @@ namespace Penguin__REMS_Project
 
         #endregion
 
-
-
         #region GETTER
          
         public String TalinPort {
@@ -1331,12 +1758,29 @@ namespace Penguin__REMS_Project
 
 
         public bool IsConnected {
-
             get => isConnected;
         }
 
+        public ObservableCollection<String> TalinLogCollection {
 
+            get => logDataCollection;
+        }
+
+        public ObservableCollection<String> DataSizeCollection
+        {
+
+            get => dataSizeCollection;
+        }
+
+        public bool GetTalinStatus {
+
+            get => GetStatus;
+            set => GetStatus = value;
+        }
         #endregion
+
+      
+
 
     }
 }

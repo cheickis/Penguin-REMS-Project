@@ -27,7 +27,7 @@ namespace Penguin__REMS_Project
     {
 
         #region Variables
-
+        static Int64 talinDataSize = 0;
         static Lidar lidar;
         static List<Lidar> lidars;
         private object m_lockScan = new object();
@@ -457,6 +457,7 @@ namespace Penguin__REMS_Project
 
                         //CloseLidarsFiles();
                         // CloseTalinFile();
+                        talinDataSize = 0; // Reinit the data Size
                         CloseLidarAndTalinsFiles();
                         return;
                     }
@@ -717,8 +718,33 @@ namespace Penguin__REMS_Project
             rb_SSphere.Checked = !(TMC.NorthSemishpere);
             cmb_VMSType.SelectedIndex = TMC.VMSType;
 
+            talinPortGrpBx.Text = TDP.TalinPort;
+            TDP.TalinLogCollection.CollectionChanged += UpdateTalinLog;
+            TDP.DataSizeCollection.CollectionChanged += UpdateDataSizeLbl;
 
+        }
 
+        private void UpdateDataSizeLbl(object sender, NotifyCollectionChangedEventArgs e)
+        {
+              if (TDP.DataSizeCollection.Last() != null)
+                {
+
+                 talinDataSize += System.Text.Encoding.ASCII.GetByteCount(TDP.DataSizeCollection.Last());
+
+                if (talinDataLbl.InvokeRequired)
+                {
+
+                    talinDataLbl.Invoke(new MethodInvoker(delegate {
+
+                        talinDataLbl.Text = Helper.FormatBytes(talinDataSize);
+
+                    }));
+                }
+
+               
+                }
+
+           
         }
 
         private void tb_ZoneID_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -738,9 +764,6 @@ namespace Penguin__REMS_Project
             Regex regex = new Regex(@"^\d*\.?\d*[0-9]*$");
             e.Handled = !regex.IsMatch((sender as TextBox).Text.Insert((sender as TextBox).SelectionStart, e.Text));
         }
-
-
-
         private void LoadPositionList()
         {
             if (lstb_Position != null)
@@ -764,7 +787,6 @@ namespace Penguin__REMS_Project
                 }
             }
         }
-
         private void LoadPosition()
         {
             //Select the item and load to Talin
@@ -842,7 +864,6 @@ namespace Penguin__REMS_Project
             }
 
         }
-
         private void lstb_Position_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             LoadPosition();
@@ -1095,13 +1116,12 @@ namespace Penguin__REMS_Project
             Helper.EnableOrDisableComboBox(talinPortCbx);
             SetTalinStatusIcon();
 
-
         }
     
       
         private void TalinStatusBtn_Click(object sender, EventArgs e)
         {
-
+            TDP.StartReadStatus(true);
 
 
         }
@@ -1130,7 +1150,14 @@ namespace Penguin__REMS_Project
 
         public void UpdateTalinLog(object sender, NotifyCollectionChangedEventArgs e)
         {
-            Helper.UpdateTxtBWithDataCollector(talinLogTxt,talinLogCollection);
+           Helper.UpdateTxtBWithDataCollector(talinLogTxt,talinLogCollection);
+            Helper.UpdateTxtBWithDataCollector(talinLogTxt, TDP.TalinLogCollection);
+
+
+          
+
+            
+            
         }
 
 
