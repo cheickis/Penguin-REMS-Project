@@ -45,7 +45,6 @@ namespace Penguin__REMS_Project
 
             }
         }
-
         public override void InitCommunication()
         {
             try
@@ -67,7 +66,6 @@ namespace Penguin__REMS_Project
              
             };
         }
-
         public void SetOrResetReadingData() {
 
             if (WriteFile)
@@ -96,7 +94,6 @@ namespace Penguin__REMS_Project
         public override void DisconnectTheLidar()
         {
             isConnected = false;
-
         }
         private void ScanDataProcessInterface(byte[] scanDataBuffer)
         {
@@ -116,9 +113,6 @@ namespace Penguin__REMS_Project
                 return;
             }
         }
-
-    
-
         private void ReceiveScanData(IAsyncResult ar)
         {
             UdpClient u = (UdpClient)((UdpState)(ar.AsyncState)).u;
@@ -137,8 +131,6 @@ namespace Penguin__REMS_Project
             }
 
         }
-
-       
         public override string PullAFrame()
         {
              InitCommunication();
@@ -148,19 +140,14 @@ namespace Penguin__REMS_Project
             stopscan = true;
             return GetAFrameData();
         }
-
         public override void UpdateRawData(object sender, NotifyCollectionChangedEventArgs e)
         {
            UpateScanFile();
         }
-
         public override void StopScanning()
         {
             SetOrResetReadingData();
-           
-          
         }
-
 
         #endregion
 

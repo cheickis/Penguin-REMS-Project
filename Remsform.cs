@@ -191,8 +191,6 @@ namespace Penguin__REMS_Project
         }
         #endregion
 
-       
-        
         #region  GPR (Ground prenetration radar handler
         private void GPRHandler()
         {
@@ -304,7 +302,6 @@ namespace Penguin__REMS_Project
             }
 
         }
-
         private Lidar GetLidar(String name, String ip, int port, string type) {
             Lidar temp =null;
             if (type.Equals("2D"))
@@ -325,7 +322,6 @@ namespace Penguin__REMS_Project
             }
             return temp;
         }
-     
         private void AddLidarTile(String name, String type) {
 
             MetroTile lidarTile = new MetroTile();
@@ -375,8 +371,6 @@ namespace Penguin__REMS_Project
             
             AddNewGroupBox(tlidar.STRIPAdresse, tlidar.Name, tlidar.Type);
         }
-
-
         #endregion
 
         #region  Ping and  Pull
@@ -389,7 +383,6 @@ namespace Penguin__REMS_Project
                UpdateLidarTxtBox();
             }
         }
-
         private void PullFrameBtn_Click(object sender, EventArgs e)
         {
 
@@ -403,7 +396,6 @@ namespace Penguin__REMS_Project
             }
 
         }
-              
 
         #endregion
 
@@ -473,8 +465,6 @@ namespace Penguin__REMS_Project
             }
 
         }
-
-
 
         private void SetLidarsAndTalinDatasFiles(String NowString) {
             SetTalinDataFile( NowString);
@@ -573,8 +563,6 @@ namespace Penguin__REMS_Project
         #endregion
 
         #region MAIN TAB UI 
-
-      
         private void AddNewGroupBox(String ip, String name, String type)
         {
             LidarGroupBox lidarGrpBox = new LidarGroupBox(name, ip, type);
@@ -584,12 +572,8 @@ namespace Penguin__REMS_Project
 
             if (!lidarGroupoxList.ContainsKey(lidar.STRIPAdresse)) {
                 lidarGroupoxList.Add(lidar.STRIPAdresse, lidarGrpBox);
-
-
             }
         }
-
-
         private void LidarGroupBox_On_Click(object sender, EventArgs e)
         {
             String ip = "";
@@ -623,15 +607,12 @@ namespace Penguin__REMS_Project
             lidarInfoPanel.Show();
             mainTb.Enabled = false;
         }
-
-
         private void UpdateLidarTxtBox() {
             lidarInfoTxtBox.Text = "";
             lidarInfoTxtBox.AppendText(lidar.ToString());
             lidarInfoTxtBox.AppendText(Environment.NewLine);
             logViewCollection.Add(lidar.ToString());
         }
-
         private void UpdateLidarStatus() {
 
             LidarGroupBox grpBx = lidarGroupoxList[lidar.STRIPAdresse];
@@ -644,13 +625,10 @@ namespace Penguin__REMS_Project
         }
         private void CloseLidarPanelBtn_Click(object sender, EventArgs e)
         {
-
             lidarInfoPanel.Visible = false;
             lidarConfigLogview.Clear();
             mainTb.Enabled = true;
             UpdateLidarStatus();
-          
-
         }
         #endregion
 
@@ -991,7 +969,6 @@ namespace Penguin__REMS_Project
         #endregion
 
         #region TALIN CONFIG UI HANDLER
-
         public void SetTalinStatusIcon() {
             talinPortGrpBx.Text = TDP.TalinPort;
             if (TDP.IsConnected) {
@@ -1009,7 +986,6 @@ namespace Penguin__REMS_Project
             }
 
         }
-
         private void UpdateTalinDataSizeLbl(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (TDP.DataSizeCollection.Last() != null)
@@ -1056,10 +1032,6 @@ namespace Penguin__REMS_Project
 
 
         }
-
-
-
-
         #endregion
        
         #region Talin Position Configuration
@@ -1085,7 +1057,6 @@ namespace Penguin__REMS_Project
             TT.Elapsed += TT_Elapsed;
             TT.Start();
         }
-
         private void Bt_DeletePosition_Click(object sender, EventArgs e)
         {
             try
@@ -1128,7 +1099,6 @@ namespace Penguin__REMS_Project
                 System.Windows.MessageBox.Show("Failed to delete this position. Error \n" + er.ToString());
             }
         }
-
         private void Bt_SavePosition_Click(object sender, EventArgs e)
         {
             string[] results = getPositionData();
@@ -1236,13 +1206,11 @@ namespace Penguin__REMS_Project
         }
         #endregion
 
-
         #region Log View Handler
         private void UpdateLogView(object sender, NotifyCollectionChangedEventArgs e)
         {
             Helper.UpdateTxtBWithDataCollector(logViewTxt, logViewCollection); 
         }
-
 
         #endregion
 

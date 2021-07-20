@@ -11,12 +11,14 @@ namespace Penguin__REMS_Project
         #region TELEGRAMM MSG
         public const String ONE_TELEGRAMM = "Pull a telegramm";
         #endregion
+
         #region FILES MSG
         public const String TXTEXTENSION = ".txt";
         public const String LIDARDEVICEFILE = "lidarConfig.txt";
         public const String CONFIGFILEHEADER = "Name  	       IP_ADRESSE      PORT   TYPE";
        
         #endregion
+
         #region DIALOGUE MSG
         public const String DEVICEEXISTINGINSYSTEMMSG = "This Device is already in the system \try to debug or change the IP ";
         public const String ADDDEVICECAPTIONMSG = "Device On the System";
@@ -37,13 +39,10 @@ namespace Penguin__REMS_Project
 
         #endregion
 
-
         #region Menu BAR MSQ
 
         public const String CLOSEAPP = "Close App";
         public const String CLOSEAPPMSQ = "Do you want to close the APP ?";
-
-
         public const String ABOUTDIALOGUE = "About Penguin REMS";
         public const String ABOUTMSQ = "@Copyrigth all reserved Penguin ASI 2021 ?";
         #endregion
