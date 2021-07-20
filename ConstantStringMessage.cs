@@ -24,7 +24,6 @@ namespace Penguin__REMS_Project
         public const String LOADINGCONFIGFILEERRORMSG = "Can load the config file";
         #endregion
 
-
         #region ADD NEW LIDAR MSS
         public const String ADDLIDARFORMCAPTIONMSQ = "ADD Lidar Form";
         public const String ADDLIDARFORMERRORMSQ = "ALL Field of the form must be  filled";
@@ -38,6 +37,16 @@ namespace Penguin__REMS_Project
 
         #endregion
 
+
+        #region Menu BAR MSQ
+
+        public const String CLOSEAPP = "Close App";
+        public const String CLOSEAPPMSQ = "Do you want to close the APP ?";
+
+
+        public const String ABOUTDIALOGUE = "About Penguin REMS";
+        public const String ABOUTMSQ = "@Copyrigth all reserved Penguin ASI 2021 ?";
+        #endregion
 
     }
 }

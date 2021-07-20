@@ -45,6 +45,20 @@ namespace Penguin__REMS_Project
             this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
             this.startBtn = new MetroFramework.Controls.MetroButton();
             this.metroButton1 = new MetroFramework.Controls.MetroButton();
+            this.metroTabPage7 = new MetroFramework.Controls.MetroTabPage();
+            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+            this.metroPanel2 = new MetroFramework.Controls.MetroPanel();
+            this.lidarNameCbx = new MetroFramework.Controls.MetroComboBox();
+            this.lidarTypeCbx = new MetroFramework.Controls.MetroComboBox();
+            this.metroLabel10 = new MetroFramework.Controls.MetroLabel();
+            this.lidarIPTxt = new MetroFramework.Controls.MetroTextBox();
+            this.lidarPortTxt = new MetroFramework.Controls.MetroTextBox();
+            this.resetLidarBtn = new MetroFramework.Controls.MetroButton();
+            this.addLidarBtn = new MetroFramework.Controls.MetroButton();
+            this.metroLabel7 = new MetroFramework.Controls.MetroLabel();
+            this.metroLabel8 = new MetroFramework.Controls.MetroLabel();
+            this.metroLabel9 = new MetroFramework.Controls.MetroLabel();
+            this.metroPanel3 = new MetroFramework.Controls.MetroPanel();
             this.metroTabPage6 = new MetroFramework.Controls.MetroTabPage();
             this.threeDLidarFLPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.metroTabPage2 = new MetroFramework.Controls.MetroTabPage();
@@ -109,29 +123,17 @@ namespace Penguin__REMS_Project
             this.Status_lbl = new MetroFramework.Controls.MetroLabel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.talinStatusPicBox = new System.Windows.Forms.PictureBox();
-            this.metroTabPage7 = new MetroFramework.Controls.MetroTabPage();
-            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-            this.metroPanel2 = new MetroFramework.Controls.MetroPanel();
-            this.lidarNameCbx = new MetroFramework.Controls.MetroComboBox();
-            this.lidarTypeCbx = new MetroFramework.Controls.MetroComboBox();
-            this.metroLabel10 = new MetroFramework.Controls.MetroLabel();
-            this.lidarIPTxt = new MetroFramework.Controls.MetroTextBox();
-            this.lidarPortTxt = new MetroFramework.Controls.MetroTextBox();
-            this.resetLidarBtn = new MetroFramework.Controls.MetroButton();
-            this.addLidarBtn = new MetroFramework.Controls.MetroButton();
-            this.metroLabel7 = new MetroFramework.Controls.MetroLabel();
-            this.metroLabel8 = new MetroFramework.Controls.MetroLabel();
-            this.metroLabel9 = new MetroFramework.Controls.MetroLabel();
             this.metroTabPage5 = new MetroFramework.Controls.MetroTabPage();
             this.sickFLPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.metroTabPage3 = new MetroFramework.Controls.MetroTabPage();
-            this.metroTabPage4 = new MetroFramework.Controls.MetroTabPage();
+            this.logViewTab = new MetroFramework.Controls.MetroTabPage();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lidarInfoPanel = new MetroFramework.Controls.MetroPanel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
@@ -145,7 +147,10 @@ namespace Penguin__REMS_Project
             this.lidarInfoTxtBox = new MetroFramework.Controls.MetroTextBox();
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.closeLidarPanelBtn = new MetroFramework.Controls.MetroButton();
-            this.metroPanel3 = new MetroFramework.Controls.MetroPanel();
+            this.themeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.darkToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.lightToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.logViewTxt = new MetroFramework.Controls.MetroTextBox();
             this.mainTb.SuspendLayout();
             this.metroTabPage1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -154,6 +159,9 @@ namespace Penguin__REMS_Project
             ((System.ComponentModel.ISupportInitialize)(this.talinStatusGrpPicBx)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.talinPixBox)).BeginInit();
             this.flowLayoutPanel3.SuspendLayout();
+            this.metroTabPage7.SuspendLayout();
+            this.flowLayoutPanel1.SuspendLayout();
+            this.metroPanel2.SuspendLayout();
             this.metroTabPage6.SuspendLayout();
             this.metroTabPage2.SuspendLayout();
             this.tableLayoutPanel7.SuspendLayout();
@@ -187,10 +195,8 @@ namespace Penguin__REMS_Project
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.talinStatusPicBox)).BeginInit();
-            this.metroTabPage7.SuspendLayout();
-            this.flowLayoutPanel1.SuspendLayout();
-            this.metroPanel2.SuspendLayout();
             this.metroTabPage5.SuspendLayout();
+            this.logViewTab.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.lidarInfoPanel.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -206,16 +212,16 @@ namespace Penguin__REMS_Project
             this.mainTb.Appearance = System.Windows.Forms.TabAppearance.Buttons;
             this.mainTb.Controls.Add(this.metroTabPage1);
             this.mainTb.Controls.Add(this.metroTabPage7);
-            this.mainTb.Controls.Add(this.metroTabPage6);
             this.mainTb.Controls.Add(this.metroTabPage2);
+            this.mainTb.Controls.Add(this.metroTabPage6);
             this.mainTb.Controls.Add(this.metroTabPage5);
+            this.mainTb.Controls.Add(this.logViewTab);
             this.mainTb.Controls.Add(this.metroTabPage3);
-            this.mainTb.Controls.Add(this.metroTabPage4);
             this.mainTb.Dock = System.Windows.Forms.DockStyle.Fill;
             this.mainTb.FontWeight = MetroFramework.MetroTabControlWeight.Regular;
             this.mainTb.Location = new System.Drawing.Point(20, 84);
             this.mainTb.Name = "mainTb";
-            this.mainTb.SelectedIndex = 2;
+            this.mainTb.SelectedIndex = 6;
             this.mainTb.Size = new System.Drawing.Size(1150, 663);
             this.mainTb.TabIndex = 0;
             this.mainTb.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -378,6 +384,167 @@ namespace Penguin__REMS_Project
             this.metroButton1.TabIndex = 2;
             this.metroButton1.Text = "Stop Scans";
             this.metroButton1.Click += new System.EventHandler(this.metroButton1_Click);
+            // 
+            // metroTabPage7
+            // 
+            this.metroTabPage7.Controls.Add(this.flowLayoutPanel1);
+            this.metroTabPage7.HorizontalScrollbarBarColor = true;
+            this.metroTabPage7.Location = new System.Drawing.Point(4, 38);
+            this.metroTabPage7.Name = "metroTabPage7";
+            this.metroTabPage7.Size = new System.Drawing.Size(1142, 621);
+            this.metroTabPage7.TabIndex = 6;
+            this.metroTabPage7.Text = "Lidar Config";
+            this.metroTabPage7.VerticalScrollbarBarColor = true;
+            // 
+            // flowLayoutPanel1
+            // 
+            this.flowLayoutPanel1.Controls.Add(this.metroPanel2);
+            this.flowLayoutPanel1.Controls.Add(this.metroPanel3);
+            this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(1142, 621);
+            this.flowLayoutPanel1.TabIndex = 6;
+            // 
+            // metroPanel2
+            // 
+            this.metroPanel2.BackColor = System.Drawing.Color.White;
+            this.metroPanel2.Controls.Add(this.lidarNameCbx);
+            this.metroPanel2.Controls.Add(this.lidarTypeCbx);
+            this.metroPanel2.Controls.Add(this.metroLabel10);
+            this.metroPanel2.Controls.Add(this.lidarIPTxt);
+            this.metroPanel2.Controls.Add(this.lidarPortTxt);
+            this.metroPanel2.Controls.Add(this.resetLidarBtn);
+            this.metroPanel2.Controls.Add(this.addLidarBtn);
+            this.metroPanel2.Controls.Add(this.metroLabel7);
+            this.metroPanel2.Controls.Add(this.metroLabel8);
+            this.metroPanel2.Controls.Add(this.metroLabel9);
+            this.metroPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.metroPanel2.HorizontalScrollbarBarColor = true;
+            this.metroPanel2.HorizontalScrollbarHighlightOnWheel = false;
+            this.metroPanel2.HorizontalScrollbarSize = 10;
+            this.metroPanel2.Location = new System.Drawing.Point(3, 3);
+            this.metroPanel2.Name = "metroPanel2";
+            this.metroPanel2.Size = new System.Drawing.Size(318, 513);
+            this.metroPanel2.TabIndex = 4;
+            this.metroPanel2.VerticalScrollbarBarColor = true;
+            this.metroPanel2.VerticalScrollbarHighlightOnWheel = false;
+            this.metroPanel2.VerticalScrollbarSize = 10;
+            // 
+            // lidarNameCbx
+            // 
+            this.lidarNameCbx.FormattingEnabled = true;
+            this.lidarNameCbx.ItemHeight = 23;
+            this.lidarNameCbx.Items.AddRange(new object[] {
+            "Leinshen C16",
+            "Sick LMS511 Lite",
+            "Sick LMS511 Pro",
+            "Sick MRS611",
+            "Velodyne VLP 16"});
+            this.lidarNameCbx.Location = new System.Drawing.Point(121, 15);
+            this.lidarNameCbx.Name = "lidarNameCbx";
+            this.lidarNameCbx.Size = new System.Drawing.Size(183, 29);
+            this.lidarNameCbx.Sorted = true;
+            this.lidarNameCbx.TabIndex = 13;
+            this.lidarNameCbx.Theme = MetroFramework.MetroThemeStyle.Dark;
+            // 
+            // lidarTypeCbx
+            // 
+            this.lidarTypeCbx.FormattingEnabled = true;
+            this.lidarTypeCbx.ItemHeight = 23;
+            this.lidarTypeCbx.Items.AddRange(new object[] {
+            "2D",
+            "3D"});
+            this.lidarTypeCbx.Location = new System.Drawing.Point(121, 132);
+            this.lidarTypeCbx.Name = "lidarTypeCbx";
+            this.lidarTypeCbx.Size = new System.Drawing.Size(183, 29);
+            this.lidarTypeCbx.TabIndex = 12;
+            // 
+            // metroLabel10
+            // 
+            this.metroLabel10.AutoSize = true;
+            this.metroLabel10.Location = new System.Drawing.Point(14, 142);
+            this.metroLabel10.Name = "metroLabel10";
+            this.metroLabel10.Size = new System.Drawing.Size(43, 19);
+            this.metroLabel10.TabIndex = 11;
+            this.metroLabel10.Text = "Type :";
+            // 
+            // lidarIPTxt
+            // 
+            this.lidarIPTxt.Location = new System.Drawing.Point(121, 54);
+            this.lidarIPTxt.Name = "lidarIPTxt";
+            this.lidarIPTxt.Size = new System.Drawing.Size(183, 23);
+            this.lidarIPTxt.TabIndex = 5;
+            // 
+            // lidarPortTxt
+            // 
+            this.lidarPortTxt.Location = new System.Drawing.Point(121, 99);
+            this.lidarPortTxt.Name = "lidarPortTxt";
+            this.lidarPortTxt.Size = new System.Drawing.Size(183, 23);
+            this.lidarPortTxt.TabIndex = 6;
+            // 
+            // resetLidarBtn
+            // 
+            this.resetLidarBtn.Location = new System.Drawing.Point(14, 199);
+            this.resetLidarBtn.Name = "resetLidarBtn";
+            this.resetLidarBtn.Size = new System.Drawing.Size(139, 23);
+            this.resetLidarBtn.TabIndex = 10;
+            this.resetLidarBtn.Text = "Reset";
+            this.resetLidarBtn.Click += new System.EventHandler(this.ResetLidarBtn_Click);
+            // 
+            // addLidarBtn
+            // 
+            this.addLidarBtn.Location = new System.Drawing.Point(165, 199);
+            this.addLidarBtn.Name = "addLidarBtn";
+            this.addLidarBtn.Size = new System.Drawing.Size(139, 23);
+            this.addLidarBtn.TabIndex = 9;
+            this.addLidarBtn.Text = "Add";
+            this.addLidarBtn.Click += new System.EventHandler(this.AddLidarBtn_Click);
+            // 
+            // metroLabel7
+            // 
+            this.metroLabel7.AutoSize = true;
+            this.metroLabel7.Location = new System.Drawing.Point(14, 99);
+            this.metroLabel7.Name = "metroLabel7";
+            this.metroLabel7.Size = new System.Drawing.Size(34, 19);
+            this.metroLabel7.TabIndex = 7;
+            this.metroLabel7.Text = "Port";
+            // 
+            // metroLabel8
+            // 
+            this.metroLabel8.AutoSize = true;
+            this.metroLabel8.Location = new System.Drawing.Point(14, 58);
+            this.metroLabel8.Name = "metroLabel8";
+            this.metroLabel8.Size = new System.Drawing.Size(77, 19);
+            this.metroLabel8.TabIndex = 3;
+            this.metroLabel8.Text = "Ip Adresse :";
+            // 
+            // metroLabel9
+            // 
+            this.metroLabel9.AutoSize = true;
+            this.metroLabel9.ForeColor = System.Drawing.Color.White;
+            this.metroLabel9.Location = new System.Drawing.Point(14, 19);
+            this.metroLabel9.Name = "metroLabel9";
+            this.metroLabel9.Size = new System.Drawing.Size(45, 19);
+            this.metroLabel9.Style = MetroFramework.MetroColorStyle.Silver;
+            this.metroLabel9.TabIndex = 2;
+            this.metroLabel9.Text = "Name";
+            this.metroLabel9.Theme = MetroFramework.MetroThemeStyle.Dark;
+            // 
+            // metroPanel3
+            // 
+            this.metroPanel3.BackColor = System.Drawing.Color.Transparent;
+            this.metroPanel3.HorizontalScrollbarBarColor = true;
+            this.metroPanel3.HorizontalScrollbarHighlightOnWheel = false;
+            this.metroPanel3.HorizontalScrollbarSize = 10;
+            this.metroPanel3.Location = new System.Drawing.Point(327, 3);
+            this.metroPanel3.Name = "metroPanel3";
+            this.metroPanel3.Size = new System.Drawing.Size(812, 513);
+            this.metroPanel3.TabIndex = 5;
+            this.metroPanel3.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this.metroPanel3.VerticalScrollbarBarColor = true;
+            this.metroPanel3.VerticalScrollbarHighlightOnWheel = false;
+            this.metroPanel3.VerticalScrollbarSize = 10;
             // 
             // metroTabPage6
             // 
@@ -899,7 +1066,7 @@ namespace Penguin__REMS_Project
             this.lstb_Position.Name = "lstb_Position";
             this.lstb_Position.Size = new System.Drawing.Size(432, 446);
             this.lstb_Position.TabIndex = 1;
-            this.lstb_Position.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.lstb_Position_MouseDoubleClick);
+            this.lstb_Position.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.Lstb_Position_MouseDoubleClick);
             // 
             // flowLayoutPanel9
             // 
@@ -1036,7 +1203,7 @@ namespace Penguin__REMS_Project
             this.bt_UpdatePosition.Size = new System.Drawing.Size(114, 32);
             this.bt_UpdatePosition.TabIndex = 0;
             this.bt_UpdatePosition.Text = "Update Position";
-            this.bt_UpdatePosition.Click += new System.EventHandler(this.bt_UpdatePosition_Click);
+            this.bt_UpdatePosition.Click += new System.EventHandler(this.Bt_UpdatePosition_Click);
             // 
             // bt_DeletePosition
             // 
@@ -1045,7 +1212,7 @@ namespace Penguin__REMS_Project
             this.bt_DeletePosition.Size = new System.Drawing.Size(114, 32);
             this.bt_DeletePosition.TabIndex = 2;
             this.bt_DeletePosition.Text = "Delete Position";
-            this.bt_DeletePosition.Click += new System.EventHandler(this.bt_DeletePosition_Click);
+            this.bt_DeletePosition.Click += new System.EventHandler(this.Bt_DeletePosition_Click);
             // 
             // bt_SavePosition
             // 
@@ -1054,7 +1221,7 @@ namespace Penguin__REMS_Project
             this.bt_SavePosition.Size = new System.Drawing.Size(114, 32);
             this.bt_SavePosition.TabIndex = 1;
             this.bt_SavePosition.Text = "Save Position";
-            this.bt_SavePosition.Click += new System.EventHandler(this.bt_SavePosition_Click);
+            this.bt_SavePosition.Click += new System.EventHandler(this.Bt_SavePosition_Click);
             // 
             // flowLayoutPanel7
             // 
@@ -1101,152 +1268,6 @@ namespace Penguin__REMS_Project
             this.talinStatusPicBox.TabIndex = 4;
             this.talinStatusPicBox.TabStop = false;
             // 
-            // metroTabPage7
-            // 
-            this.metroTabPage7.Controls.Add(this.flowLayoutPanel1);
-            this.metroTabPage7.HorizontalScrollbarBarColor = true;
-            this.metroTabPage7.Location = new System.Drawing.Point(4, 38);
-            this.metroTabPage7.Name = "metroTabPage7";
-            this.metroTabPage7.Size = new System.Drawing.Size(1142, 621);
-            this.metroTabPage7.TabIndex = 6;
-            this.metroTabPage7.Text = "Lidar Config";
-            this.metroTabPage7.VerticalScrollbarBarColor = true;
-            // 
-            // flowLayoutPanel1
-            // 
-            this.flowLayoutPanel1.Controls.Add(this.metroPanel2);
-            this.flowLayoutPanel1.Controls.Add(this.metroPanel3);
-            this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(1142, 621);
-            this.flowLayoutPanel1.TabIndex = 6;
-            // 
-            // metroPanel2
-            // 
-            this.metroPanel2.BackColor = System.Drawing.Color.White;
-            this.metroPanel2.Controls.Add(this.lidarNameCbx);
-            this.metroPanel2.Controls.Add(this.lidarTypeCbx);
-            this.metroPanel2.Controls.Add(this.metroLabel10);
-            this.metroPanel2.Controls.Add(this.lidarIPTxt);
-            this.metroPanel2.Controls.Add(this.lidarPortTxt);
-            this.metroPanel2.Controls.Add(this.resetLidarBtn);
-            this.metroPanel2.Controls.Add(this.addLidarBtn);
-            this.metroPanel2.Controls.Add(this.metroLabel7);
-            this.metroPanel2.Controls.Add(this.metroLabel8);
-            this.metroPanel2.Controls.Add(this.metroLabel9);
-            this.metroPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.metroPanel2.HorizontalScrollbarBarColor = true;
-            this.metroPanel2.HorizontalScrollbarHighlightOnWheel = false;
-            this.metroPanel2.HorizontalScrollbarSize = 10;
-            this.metroPanel2.Location = new System.Drawing.Point(3, 3);
-            this.metroPanel2.Name = "metroPanel2";
-            this.metroPanel2.Size = new System.Drawing.Size(318, 513);
-            this.metroPanel2.TabIndex = 4;
-            this.metroPanel2.VerticalScrollbarBarColor = true;
-            this.metroPanel2.VerticalScrollbarHighlightOnWheel = false;
-            this.metroPanel2.VerticalScrollbarSize = 10;
-            // 
-            // lidarNameCbx
-            // 
-            this.lidarNameCbx.FormattingEnabled = true;
-            this.lidarNameCbx.ItemHeight = 23;
-            this.lidarNameCbx.Items.AddRange(new object[] {
-            "Leinshen C16",
-            "Sick LMS511 Lite",
-            "Sick LMS511 Pro",
-            "Sick MRS611",
-            "Velodyne VLP 16"});
-            this.lidarNameCbx.Location = new System.Drawing.Point(121, 15);
-            this.lidarNameCbx.Name = "lidarNameCbx";
-            this.lidarNameCbx.Size = new System.Drawing.Size(183, 29);
-            this.lidarNameCbx.Sorted = true;
-            this.lidarNameCbx.TabIndex = 13;
-            this.lidarNameCbx.Theme = MetroFramework.MetroThemeStyle.Dark;
-            // 
-            // lidarTypeCbx
-            // 
-            this.lidarTypeCbx.FormattingEnabled = true;
-            this.lidarTypeCbx.ItemHeight = 23;
-            this.lidarTypeCbx.Items.AddRange(new object[] {
-            "2D",
-            "3D"});
-            this.lidarTypeCbx.Location = new System.Drawing.Point(121, 132);
-            this.lidarTypeCbx.Name = "lidarTypeCbx";
-            this.lidarTypeCbx.Size = new System.Drawing.Size(183, 29);
-            this.lidarTypeCbx.TabIndex = 12;
-            // 
-            // metroLabel10
-            // 
-            this.metroLabel10.AutoSize = true;
-            this.metroLabel10.Location = new System.Drawing.Point(14, 142);
-            this.metroLabel10.Name = "metroLabel10";
-            this.metroLabel10.Size = new System.Drawing.Size(43, 19);
-            this.metroLabel10.TabIndex = 11;
-            this.metroLabel10.Text = "Type :";
-            // 
-            // lidarIPTxt
-            // 
-            this.lidarIPTxt.Location = new System.Drawing.Point(121, 54);
-            this.lidarIPTxt.Name = "lidarIPTxt";
-            this.lidarIPTxt.Size = new System.Drawing.Size(183, 23);
-            this.lidarIPTxt.TabIndex = 5;
-            // 
-            // lidarPortTxt
-            // 
-            this.lidarPortTxt.Location = new System.Drawing.Point(121, 99);
-            this.lidarPortTxt.Name = "lidarPortTxt";
-            this.lidarPortTxt.Size = new System.Drawing.Size(183, 23);
-            this.lidarPortTxt.TabIndex = 6;
-            // 
-            // resetLidarBtn
-            // 
-            this.resetLidarBtn.Location = new System.Drawing.Point(14, 199);
-            this.resetLidarBtn.Name = "resetLidarBtn";
-            this.resetLidarBtn.Size = new System.Drawing.Size(139, 23);
-            this.resetLidarBtn.TabIndex = 10;
-            this.resetLidarBtn.Text = "Reset";
-            this.resetLidarBtn.Click += new System.EventHandler(this.ResetLidarBtn_Click);
-            // 
-            // addLidarBtn
-            // 
-            this.addLidarBtn.Location = new System.Drawing.Point(165, 199);
-            this.addLidarBtn.Name = "addLidarBtn";
-            this.addLidarBtn.Size = new System.Drawing.Size(139, 23);
-            this.addLidarBtn.TabIndex = 9;
-            this.addLidarBtn.Text = "Add";
-            this.addLidarBtn.Click += new System.EventHandler(this.AddLidarBtn_Click);
-            // 
-            // metroLabel7
-            // 
-            this.metroLabel7.AutoSize = true;
-            this.metroLabel7.Location = new System.Drawing.Point(14, 99);
-            this.metroLabel7.Name = "metroLabel7";
-            this.metroLabel7.Size = new System.Drawing.Size(34, 19);
-            this.metroLabel7.TabIndex = 7;
-            this.metroLabel7.Text = "Port";
-            // 
-            // metroLabel8
-            // 
-            this.metroLabel8.AutoSize = true;
-            this.metroLabel8.Location = new System.Drawing.Point(14, 58);
-            this.metroLabel8.Name = "metroLabel8";
-            this.metroLabel8.Size = new System.Drawing.Size(77, 19);
-            this.metroLabel8.TabIndex = 3;
-            this.metroLabel8.Text = "Ip Adresse :";
-            // 
-            // metroLabel9
-            // 
-            this.metroLabel9.AutoSize = true;
-            this.metroLabel9.ForeColor = System.Drawing.Color.White;
-            this.metroLabel9.Location = new System.Drawing.Point(14, 19);
-            this.metroLabel9.Name = "metroLabel9";
-            this.metroLabel9.Size = new System.Drawing.Size(45, 19);
-            this.metroLabel9.Style = MetroFramework.MetroColorStyle.Silver;
-            this.metroLabel9.TabIndex = 2;
-            this.metroLabel9.Text = "Name";
-            this.metroLabel9.Theme = MetroFramework.MetroThemeStyle.Dark;
-            // 
             // metroTabPage5
             // 
             this.metroTabPage5.BackgroundImage = global::Penguin__REMS_Project.Properties.Resources.isckLMS;
@@ -1280,15 +1301,16 @@ namespace Penguin__REMS_Project
             this.metroTabPage3.Theme = MetroFramework.MetroThemeStyle.Light;
             this.metroTabPage3.VerticalScrollbarBarColor = true;
             // 
-            // metroTabPage4
+            // logViewTab
             // 
-            this.metroTabPage4.HorizontalScrollbarBarColor = true;
-            this.metroTabPage4.Location = new System.Drawing.Point(4, 38);
-            this.metroTabPage4.Name = "metroTabPage4";
-            this.metroTabPage4.Size = new System.Drawing.Size(1142, 621);
-            this.metroTabPage4.TabIndex = 3;
-            this.metroTabPage4.Text = "Log View";
-            this.metroTabPage4.VerticalScrollbarBarColor = true;
+            this.logViewTab.Controls.Add(this.logViewTxt);
+            this.logViewTab.HorizontalScrollbarBarColor = true;
+            this.logViewTab.Location = new System.Drawing.Point(4, 38);
+            this.logViewTab.Name = "logViewTab";
+            this.logViewTab.Size = new System.Drawing.Size(1142, 621);
+            this.logViewTab.TabIndex = 3;
+            this.logViewTab.Text = "Log View";
+            this.logViewTab.VerticalScrollbarBarColor = true;
             // 
             // menuStrip1
             // 
@@ -1314,8 +1336,9 @@ namespace Penguin__REMS_Project
             // quitToolStripMenuItem
             // 
             this.quitToolStripMenuItem.Name = "quitToolStripMenuItem";
-            this.quitToolStripMenuItem.Size = new System.Drawing.Size(97, 22);
+            this.quitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.quitToolStripMenuItem.Text = "Quit";
+            this.quitToolStripMenuItem.Click += new System.EventHandler(this.CloseApp);
             // 
             // editToolStripMenuItem
             // 
@@ -1325,15 +1348,26 @@ namespace Penguin__REMS_Project
             // 
             // viewToolStripMenuItem
             // 
+            this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.themeToolStripMenuItem});
             this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
             this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.viewToolStripMenuItem.Text = "View";
             // 
             // helpToolStripMenuItem
             // 
+            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.aboutToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.helpToolStripMenuItem.Text = "Help";
+            // 
+            // aboutToolStripMenuItem
+            // 
+            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.aboutToolStripMenuItem.Text = "About";
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.AboutClickEvent);
             // 
             // lidarInfoPanel
             // 
@@ -1492,20 +1526,40 @@ namespace Penguin__REMS_Project
             this.closeLidarPanelBtn.Text = "Close";
             this.closeLidarPanelBtn.Click += new System.EventHandler(this.CloseLidarPanelBtn_Click);
             // 
-            // metroPanel3
+            // themeToolStripMenuItem
             // 
-            this.metroPanel3.BackColor = System.Drawing.Color.Transparent;
-            this.metroPanel3.HorizontalScrollbarBarColor = true;
-            this.metroPanel3.HorizontalScrollbarHighlightOnWheel = false;
-            this.metroPanel3.HorizontalScrollbarSize = 10;
-            this.metroPanel3.Location = new System.Drawing.Point(327, 3);
-            this.metroPanel3.Name = "metroPanel3";
-            this.metroPanel3.Size = new System.Drawing.Size(812, 513);
-            this.metroPanel3.TabIndex = 5;
-            this.metroPanel3.Theme = MetroFramework.MetroThemeStyle.Dark;
-            this.metroPanel3.VerticalScrollbarBarColor = true;
-            this.metroPanel3.VerticalScrollbarHighlightOnWheel = false;
-            this.metroPanel3.VerticalScrollbarSize = 10;
+            this.themeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.darkToolStripMenuItem,
+            this.lightToolStripMenuItem});
+            this.themeToolStripMenuItem.Name = "themeToolStripMenuItem";
+            this.themeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.themeToolStripMenuItem.Text = "Theme";
+            // 
+            // darkToolStripMenuItem
+            // 
+            this.darkToolStripMenuItem.Name = "darkToolStripMenuItem";
+            this.darkToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.darkToolStripMenuItem.Text = "Dark";
+            this.darkToolStripMenuItem.Click += new System.EventHandler(this.DarkThemClickEvent);
+            // 
+            // lightToolStripMenuItem
+            // 
+            this.lightToolStripMenuItem.Name = "lightToolStripMenuItem";
+            this.lightToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.lightToolStripMenuItem.Text = "Light";
+            this.lightToolStripMenuItem.Click += new System.EventHandler(this.LightThemClikcEvent);
+            // 
+            // logViewTxt
+            // 
+            this.logViewTxt.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.logViewTxt.Location = new System.Drawing.Point(0, 0);
+            this.logViewTxt.Multiline = true;
+            this.logViewTxt.Name = "logViewTxt";
+            this.logViewTxt.Size = new System.Drawing.Size(1142, 621);
+            this.logViewTxt.Style = MetroFramework.MetroColorStyle.Black;
+            this.logViewTxt.TabIndex = 2;
+            this.logViewTxt.Text = "metroTextBox1";
+            this.logViewTxt.Theme = MetroFramework.MetroThemeStyle.Dark;
             // 
             // Remsform
             // 
@@ -1519,6 +1573,7 @@ namespace Penguin__REMS_Project
             this.Name = "Remsform";
             this.Text = "Penguin Rems";
             this.TextAlign = System.Windows.Forms.VisualStyles.HorizontalAlign.Right;
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.WindowCloseXButtonEvent);
             this.mainTb.ResumeLayout(false);
             this.metroTabPage1.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
@@ -1528,6 +1583,10 @@ namespace Penguin__REMS_Project
             ((System.ComponentModel.ISupportInitialize)(this.talinStatusGrpPicBx)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.talinPixBox)).EndInit();
             this.flowLayoutPanel3.ResumeLayout(false);
+            this.metroTabPage7.ResumeLayout(false);
+            this.flowLayoutPanel1.ResumeLayout(false);
+            this.metroPanel2.ResumeLayout(false);
+            this.metroPanel2.PerformLayout();
             this.metroTabPage6.ResumeLayout(false);
             this.metroTabPage2.ResumeLayout(false);
             this.tableLayoutPanel7.ResumeLayout(false);
@@ -1569,11 +1628,8 @@ namespace Penguin__REMS_Project
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.talinStatusPicBox)).EndInit();
-            this.metroTabPage7.ResumeLayout(false);
-            this.flowLayoutPanel1.ResumeLayout(false);
-            this.metroPanel2.ResumeLayout(false);
-            this.metroPanel2.PerformLayout();
             this.metroTabPage5.ResumeLayout(false);
+            this.logViewTab.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.lidarInfoPanel.ResumeLayout(false);
@@ -1597,7 +1653,7 @@ namespace Penguin__REMS_Project
         private MetroFramework.Controls.MetroButton metroButton1;
         private MetroFramework.Controls.MetroTabPage metroTabPage2;
         private MetroFramework.Controls.MetroTabPage metroTabPage3;
-        private MetroFramework.Controls.MetroTabPage metroTabPage4;
+        private MetroFramework.Controls.MetroTabPage logViewTab;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
@@ -1708,6 +1764,11 @@ namespace Penguin__REMS_Project
         private MetroFramework.Controls.MetroLabel talinPortGrpBx;
         private MetroFramework.Controls.MetroLabel metroLabel6;
         private MetroFramework.Controls.MetroPanel metroPanel3;
+        private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem themeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem darkToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem lightToolStripMenuItem;
+        private MetroFramework.Controls.MetroTextBox logViewTxt;
     }
 }
 

@@ -137,7 +137,7 @@ namespace Penguin__REMS_Project
              }, 
              () =>
              {
-                     TalonHandler();
+                   //  TalonHandler();
                     },
               () =>
               {
@@ -184,12 +184,7 @@ namespace Penguin__REMS_Project
         }
         #endregion
 
-        #region  Talon handler
-        private void TalonHandler()
-        {
-
-        }
-        #endregion
+       
         
         #region  GPR (Ground prenetration radar handler
         private void GPRHandler()
@@ -273,7 +268,7 @@ namespace Penguin__REMS_Project
         }
         #endregion
 
-        #region Helper
+        #region Helper LIDAR UI 
         private void ResetAddLidarForm()
         {
             lidarIPTxt.Text = "";
@@ -624,8 +619,6 @@ namespace Penguin__REMS_Project
 
 
         private void UpdateLidarTxtBox() {
-
-
             lidarInfoTxtBox.Text = "";
             lidarInfoTxtBox.AppendText(lidar.ToString());
             lidarInfoTxtBox.AppendText(Environment.NewLine);
@@ -641,20 +634,18 @@ namespace Penguin__REMS_Project
 
                 grpBx.SetStatusIcon(lidar.IsConnected);
             }
-
-           
-
         }
-        #endregion
-
         private void CloseLidarPanelBtn_Click(object sender, EventArgs e)
         {
-           
+
             lidarInfoPanel.Visible = false;
             lidarConfigLogview.Clear();
             mainTb.Enabled = true;
             UpdateLidarStatus();
         }
+        #endregion
+
+
 
         private void metroButton1_Click(object sender, EventArgs e)
         {
@@ -1061,8 +1052,9 @@ namespace Penguin__REMS_Project
 
 
         #endregion
+       
         #region Talin Position Configuration
-        private void bt_UpdatePosition_Click(object sender, EventArgs e)
+        private void Bt_UpdatePosition_Click(object sender, EventArgs e)
         {
             string[] results = getPositionData();
             if (results == null)
@@ -1085,7 +1077,7 @@ namespace Penguin__REMS_Project
             TT.Start();
         }
 
-        private void bt_DeletePosition_Click(object sender, EventArgs e)
+        private void Bt_DeletePosition_Click(object sender, EventArgs e)
         {
             try
             {
@@ -1128,7 +1120,7 @@ namespace Penguin__REMS_Project
             }
         }
 
-        private void bt_SavePosition_Click(object sender, EventArgs e)
+        private void Bt_SavePosition_Click(object sender, EventArgs e)
         {
             string[] results = getPositionData();
             if (results == null)
@@ -1182,13 +1174,60 @@ namespace Penguin__REMS_Project
 
             LoadPositionList();
         }
-        private void lstb_Position_MouseDoubleClick(object sender, System.Windows.Forms.MouseEventArgs e)
+        private void Lstb_Position_MouseDoubleClick(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             LoadPosition();
         }
+
         #endregion
 
+        #region Menu Fucntion
+        private void CloseApp(object sender, EventArgs e)
+        {
 
+
+            DialogResult dr = ShowMessage(ConstantStringMessage.CLOSEAPPMSQ,ConstantStringMessage.CLOSEAPP, MessageBoxButtons.YesNo);
+
+            if (dr == DialogResult.Yes)
+            {
+                if (Test_TalinInclude == true)
+                    TDP.stopNavigation();
+            }
+               
+        }
+
+       
+        #endregion
+
+        private void WindowCloseXButtonEvent(object sender, FormClosedEventArgs e)
+        {
+           
+            if (Test_TalinInclude == true)
+                  TDP.stopNavigation();
+
+        }
+
+        private void AboutClickEvent(object sender, EventArgs e)
+        {
+            DialogResult dr = ShowMessage(ConstantStringMessage.ABOUTMSQ, ConstantStringMessage.ABOUTDIALOGUE, MessageBoxButtons.OK);
+        }
+
+        private void LightThemClikcEvent(object sender, EventArgs e)
+        {
+            this.Theme = MetroThemeStyle.Light;
+
+            this.mainTb.Theme = this.Theme;
+            this.Update();
+            this.Refresh();
+        }
+
+        private void DarkThemClickEvent(object sender, EventArgs e)
+        {
+            this.Theme = MetroThemeStyle.Dark;
+            this.mainTb.Theme = this.Theme;
+            this.Update();
+            this.Refresh();
+        }
     }
 
 }
