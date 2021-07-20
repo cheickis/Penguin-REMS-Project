@@ -667,6 +667,9 @@ namespace Penguin__REMS_Project
     
         private void InitTalin() {
 
+            TDP.TalinLogCollection.CollectionChanged += UpdateTalinLog;
+            TDP.DataSizeCollection.CollectionChanged += UpdateTalinDataSizeLbl;
+            
             if (TDP.Talin_Initial() == true )
             {
                 SetTalinStatusIcon();
@@ -721,33 +724,11 @@ namespace Penguin__REMS_Project
             cmb_VMSType.SelectedIndex = TMC.VMSType;
 
             talinPortGrpBx.Text = TDP.TalinPort;
-            TDP.TalinLogCollection.CollectionChanged += UpdateTalinLog;
-            TDP.DataSizeCollection.CollectionChanged += UpdateDataSizeLbl;
-
-        }
-
-        private void UpdateDataSizeLbl(object sender, NotifyCollectionChangedEventArgs e)
-        {
-              if (TDP.DataSizeCollection.Last() != null)
-                {
-
-                 talinDataSize += System.Text.Encoding.ASCII.GetByteCount(TDP.DataSizeCollection.Last());
-
-                if (talinDataLbl.InvokeRequired)
-                {
-
-                    talinDataLbl.Invoke(new MethodInvoker(delegate {
-
-                        talinDataLbl.Text = Helper.FormatBytes(talinDataSize);
-
-                    }));
-                }
-
-               
-                }
-
            
+
         }
+
+       
 
         private void tb_ZoneID_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {   //For all text box required number
@@ -866,11 +847,7 @@ namespace Penguin__REMS_Project
             }
 
         }
-        private void lstb_Position_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            LoadPosition();
-        }
-
+      
         private string[] getPositionData()
         {
             string[] results;
@@ -933,29 +910,7 @@ namespace Penguin__REMS_Project
 
         }
       
-        private void Bt_UpdatePosition_Click(object sender, RoutedEventArgs e)
-        {
-            string[] results = getPositionData();
-            if (results == null)
-            {
-                System.Windows.MessageBox.Show("Input position format is incorrect. ", "Update Failed!");
-                return;
-            }
-            if ((double.Parse(results[6]) == 0) || (double.Parse(results[7]) == 0) || (double.Parse(results[8]) == 0))
-            {
-                System.Windows.MessageBox.Show("Input Easting, Northing and Elevation value shall not be zero. ", "Update Failed!");
-                return;
-            }
-            byte[] command = TML.generatePositionUpdateCommand(results, (UInt16)cmb_VMSType.SelectedIndex);
-            TDP.PositionUpdateCommand = command;
-            //System.Buffer.BlockCopy(command, 0, TalinCommandArray, 0, command.Length);
-            TalinPositionUpdateThread = new Thread(TDP.Talin_InitialPosition);
-            TalinPositionUpdateThread.Start();
-            //TDP.Talin_InitialPosition(command);
-            TT.Elapsed += TT_Elapsed;
-            TT.Start();
-        }
-
+     
         private
         void TT_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
@@ -979,104 +934,8 @@ namespace Penguin__REMS_Project
             }
         }
 
-        private void bt_SavePosition_Click(object sender, RoutedEventArgs e)
-        {
-            string[] results = getPositionData();
-            if (results == null)
-                return;
-            string return_value = results[0] + " " + results[1];
-            for (int i = 2; i < results.Length; i++)
-            {
-                return_value += (", " + results[i]);
-            }
-
-            string[] str = new string[lstb_Position.Items.Count + 1];
-            bool rewrite = false;
-            int j = 0;
-            //Read the list
-            using (StreamReader sr = new StreamReader(TMC.FileName)) //Shall be a database in future
-            {
-                //List<string> lines = new List<string>();
-                string line;
-
-                while (((line = sr.ReadLine()) != null) && (line != ""))
-                {
-                    string[] fields = line.Split(',', '=', ' ');
-                    string valuetoremove2 = "";
-                    fields = fields.Where(val => val != valuetoremove2).ToArray();
-                    if (fields[2].Trim() == results[2]) //if same name rewrite the file
-                    {
-                        str[j] = (return_value + "\n");
-                        rewrite = true;
-                    }
-                    else
-                    {
-                        str[j] = line;
-                    }
-                    j++;
-
-                }
-            }
-            if (rewrite == false)  //add new one
-            {
-                str[j] = return_value;
-            }
-            else
-            {
-                j--;
-            }
-            using (StreamWriter sw = new StreamWriter(TMC.FileName))
-            {
-                for (int k = 0; k <= j; k++)
-                    sw.WriteLine(str[k]);
-            }
-
-            LoadPositionList();
-
-        }
-
-        private void bt_DeletePosition_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                //Since we load everything to the list even nonvalid data, following code can work
-                int temp = lstb_Position.SelectedIndex;
-                string[] str = new string[lstb_Position.Items.Count - 1];
-                int i = 0;
-                using (StreamReader sr = new StreamReader(TMC.FileName)) //Shall be a database in future
-                {
-                    //List<string> lines = new List<string>();
-                    string line;
-                    int j = 0;
-                    while (((line = sr.ReadLine()) != null) && (line != ""))
-                    {
-                        string[] fields = line.Split(',', '=', ' ');
-                        string valuetoremove2 = "";
-                        fields = fields.Where(val => val != valuetoremove2).ToArray();
-                        if (j != temp) //if same name rewrite the file
-                        {
-                            str[i] += line;
-                            i++;
-                            //if (i >= lstb_Position.Items.Count)
-                            //    break;
-                        }
-                        j++;
-
-                    }
-                }
-                using (StreamWriter sw = new StreamWriter(TMC.FileName))
-                {
-                    for (int k = 0; k < i; k++)
-                        sw.WriteLine(str[k]);
-                }
-
-                LoadPositionList();
-            }
-            catch (Exception er)
-            {
-                System.Windows.MessageBox.Show("Failed to delete this position. Error \n" + er.ToString());
-            }
-        }
+       
+     
 
         public byte[] ReturnTalinCommand()  //The returned byte is for server-client application
         {
@@ -1151,10 +1010,31 @@ namespace Penguin__REMS_Project
 
         }
 
+        private void UpdateTalinDataSizeLbl(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (TDP.DataSizeCollection.Last() != null)
+            {
 
+                talinDataSize += System.Text.Encoding.ASCII.GetByteCount(TDP.DataSizeCollection.Last());
+
+                if (talinDataLbl.InvokeRequired)
+                {
+
+                    talinDataLbl.Invoke(new MethodInvoker(delegate {
+
+                        talinDataLbl.Text = Helper.FormatBytes(talinDataSize);
+
+                    }));
+                }
+
+
+            }
+
+
+        }
         public void UpdateTalinLog(object sender, NotifyCollectionChangedEventArgs e)
         {
-            Helper.UpdateTxtBWithDataCollector(talinLogTxt,talinLogCollection);
+          //  Helper.UpdateTxtBWithDataCollector(talinLogTxt,talinLogCollection);
             Helper.UpdateTxtBWithDataCollector(talinLogTxt, TDP.TalinLogCollection);
 
 
@@ -1178,7 +1058,134 @@ namespace Penguin__REMS_Project
         }
 
 
-        
+
+
+        #endregion
+        #region Talin Position Configuration
+        private void bt_UpdatePosition_Click(object sender, EventArgs e)
+        {
+            string[] results = getPositionData();
+            if (results == null)
+            {
+                System.Windows.MessageBox.Show("Input position format is incorrect. ", "Update Failed!");
+                return;
+            }
+            if ((double.Parse(results[6]) == 0) || (double.Parse(results[7]) == 0) || (double.Parse(results[8]) == 0))
+            {
+                System.Windows.MessageBox.Show("Input Easting, Northing and Elevation value shall not be zero. ", "Update Failed!");
+                return;
+            }
+            byte[] command = TML.generatePositionUpdateCommand(results, (UInt16)cmb_VMSType.SelectedIndex);
+            TDP.PositionUpdateCommand = command;
+            //System.Buffer.BlockCopy(command, 0, TalinCommandArray, 0, command.Length);
+            TalinPositionUpdateThread = new Thread(TDP.Talin_InitialPosition);
+            TalinPositionUpdateThread.Start();
+            //TDP.Talin_InitialPosition(command);
+            TT.Elapsed += TT_Elapsed;
+            TT.Start();
+        }
+
+        private void bt_DeletePosition_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                //Since we load everything to the list even nonvalid data, following code can work
+                int temp = lstb_Position.SelectedIndex;
+                string[] str = new string[lstb_Position.Items.Count - 1];
+                int i = 0;
+                using (StreamReader sr = new StreamReader(TMC.FileName)) //Shall be a database in future
+                {
+                    //List<string> lines = new List<string>();
+                    string line;
+                    int j = 0;
+                    while (((line = sr.ReadLine()) != null) && (line != ""))
+                    {
+                        string[] fields = line.Split(',', '=', ' ');
+                        string valuetoremove2 = "";
+                        fields = fields.Where(val => val != valuetoremove2).ToArray();
+                        if (j != temp) //if same name rewrite the file
+                        {
+                            str[i] += line;
+                            i++;
+                            //if (i >= lstb_Position.Items.Count)
+                            //    break;
+                        }
+                        j++;
+
+                    }
+                }
+                using (StreamWriter sw = new StreamWriter(TMC.FileName))
+                {
+                    for (int k = 0; k < i; k++)
+                        sw.WriteLine(str[k]);
+                }
+
+                LoadPositionList();
+            }
+            catch (Exception er)
+            {
+                System.Windows.MessageBox.Show("Failed to delete this position. Error \n" + er.ToString());
+            }
+        }
+
+        private void bt_SavePosition_Click(object sender, EventArgs e)
+        {
+            string[] results = getPositionData();
+            if (results == null)
+                return;
+            string return_value = results[0] + " " + results[1];
+            for (int i = 2; i < results.Length; i++)
+            {
+                return_value += (", " + results[i]);
+            }
+
+            string[] str = new string[lstb_Position.Items.Count + 1];
+            bool rewrite = false;
+            int j = 0;
+            //Read the list
+            using (StreamReader sr = new StreamReader(TMC.FileName)) //Shall be a database in future
+            {
+                //List<string> lines = new List<string>();
+                string line;
+
+                while (((line = sr.ReadLine()) != null) && (line != ""))
+                {
+                    string[] fields = line.Split(',', '=', ' ');
+                    string valuetoremove2 = "";
+                    fields = fields.Where(val => val != valuetoremove2).ToArray();
+                    if (fields[2].Trim() == results[2]) //if same name rewrite the file
+                    {
+                        str[j] = (return_value + "\n");
+                        rewrite = true;
+                    }
+                    else
+                    {
+                        str[j] = line;
+                    }
+                    j++;
+
+                }
+            }
+            if (rewrite == false)  //add new one
+            {
+                str[j] = return_value;
+            }
+            else
+            {
+                j--;
+            }
+            using (StreamWriter sw = new StreamWriter(TMC.FileName))
+            {
+                for (int k = 0; k <= j; k++)
+                    sw.WriteLine(str[k]);
+            }
+
+            LoadPositionList();
+        }
+        private void lstb_Position_MouseDoubleClick(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            LoadPosition();
+        }
         #endregion
 
 

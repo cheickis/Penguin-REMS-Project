@@ -215,7 +215,7 @@ namespace Penguin__REMS_Project
             this.mainTb.FontWeight = MetroFramework.MetroTabControlWeight.Regular;
             this.mainTb.Location = new System.Drawing.Point(20, 84);
             this.mainTb.Name = "mainTb";
-            this.mainTb.SelectedIndex = 0;
+            this.mainTb.SelectedIndex = 2;
             this.mainTb.Size = new System.Drawing.Size(1150, 663);
             this.mainTb.TabIndex = 0;
             this.mainTb.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -458,7 +458,6 @@ namespace Penguin__REMS_Project
             // 
             this.metroLabel2.AutoSize = true;
             this.metroLabel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.metroLabel2.FontSize = MetroFramework.MetroLabelSize.Tall;
             this.metroLabel2.FontWeight = MetroFramework.MetroLabelWeight.Bold;
             this.metroLabel2.Location = new System.Drawing.Point(3, 0);
             this.metroLabel2.Name = "metroLabel2";
@@ -661,7 +660,7 @@ namespace Penguin__REMS_Project
             // 
             this.groupBox6.Controls.Add(this.tb_deflection2);
             this.groupBox6.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox6.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox6.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox6.Location = new System.Drawing.Point(3, 523);
             this.groupBox6.Name = "groupBox6";
             this.groupBox6.Size = new System.Drawing.Size(213, 89);
@@ -681,7 +680,7 @@ namespace Penguin__REMS_Project
             // 
             this.groupBox5.Controls.Add(this.tb_deflection1);
             this.groupBox5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox5.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox5.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox5.Location = new System.Drawing.Point(3, 433);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(213, 84);
@@ -900,6 +899,7 @@ namespace Penguin__REMS_Project
             this.lstb_Position.Name = "lstb_Position";
             this.lstb_Position.Size = new System.Drawing.Size(432, 446);
             this.lstb_Position.TabIndex = 1;
+            this.lstb_Position.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.lstb_Position_MouseDoubleClick);
             // 
             // flowLayoutPanel9
             // 
@@ -1036,6 +1036,7 @@ namespace Penguin__REMS_Project
             this.bt_UpdatePosition.Size = new System.Drawing.Size(114, 32);
             this.bt_UpdatePosition.TabIndex = 0;
             this.bt_UpdatePosition.Text = "Update Position";
+            this.bt_UpdatePosition.Click += new System.EventHandler(this.bt_UpdatePosition_Click);
             // 
             // bt_DeletePosition
             // 
@@ -1044,6 +1045,7 @@ namespace Penguin__REMS_Project
             this.bt_DeletePosition.Size = new System.Drawing.Size(114, 32);
             this.bt_DeletePosition.TabIndex = 2;
             this.bt_DeletePosition.Text = "Delete Position";
+            this.bt_DeletePosition.Click += new System.EventHandler(this.bt_DeletePosition_Click);
             // 
             // bt_SavePosition
             // 
@@ -1052,6 +1054,7 @@ namespace Penguin__REMS_Project
             this.bt_SavePosition.Size = new System.Drawing.Size(114, 32);
             this.bt_SavePosition.TabIndex = 1;
             this.bt_SavePosition.Text = "Save Position";
+            this.bt_SavePosition.Click += new System.EventHandler(this.bt_SavePosition_Click);
             // 
             // flowLayoutPanel7
             // 
