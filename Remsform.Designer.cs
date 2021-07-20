@@ -1376,7 +1376,7 @@ namespace Penguin__REMS_Project
             this.lidarInfoPanel.HorizontalScrollbarBarColor = true;
             this.lidarInfoPanel.HorizontalScrollbarHighlightOnWheel = false;
             this.lidarInfoPanel.HorizontalScrollbarSize = 10;
-            this.lidarInfoPanel.Location = new System.Drawing.Point(1176, 40);
+            this.lidarInfoPanel.Location = new System.Drawing.Point(236, 16);
             this.lidarInfoPanel.Name = "lidarInfoPanel";
             this.lidarInfoPanel.Size = new System.Drawing.Size(680, 570);
             this.lidarInfoPanel.TabIndex = 0;
@@ -1558,7 +1558,6 @@ namespace Penguin__REMS_Project
             this.logViewTxt.Size = new System.Drawing.Size(1142, 621);
             this.logViewTxt.Style = MetroFramework.MetroColorStyle.Black;
             this.logViewTxt.TabIndex = 2;
-            this.logViewTxt.Text = "metroTextBox1";
             this.logViewTxt.Theme = MetroFramework.MetroThemeStyle.Dark;
             // 
             // Remsform

@@ -73,6 +73,7 @@ namespace Penguin__REMS_Project
         private ObservableCollection<Realsens> realsensCollection;
         private ObservableCollection<String> talinLogCollection;
 
+        private ObservableCollection<String> logViewCollection;
         #endregion
 
         #region Queue
@@ -111,8 +112,13 @@ namespace Penguin__REMS_Project
             talinLogCollection = new ObservableCollection<string>();
             talinLogCollection.CollectionChanged  += UpdateTalinLog;
 
+            logViewCollection = new ObservableCollection<string>();
+            logViewCollection.CollectionChanged += UpdateLogView;
+
+
         }
 
+       
         private void upadteSickListForm(object sender, NotifyCollectionChangedEventArgs e)
         {
            // throw new NotImplementedException();
@@ -280,9 +286,14 @@ namespace Penguin__REMS_Project
             if (!listOfLidarInStory.ContainsKey(ip))
             {
                 String line =  name + " : " + ip + " : " +port+ " : "+type;
+               
                 writer.WriteLine(line);
                 writer.Flush();
-                listOfLidarInStory.Add(ip, GetLidar(name, ip, port, type));
+
+               Lidar newLidar = GetLidar(name, ip, port, type);
+        
+                listOfLidarInStory.Add(ip, newLidar);
+                logViewCollection.Add(line);
             }
             else
             {
@@ -294,31 +305,26 @@ namespace Penguin__REMS_Project
         }
 
         private Lidar GetLidar(String name, String ip, int port, string type) {
-
+            Lidar temp =null;
             if (type.Equals("2D"))
             {
-                AddTwoDLidar(name, ip, port, type);
-                return new TwoDLidar(name, ip, port, type);
+               
+                temp =new TwoDLidar(name, ip, port, type);
             }
             else
             {
-                AddThreeDLidar(name, ip, port, type);
-                return new ThreeDLidar(name, ip, port, type);
+               
+               temp= new ThreeDLidar(name, ip, port, type);
             }
-        }
-        private void AddThreeDLidar(String name, String ip, int port, string type)
-        {
-            ThreeDLidar newThreeDLidar = new ThreeDLidar(name, ip, port , type);
-            treeDLidarCollection.Add(newThreeDLidar);
-            SetLidarCollectionAndForm(newThreeDLidar);
-        }
-        private void  AddTwoDLidar(String name, String ip, int port, string type)
-        {
+            if (temp != null) {
 
-            TwoDLidar newtwoDLidar = new TwoDLidar(name, ip, port, type);
-            twoDLidarCollections.Add(newtwoDLidar);
-            SetLidarCollectionAndForm(newtwoDLidar);
+                lidarCollections.Add(temp);
+                SetLidarCollectionAndForm(temp);
+               
+            }
+            return temp;
         }
+     
         private void AddLidarTile(String name, String type) {
 
             MetroTile lidarTile = new MetroTile();
@@ -378,7 +384,8 @@ namespace Penguin__REMS_Project
             if (lidar != null) {
                 lidar.ConnectToTheLidar();
                 lidarConfigLogview.Text = lidar.PingLidarResponse();
-                UpdateLidarTxtBox();
+                logViewCollection.Add(lidarConfigLogview.Text);
+               UpdateLidarTxtBox();
             }
         }
 
@@ -392,6 +399,9 @@ namespace Penguin__REMS_Project
                 lidarConfigLogview.Text = lidar.PullAFrame();
                 lidarConfigLogview.Update();
                 lidarConfigLogview.Refresh();
+
+                logViewCollection.Add(ConstantStringMessage.ONE_TELEGRAMM);
+                logViewCollection.Add(lidar.PullAFrame());
             }
 
         }
@@ -438,8 +448,9 @@ namespace Penguin__REMS_Project
             SetLidarsAndTalinDatasFiles(timeStamp);
             while (true)
             {
-                //ScanningTile.Text = " Scanning ...  "; // Status message info Here
-               // LidarsStartScan();
+               
+                logViewCollection.Add(" Scanning ...  ");
+                // LidarsStartScan();
                 StartTalinNavigation();
                 if (m_isAbortRequestedScan)
                 {
@@ -448,8 +459,8 @@ namespace Penguin__REMS_Project
                  
                     if (dr == DialogResult.Yes)
                     {
-                        //ScanningTile.Text = " Stop Scanning  "; 
-
+                      
+                        logViewCollection.Add("Stop Scanning ");
                         //CloseLidarsFiles();
                         // CloseTalinFile();
                         talinDataSize = 0; // Reinit the data Size
@@ -622,7 +633,7 @@ namespace Penguin__REMS_Project
             lidarInfoTxtBox.Text = "";
             lidarInfoTxtBox.AppendText(lidar.ToString());
             lidarInfoTxtBox.AppendText(Environment.NewLine);
-
+            logViewCollection.Add(lidar.ToString());
         }
 
         private void UpdateLidarStatus() {
@@ -1007,7 +1018,6 @@ namespace Penguin__REMS_Project
             {
 
                 talinDataSize += System.Text.Encoding.ASCII.GetByteCount(TDP.DataSizeCollection.Last());
-
                 if (talinDataLbl.InvokeRequired)
                 {
 
@@ -1027,8 +1037,8 @@ namespace Penguin__REMS_Project
         {
           //  Helper.UpdateTxtBWithDataCollector(talinLogTxt,talinLogCollection);
             Helper.UpdateTxtBWithDataCollector(talinLogTxt, TDP.TalinLogCollection);
-
-
+            String val = TDP.TalinLogCollection.Last();
+            logViewCollection.Add(val);
             if (talinLogTxt.InvokeRequired)
             {
 
@@ -1036,9 +1046,10 @@ namespace Penguin__REMS_Project
 
                     if (TDP.TalinLogCollection.Count > 0)
                     {
-
-                        talinLogTxt.AppendText(TDP.TalinLogCollection.Last());
+                       
+                        talinLogTxt.AppendText(val);
                         talinLogTxt.AppendText(Environment.NewLine);
+                      
                     }
 
                 }));
@@ -1196,9 +1207,6 @@ namespace Penguin__REMS_Project
                
         }
 
-       
-        #endregion
-
         private void WindowCloseXButtonEvent(object sender, FormClosedEventArgs e)
         {
            
@@ -1228,6 +1236,19 @@ namespace Penguin__REMS_Project
             this.Update();
             this.Refresh();
         }
+        #endregion
+
+
+        #region Log View Handler
+        private void UpdateLogView(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            Helper.UpdateTxtBWithDataCollector(logViewTxt, logViewCollection); 
+        }
+
+
+        #endregion
+
+
     }
 
 }
