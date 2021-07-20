@@ -236,8 +236,6 @@ namespace Penguin__REMS_Project
 
                     if (dataSizeCollection.Count > 0)
                     {
-
-                        //dataLabel.Text = (dataSizeCollection.ElementAt(dataSizeCollection.Count - 1));
                         dataLabel.Text = dataSizeCollection.Last() ;
 
                     }
@@ -247,7 +245,7 @@ namespace Penguin__REMS_Project
             else if (dataSizeCollection.Count > 0 && dataLabel != null)
             {
 
-               // dataLabel.Text = (dataSizeCollection.ElementAt(dataSizeCollection.Count - 1));
+               
                 dataLabel.Text = dataSizeCollection.Last() ;
             }
 
@@ -258,6 +256,9 @@ namespace Penguin__REMS_Project
         
         
         }
+
+
+        
 
         public void ClearCollectionDAtas() {
 

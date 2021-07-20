@@ -55,7 +55,7 @@ namespace Penguin__REMS_Project
                     datasize = 0;
                 }
                WriteFile = true;
-              continuousReading = true;
+                continuousReading = true;
                 stopscan = false;
                 
                 listener_Lidar.BeginReceive(new AsyncCallback(ReceiveScanData), udpState);
@@ -142,8 +142,11 @@ namespace Penguin__REMS_Project
         public override string PullAFrame()
         {
              InitCommunication();
+           
             Thread.Sleep(2);
-           return GetAFrameData();
+      
+            stopscan = true;
+            return GetAFrameData();
         }
 
         public override void UpdateRawData(object sender, NotifyCollectionChangedEventArgs e)

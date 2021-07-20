@@ -221,7 +221,7 @@ namespace Penguin__REMS_Project
             this.mainTb.FontWeight = MetroFramework.MetroTabControlWeight.Regular;
             this.mainTb.Location = new System.Drawing.Point(20, 84);
             this.mainTb.Name = "mainTb";
-            this.mainTb.SelectedIndex = 6;
+            this.mainTb.SelectedIndex = 0;
             this.mainTb.Size = new System.Drawing.Size(1150, 663);
             this.mainTb.TabIndex = 0;
             this.mainTb.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -284,7 +284,7 @@ namespace Penguin__REMS_Project
             // talinPortGrpBx
             // 
             this.talinPortGrpBx.AutoSize = true;
-            this.talinPortGrpBx.Location = new System.Drawing.Point(262, 79);
+            this.talinPortGrpBx.Location = new System.Drawing.Point(232, 79);
             this.talinPortGrpBx.Name = "talinPortGrpBx";
             this.talinPortGrpBx.Size = new System.Drawing.Size(41, 19);
             this.talinPortGrpBx.TabIndex = 8;
@@ -303,7 +303,7 @@ namespace Penguin__REMS_Project
             // 
             this.talinDataLbl.AutoSize = true;
             this.talinDataLbl.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.talinDataLbl.Location = new System.Drawing.Point(257, 113);
+            this.talinDataLbl.Location = new System.Drawing.Point(224, 113);
             this.talinDataLbl.Name = "talinDataLbl";
             this.talinDataLbl.Size = new System.Drawing.Size(53, 21);
             this.talinDataLbl.TabIndex = 6;
@@ -313,7 +313,7 @@ namespace Penguin__REMS_Project
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(151, 113);
+            this.label2.Location = new System.Drawing.Point(150, 113);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(49, 21);
             this.label2.TabIndex = 5;
@@ -322,7 +322,7 @@ namespace Penguin__REMS_Project
             // talinStatusGrpPicBx
             // 
             this.talinStatusGrpPicBx.Image = global::Penguin__REMS_Project.Properties.Resources.Red1;
-            this.talinStatusGrpPicBx.Location = new System.Drawing.Point(256, 172);
+            this.talinStatusGrpPicBx.Location = new System.Drawing.Point(226, 172);
             this.talinStatusGrpPicBx.Name = "talinStatusGrpPicBx";
             this.talinStatusGrpPicBx.Size = new System.Drawing.Size(54, 50);
             this.talinStatusGrpPicBx.TabIndex = 4;
@@ -331,7 +331,7 @@ namespace Penguin__REMS_Project
             // metroLabel11
             // 
             this.metroLabel11.AutoSize = true;
-            this.metroLabel11.Location = new System.Drawing.Point(155, 184);
+            this.metroLabel11.Location = new System.Drawing.Point(149, 184);
             this.metroLabel11.Name = "metroLabel11";
             this.metroLabel11.Size = new System.Drawing.Size(43, 19);
             this.metroLabel11.TabIndex = 3;
@@ -1376,7 +1376,7 @@ namespace Penguin__REMS_Project
             this.lidarInfoPanel.HorizontalScrollbarBarColor = true;
             this.lidarInfoPanel.HorizontalScrollbarHighlightOnWheel = false;
             this.lidarInfoPanel.HorizontalScrollbarSize = 10;
-            this.lidarInfoPanel.Location = new System.Drawing.Point(236, 16);
+            this.lidarInfoPanel.Location = new System.Drawing.Point(228, 27);
             this.lidarInfoPanel.Name = "lidarInfoPanel";
             this.lidarInfoPanel.Size = new System.Drawing.Size(680, 570);
             this.lidarInfoPanel.TabIndex = 0;
@@ -1555,6 +1555,7 @@ namespace Penguin__REMS_Project
             this.logViewTxt.Location = new System.Drawing.Point(0, 0);
             this.logViewTxt.Multiline = true;
             this.logViewTxt.Name = "logViewTxt";
+            this.logViewTxt.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.logViewTxt.Size = new System.Drawing.Size(1142, 621);
             this.logViewTxt.Style = MetroFramework.MetroColorStyle.Black;
             this.logViewTxt.TabIndex = 2;

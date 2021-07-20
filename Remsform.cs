@@ -130,10 +130,10 @@ namespace Penguin__REMS_Project
         {
             DateTime _now = DateTime.Now;
             string NowString = _now.ToString("yyyyMMddHHmmss");   //Timestamp.
-
+            LidarsThreadHandlers(NowString);
             #region ParallelTasks
-            // Perform three tasks in parallel :  2D lidar , 3D lidar, realsens, GPR ...
-            Parallel.Invoke(() =>
+            // Perform three tasks in parallel :  2D lidar , 3D lidar, realsens, GPR ...   Will use Parralel if we need it but not for now
+         /*   Parallel.Invoke(() =>
             { 
                 LidarsThreadHandlers(NowString);
             },  
@@ -144,7 +144,7 @@ namespace Penguin__REMS_Project
              () =>
              {
                    //  TalonHandler();
-                    },
+             },
               () =>
               {
                      GPRHandler();
@@ -155,6 +155,7 @@ namespace Penguin__REMS_Project
                }
 
              );
+            */
 
             filecounter++;
             #endregion
@@ -384,7 +385,7 @@ namespace Penguin__REMS_Project
             if (lidar != null) {
                 lidar.ConnectToTheLidar();
                 lidarConfigLogview.Text = lidar.PingLidarResponse();
-                logViewCollection.Add(lidarConfigLogview.Text);
+              
                UpdateLidarTxtBox();
             }
         }
@@ -399,9 +400,6 @@ namespace Penguin__REMS_Project
                 lidarConfigLogview.Text = lidar.PullAFrame();
                 lidarConfigLogview.Update();
                 lidarConfigLogview.Refresh();
-
-                logViewCollection.Add(ConstantStringMessage.ONE_TELEGRAMM);
-                logViewCollection.Add(lidar.PullAFrame());
             }
 
         }
@@ -443,15 +441,13 @@ namespace Penguin__REMS_Project
         }
         private void StartLidarsCommunications(String timeStamp)
         {
-            //SetSScansDatasFiles(timeStamp);
-           // SetTalinDataFile(timeStamp);
+          
             SetLidarsAndTalinDatasFiles(timeStamp);
+            logViewCollection.Add(" Scanning ...  ");
             while (true)
             {
-               
-                logViewCollection.Add(" Scanning ...  ");
-                // LidarsStartScan();
-                StartTalinNavigation();
+                StartScanningAndNavigation();
+              
                 if (m_isAbortRequestedScan)
                 {
                    
@@ -461,9 +457,9 @@ namespace Penguin__REMS_Project
                     {
                       
                         logViewCollection.Add("Stop Scanning ");
-                        //CloseLidarsFiles();
-                        // CloseTalinFile();
+                        talinDataLbl.Text = Helper.FormatBytes(talinDataSize);
                         talinDataSize = 0; // Reinit the data Size
+
                         CloseLidarAndTalinsFiles();
                         return;
                     }
@@ -492,7 +488,7 @@ namespace Penguin__REMS_Project
 
         private void CloseLidarAndTalinsFiles() {
 
-            //CloseLidarsFiles();
+            CloseLidarsFiles();
             CloseTalinFile();
 
         }
@@ -653,6 +649,8 @@ namespace Penguin__REMS_Project
             lidarConfigLogview.Clear();
             mainTb.Enabled = true;
             UpdateLidarStatus();
+          
+
         }
         #endregion
 
