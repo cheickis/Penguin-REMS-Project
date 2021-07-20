@@ -121,23 +121,29 @@
   <data name="Red" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Red.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Yellow" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Yellow.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="AdvancedSetting" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\AdvancedSetting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Green1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Green.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="RedTalon1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\RedTalon1.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Purple" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Purple.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TalonGreenStatus" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\TalonGreenStatus.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Yellow" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Yellow.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="leishen_res" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\leishen_res.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Red1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Red.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="AdvancedSetting" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\AdvancedSetting.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Play" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Play.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -148,8 +154,14 @@
   <data name="leishen" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\leishen1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Red2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Red1.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Record" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Record.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="talin" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\talin.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="close" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\close.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -157,17 +169,14 @@
   <data name="isckLMS1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\isckLMS.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Pause" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Pause.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="leishen2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\leishen2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="RedTalon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\RedTalon.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Red2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Red1.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Pause" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Pause.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="isckLMS" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\isckLMS.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -178,7 +187,7 @@
   <data name="Green" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Green.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="RedTalon1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\RedTalon1.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="talin_pic" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\talin_pic.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

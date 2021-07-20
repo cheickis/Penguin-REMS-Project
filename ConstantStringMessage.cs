@@ -33,7 +33,8 @@ namespace Penguin__REMS_Project
 
         #region Scan Folder
        public  const String FOLDERPATH = @"C:\Scandatas\";
-      public   const String FOLDERSUFFIX = "_ScanData_"; 
+       public   const String FOLDERSUFFIX = "_ScanData_";
+        public const String TalinFOLDERSUFFIX = "TalinData_";
 
         #endregion
 
