@@ -670,7 +670,8 @@ namespace Penguin__REMS_Project
             if (TDP.Talin_Initial() == true )
             {
                 SetTalinStatusIcon();
-                talinLogCollection.Add("Talin is Connected!");
+               // talinLogCollection.Add("Talin is Connected!");
+                TDP.TalinLogCollection.Add("Talin is Connected!");
 
                 ConnectToTalinBtn.Enabled = false;
                 talinPortCbx.Enabled = false;
@@ -681,8 +682,9 @@ namespace Penguin__REMS_Project
             }
             else
             {
-                talinLogCollection.Add("Talin is not Connected!");
-                
+               // talinLogCollection.Add("Talin is not Connected!");
+                TDP.TalinLogCollection.Add("Talin is not Connected!");
+
                 if (Test_TalinInclude == false)
                 {
                     ConnectToTalinBtn.Enabled = false;
@@ -965,13 +967,15 @@ namespace Penguin__REMS_Project
                    // bt_StartScan.IsEnabled = true;   // button start connexion
                     TT.Stop();
                  //  lb_Status.Content = " Talin Aligned. Scan can Start.";
-                    talinLogCollection.Add( " Talin Aligned. Scan can Start.");
+                    //talinLogCollection.Add( " Talin Aligned. Scan can Start.");
+                TDP.TalinLogCollection.Add(" Talin Aligned. Scan can Start.");
 
             }
             else
             {
-                talinLogCollection.Add("Talin Alignment Time = " + TalinDataProcess.AlignmentTime.ToString());
-              
+               // talinLogCollection.Add("Talin Alignment Time = " + TalinDataProcess.AlignmentTime.ToString());
+
+                TDP.TalinLogCollection.Add("Talin Alignment Time = " + TalinDataProcess.AlignmentTime.ToString());
             }
         }
 
@@ -1103,8 +1107,8 @@ namespace Penguin__REMS_Project
         {
             TDP.Disconnect_Talin();
 
-            talinLogCollection.Add("Talin is  disconnected!");
-           
+          //  talinLogCollection.Add("Talin is  disconnected!");
+            TDP.TalinLogCollection.Add("Talin is  disconnected!");
             EnableOrDiseableTalinConnectGroupoxItem();
         }
 
@@ -1150,14 +1154,27 @@ namespace Penguin__REMS_Project
 
         public void UpdateTalinLog(object sender, NotifyCollectionChangedEventArgs e)
         {
-           Helper.UpdateTxtBWithDataCollector(talinLogTxt,talinLogCollection);
+            Helper.UpdateTxtBWithDataCollector(talinLogTxt,talinLogCollection);
             Helper.UpdateTxtBWithDataCollector(talinLogTxt, TDP.TalinLogCollection);
 
 
-          
+            if (talinLogTxt.InvokeRequired)
+            {
 
-            
-            
+                talinLogTxt.Invoke(new MethodInvoker(delegate {
+
+                    if (TDP.TalinLogCollection.Count > 0)
+                    {
+
+                        talinLogTxt.AppendText(TDP.TalinLogCollection.Last());
+                        talinLogTxt.AppendText(Environment.NewLine);
+                    }
+
+                }));
+            }
+
+
+
         }
 
 
